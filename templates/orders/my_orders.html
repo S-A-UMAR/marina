@@ -1,0 +1,216 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Orders | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<section style="background: var(--dark); padding: 56px 0 40px;">
+  <div class="container">
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 10px;">
+      <i class="fa-solid fa-box" style="font-size: 2rem; color: var(--primary);"></i>
+      <h1 style="font-size: 2.2rem; font-weight: 700; color: var(--white); margin: 0;">My Orders</h1>
+    </div>
+    <nav aria-label="breadcrumb">
+      <ol style="display: flex; gap: 8px; list-style: none; padding: 0; margin: 0;">
+        <li><a href="/" style="color: var(--dark-muted); text-decoration: none; font-size: 0.9rem;">Home</a></li>
+        <li style="color: var(--dark-muted); font-size: 0.9rem;">/</li>
+        <li><a href="{% url 'account' %}" style="color: var(--dark-muted); text-decoration: none; font-size: 0.9rem;">Account</a></li>
+        <li style="color: var(--dark-muted); font-size: 0.9rem;">/</li>
+        <li style="color: var(--primary); font-size: 0.9rem;">My Orders</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- Orders Content -->
+<section style="background: var(--light); padding: 56px 0; min-height: 60vh;">
+  <div class="container">
+
+    {% if orders %}
+
+      <!-- Orders count + header row -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin: 0 0 4px;">Order History</h2>
+          <p style="font-size: 0.9rem; color: var(--dark-muted); margin: 0;">{{ orders|length }} order{{ orders|length|pluralize }} found on your account.</p>
+        </div>
+        <a href="{% url 'shop' %}" style="display: inline-flex; align-items: center; gap: 8px; background: var(--primary); color: var(--white); text-decoration: none; padding: 11px 22px; border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem;">
+          <i class="fa-solid fa-cart-shopping"></i>Continue Shopping
+        </a>
+      </div>
+
+      <!-- Orders List -->
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+
+        {% for order in orders %}
+
+        <div style="background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); overflow: hidden;">
+
+          <!-- Card Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; border-bottom: 1px solid var(--border-color); background: var(--light); flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+              <!-- Order Number -->
+              <div>
+                <div style="font-size: 0.75rem; color: var(--dark-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px;">Order Number</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: var(--dark);">#{{ order.order_number }}</div>
+              </div>
+              <!-- Divider -->
+              <div style="width: 1px; height: 32px; background: var(--border-color);"></div>
+              <!-- Date -->
+              <div>
+                <div style="font-size: 0.75rem; color: var(--dark-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px;">Order Date</div>
+                <div style="font-size: 0.9rem; color: var(--dark); font-weight: 500;">{{ order.created_at|date:"M d, Y" }}</div>
+              </div>
+              <!-- Divider -->
+              <div style="width: 1px; height: 32px; background: var(--border-color);"></div>
+              <!-- Total -->
+              <div>
+                <div style="font-size: 0.75rem; color: var(--dark-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px;">Order Total</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: var(--dark);">{{ site_settings.currency_symbol }}{{ order.total_amount }}</div>
+              </div>
+            </div>
+
+            <!-- Status Badge -->
+            <div>
+              {% if order.status == 'pending' %}
+                <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255,152,0,0.12); color: #E65100; font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px;">
+                  <i class="fa-regular fa-clock"></i>Pending
+                </span>
+              {% elif order.status == 'processing' %}
+                <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(33,150,243,0.12); color: #1565C0; font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px;">
+                  <i class="fa-solid fa-gear"></i>Processing
+                </span>
+              {% elif order.status == 'shipped' %}
+                <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(103,58,183,0.12); color: #4527A0; font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px;">
+                  <i class="fa-solid fa-truck"></i>Shipped
+                </span>
+              {% elif order.status == 'delivered' %}
+                <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(76,175,80,0.12); color: #2E7D32; font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px;">
+                  <i class="fa-solid fa-circle-check"></i>Delivered
+                </span>
+              {% elif order.status == 'cancelled' %}
+                <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(244,67,54,0.12); color: #C62828; font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px;">
+                  <i class="fa-solid fa-circle-xmark"></i>Cancelled
+                </span>
+              {% else %}
+                <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(158,158,158,0.12); color: var(--dark-muted); font-size: 0.8rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px;">
+                  <i class="fa-regular fa-circle-dot"></i>{{ order.status|capfirst }}
+                </span>
+              {% endif %}
+            </div>
+
+          </div>
+
+          <!-- Card Body -->
+          <div style="padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+
+            <!-- Status Progress Indicator -->
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              {% if order.status != 'cancelled' %}
+                <div style="display: flex; align-items: center; gap: 0;">
+
+                  <!-- Step: Order Placed -->
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
+                      {% if order.status == 'pending' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}background: var(--primary); color: var(--white);{% else %}background: var(--border-color); color: var(--dark-muted);{% endif %}">
+                      <i class="fa-solid fa-check"></i>
+                    </div>
+                    <span style="font-size: 0.78rem; color: var(--dark-muted); font-weight: 500; white-space: nowrap;">Order Placed</span>
+                  </div>
+
+                  <div style="width: 32px; height: 2px; {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}background: var(--primary);{% else %}background: var(--border-color);{% endif %} margin: 0 4px;"></div>
+
+                  <!-- Step: Processing -->
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
+                      {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}background: var(--primary); color: var(--white);{% else %}background: var(--border-color); color: var(--dark-muted);{% endif %}">
+                      <i class="fa-solid fa-gear"></i>
+                    </div>
+                    <span style="font-size: 0.78rem; color: var(--dark-muted); font-weight: 500; white-space: nowrap;">Processing</span>
+                  </div>
+
+                  <div style="width: 32px; height: 2px; {% if order.status == 'shipped' or order.status == 'delivered' %}background: var(--primary);{% else %}background: var(--border-color);{% endif %} margin: 0 4px;"></div>
+
+                  <!-- Step: Shipped -->
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
+                      {% if order.status == 'shipped' or order.status == 'delivered' %}background: var(--primary); color: var(--white);{% else %}background: var(--border-color); color: var(--dark-muted);{% endif %}">
+                      <i class="fa-solid fa-truck"></i>
+                    </div>
+                    <span style="font-size: 0.78rem; color: var(--dark-muted); font-weight: 500; white-space: nowrap;">Shipped</span>
+                  </div>
+
+                  <div style="width: 32px; height: 2px; {% if order.status == 'delivered' %}background: var(--primary);{% else %}background: var(--border-color);{% endif %} margin: 0 4px;"></div>
+
+                  <!-- Step: Delivered -->
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
+                      {% if order.status == 'delivered' %}background: #4CAF50; color: var(--white);{% else %}background: var(--border-color); color: var(--dark-muted);{% endif %}">
+                      <i class="fa-solid fa-house"></i>
+                    </div>
+                    <span style="font-size: 0.78rem; color: var(--dark-muted); font-weight: 500; white-space: nowrap;">Delivered</span>
+                  </div>
+
+                </div>
+              {% else %}
+                <div style="display: flex; align-items: center; gap: 8px; color: #C62828; font-size: 0.88rem;">
+                  <i class="fa-solid fa-circle-xmark"></i>
+                  <span>This order was cancelled.</span>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- View Details Button / Link -->
+            <div>
+              {% if order.status == 'delivered' %}
+                <a href="{% url 'order_confirm' order.order_number %}"
+                  style="display: inline-flex; align-items: center; gap: 8px; background: var(--primary); color: var(--white); text-decoration: none; padding: 10px 20px; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 600;">
+                  <i class="fa-solid fa-eye"></i>View Details
+                </a>
+              {% else %}
+                <span style="display: inline-flex; align-items: center; gap: 8px; background: var(--light); color: var(--dark-muted); padding: 10px 20px; border-radius: var(--radius-md); font-size: 0.88rem; font-weight: 500; border: 1px solid var(--border-color); cursor: default;">
+                  <i class="fa-regular fa-clock"></i>In Progress
+                </span>
+              {% endif %}
+            </div>
+
+          </div>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+
+    {% else %}
+
+      <!-- Empty State -->
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center;">
+        <div style="width: 100px; height: 100px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+          <i class="fa-solid fa-box-open" style="font-size: 2.6rem; color: var(--border-color);"></i>
+        </div>
+        <h2 style="font-size: 1.6rem; font-weight: 700; color: var(--dark); margin: 0 0 12px;">No Orders Yet</h2>
+        <p style="font-size: 0.97rem; color: var(--dark-muted); line-height: 1.8; max-width: 420px; margin: 0 0 32px;">
+          You have not placed any orders with us yet. Browse our catalog and discover thousands of quality products waiting for you.
+        </p>
+        <a href="{% url 'shop' %}"
+          style="display: inline-flex; align-items: center; gap: 10px; background: var(--primary); color: var(--white); text-decoration: none; padding: 14px 32px; border-radius: var(--radius-md); font-weight: 700; font-size: 1rem;">
+          <i class="fa-solid fa-cart-shopping"></i>Start Shopping
+        </a>
+        <div style="margin-top: 20px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: center;">
+          <a href="{% url 'home' %}" style="font-size: 0.9rem; color: var(--dark-muted); text-decoration: none;">
+            <i class="fa-solid fa-house" style="margin-right: 6px;"></i>Go to Homepage
+          </a>
+          <a href="{% url 'contact' %}" style="font-size: 0.9rem; color: var(--dark-muted); text-decoration: none;">
+            <i class="fa-solid fa-headset" style="margin-right: 6px;"></i>Need Help?
+          </a>
+        </div>
+      </div>
+
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}

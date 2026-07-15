@@ -1,0 +1,179 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Welcome | {{ site_settings.business_name }}{% endblock %}
+
+{% block category_nav %}
+    {% for category in categories %}
+        <a href="{% url 'store:category_page' category.slug %}" class="category-link">{{ category.name }}</a>
+    {% endfor %}
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Banner -->
+    <section class="hero-section">
+        <!-- Background decorative blobs -->
+        <div class="hero-blob hero-blob-1"></div>
+        <div class="hero-blob hero-blob-2"></div>
+
+        <div class="hero-left">
+            <span class="hero-eyebrow">
+                <i class="fa-solid fa-bolt"></i> Flash Deals Updated Daily
+            </span>
+            <h1 class="hero-headline">
+                Shop Smarter.<br>
+                <span class="hero-headline-accent">Save Bigger.</span>
+            </h1>
+            <p class="hero-subtext">
+                Millions of products. Unbeatable prices. Lightning-fast delivery straight to your door.
+            </p>
+            <div class="hero-cta-group">
+                <a href="{% url 'store:search_results' %}" class="btn btn-primary btn-lg hero-btn-primary">
+                    <i class="fa-solid fa-bag-shopping"></i> Shop Now
+                </a>
+                <a href="{% url 'store:search_results' %}?sort=discount" class="btn hero-btn-deals">
+                    <i class="fa-solid fa-fire"></i> Hot Deals
+                </a>
+            </div>
+
+            <!-- Trust stats bar -->
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <strong>50K+</strong>
+                    <span>Products</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <strong>10K+</strong>
+                    <span>Happy Customers</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <strong>24h</strong>
+                    <span>Fast Delivery</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <!-- Floating product showcase cards -->
+            <div class="hero-showcase">
+                <div class="showcase-main-card">
+                    <i class="fa-solid fa-box-open"></i>
+                    <span>New Arrivals</span>
+                </div>
+                <div class="showcase-badge-card badge-deal">
+                    <i class="fa-solid fa-tag"></i>
+                    <strong>Up to 60% Off</strong>
+                </div>
+                <div class="showcase-badge-card badge-shipping">
+                    <i class="fa-solid fa-truck-fast"></i>
+                    <strong>Free Shipping</strong>
+                </div>
+                <div class="showcase-badge-card badge-secure">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <strong>Secure Checkout</strong>
+                </div>
+                <div class="hero-circle-ring"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Carousel/Grid -->
+    <div class="section-title">
+        <h2>Shop by Category</h2>
+    </div>
+    <div class="category-grid">
+        {% for cat in categories %}
+            <a href="{% url 'store:category_page' cat.slug %}" class="category-card">
+                {% if cat.image %}
+                    <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
+                {% else %}
+                    <div style="width:60px; height:60px; border-radius:50%; background:#FBE9E7; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-table-cells" style="color:var(--primary); font-size:24px;"></i>
+                    </div>
+                {% endif %}
+                <h3>{{ cat.name }}</h3>
+            </a>
+        {% empty %}
+            <p>No categories available.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Featured Products -->
+    {% if featured_products %}
+        <div class="section-title">
+            <h2>Featured Products</h2>
+            <a href="{% url 'store:search_results' %}">View All</a>
+        </div>
+        <div class="product-grid">
+            {% for prod in featured_products %}
+                <div class="product-card">
+                    {% if prod.discount_price %}
+                        <span class="discount-badge">-{{ prod.discount_percent }}%</span>
+                    {% endif %}
+                    <div class="product-image-container">
+                        {% if prod.image %}
+                            <img src="{{ prod.image.url }}" alt="{{ prod.name }}">
+                        {% else %}
+                            <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#F5F5F5;">
+                                <i class="fa-solid fa-image" style="font-size:48px; color:#CCC;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">
+                            <a href="{% url 'store:product_detail' prod.slug %}">{{ prod.name }}</a>
+                        </h3>
+                        <div class="product-price-row">
+                            {% if prod.discount_price %}
+                                <span class="current-price">{{ site_settings.currency_symbol }}{{ prod.discount_price }}</span>
+                                <span class="original-price">{{ site_settings.currency_symbol }}{{ prod.price }}</span>
+                            {% else %}
+                                <span class="current-price">{{ site_settings.currency_symbol }}{{ prod.price }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'store:product_detail' prod.slug %}" class="btn btn-secondary btn-sm" style="width:100%;">
+                            <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Big Discount Campaign -->
+    {% if discount_products %}
+        <div class="section-title">
+            <h2>Hot Discounts & Deals</h2>
+        </div>
+        <div class="product-grid">
+            {% for prod in discount_products %}
+                <div class="product-card">
+                    <span class="discount-badge">-{{ prod.discount_percent }}%</span>
+                    <div class="product-image-container">
+                        {% if prod.image %}
+                            <img src="{{ prod.image.url }}" alt="{{ prod.name }}">
+                        {% else %}
+                            <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#F5F5F5;">
+                                <i class="fa-solid fa-image" style="font-size:48px; color:#CCC;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">
+                            <a href="{% url 'store:product_detail' prod.slug %}">{{ prod.name }}</a>
+                        </h3>
+                        <div class="product-price-row">
+                            <span class="current-price">{{ site_settings.currency_symbol }}{{ prod.discount_price }}</span>
+                            <span class="original-price">{{ site_settings.currency_symbol }}{{ prod.price }}</span>
+                        </div>
+                        <a href="{% url 'store:product_detail' prod.slug %}" class="btn btn-secondary btn-sm" style="width:100%;">
+                            <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

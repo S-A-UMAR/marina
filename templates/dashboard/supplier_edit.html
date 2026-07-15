@@ -1,0 +1,37 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Edit Supplier | Admin{% endblock %}
+{% block page_title %}Edit Supplier: {{ supplier.name }}{% endblock %}
+
+{% block dashboard_content %}
+    <div class="dashboard-form-container">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_name">Supplier Name</label>
+                {{ form.name }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_contact_email">Contact Email</label>
+                {{ form.contact_email }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_phone">Phone Number</label>
+                {{ form.phone }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_address">Office Address</label>
+                {{ form.address }}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'store:dashboard_suppliers' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Supplier Details <i class="fa-solid fa-circle-check"></i></button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

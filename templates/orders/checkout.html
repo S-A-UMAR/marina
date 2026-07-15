@@ -1,0 +1,105 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Checkout | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+    <div style="margin:40px 0;">
+        <h2 style="font-size:24px; font-weight:700; margin-bottom:30px; border-bottom:1px solid var(--border-color); padding-bottom:15px;">
+            <i class="fa-solid fa-truck-fast"></i> Delivery & Shipping Details
+        </h2>
+
+        <div class="cart-layout">
+            <!-- Delivery Info Form -->
+            <div style="background:#FFF; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:30px;">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="id_full_name">Recipient Full Name</label>
+                        {{ form.full_name }}
+                    </div>
+
+                    <div class="checkout-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                        <div class="form-group">
+                            <label for="id_email">Email Address</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_phone">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_address">Delivery Address</label>
+                        {{ form.address }}
+                    </div>
+
+                    <div class="checkout-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                        <div class="form-group">
+                            <label for="id_city">City</label>
+                            {{ form.city }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_state">State / Region</label>
+                            {{ form.state }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_notes">Order Notes (Optional)</label>
+                        {{ form.notes }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:20px;">
+                        Place Order & Proceed to Pay <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Order Items review sidebar -->
+            <div>
+                <div class="summary-card">
+                    <h3 style="font-size:18px; font-weight:700; margin-bottom:20px; border-bottom:1px solid var(--border-color); padding-bottom:10px;">Review Order Items</h3>
+                    
+                    <div style="max-height: 250px; overflow-y:auto; margin-bottom:20px; display:flex; flex-direction:column; gap:15px; padding-right:5px;">
+                        {% for item in cart.items.all %}
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+                                <div style="display:flex; gap:10px; align-items:center; max-width:70%;">
+                                    {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:40px; height:40px; border-radius:var(--radius-sm);">
+                                    {% else %}
+                                        <div style="width:40px; height:40px; background:#F5F5F5; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center;">
+                                            <i class="fa-solid fa-image" style="color:#CCC; font-size:14px;"></i>
+                                        </div>
+                                    {% endif %}
+                                    <span style="font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ item.product.name }}</span>
+                                </div>
+                                <span style="color:var(--dark-muted)">{{ item.quantity }} x {{ site_settings.currency_symbol }}{{ item.product.effective_price }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="summary-row" style="border-top:1px solid var(--border-color); padding-top:15px;">
+                        <span>Subtotal</span>
+                        <span>{{ site_settings.currency_symbol }}{{ subtotal }}</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        {% if shipping == 0 %}
+                            <span style="color:#2E7D32;">Free Shipping</span>
+                        {% else %}
+                            <span>{{ site_settings.currency_symbol }}{{ shipping }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="summary-row total">
+                        <span>Order Total</span>
+                        <span>{{ site_settings.currency_symbol }}{{ total }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

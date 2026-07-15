@@ -1,0 +1,43 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Change User Role | Admin{% endblock %}
+{% block page_title %}Edit Role: {{ user_to_edit.username }}{% endblock %}
+
+{% block dashboard_content %}
+    <div class="dashboard-form-container">
+        <div style="background:#FFF3E0; border:1px solid #FFE082; padding:15px; border-radius:8px; display:flex; gap:10px; align-items:center; margin-bottom:25px; font-size:13px; color:#5D4037;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:20px; color:#F57F17;"></i>
+            <span>Warning: Promoting a user to Staff or Admin gives them full access to view, edit, delete, and restock products on the inventory control system.</span>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" class="form-control" value="{{ user_to_edit.first_name }}" readonly style="background:#F1F5F9; color:#64748B;">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" class="form-control" value="{{ user_to_edit.last_name }}" readonly style="background:#F1F5F9; color:#64748B;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" class="form-control" value="{{ user_to_edit.email }}" readonly style="background:#F1F5F9; color:#64748B;">
+            </div>
+
+            <div class="form-group">
+                <label for="id_role">Assign System Role</label>
+                {{ form.role }}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'store:dashboard_users' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Update User Role <i class="fa-solid fa-circle-check"></i></button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

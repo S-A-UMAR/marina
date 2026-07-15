@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Register | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+    <div class="auth-container" style="max-width: 500px;">
+        <div class="text-center" style="margin-bottom: 30px;">
+            <i class="fa-solid fa-user-plus" style="font-size: 48px; color: var(--primary);"></i>
+            <h2 style="margin-top:10px; font-weight:700;">Create Account</h2>
+            <p style="font-size:13px; color:var(--dark-muted); margin-top:5px;">Join us and get the best global deals</p>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <span style="color:#C62828; font-size:12px; margin-top:5px; display:block;">{{ field.errors.0 }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px;">
+                Create Account <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+        </form>
+        
+        <div class="text-center" style="margin-top: 25px; font-size: 13px; border-top:1px solid var(--border-color); padding-top:20px;">
+            <span style="color:var(--dark-muted)">Already have an account?</span>
+            <a href="{% url 'store:login' %}" style="color:var(--primary); font-weight:600; margin-left:5px;">Log In</a>
+        </div>
+    </div>
+{% endblock %}

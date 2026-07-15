@@ -1,0 +1,198 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Frequently Asked Questions | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<section style="background: var(--dark); padding: 56px 0 40px;">
+  <div class="container">
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 10px;">
+      <i class="fa-solid fa-circle-question" style="font-size: 2rem; color: var(--primary);"></i>
+      <h1 style="font-size: 2.2rem; font-weight: 700; color: var(--white); margin: 0;">Frequently Asked Questions</h1>
+    </div>
+    <nav aria-label="breadcrumb">
+      <ol style="display: flex; gap: 8px; list-style: none; padding: 0; margin: 0;">
+        <li><a href="/" style="color: var(--dark-muted); text-decoration: none; font-size: 0.9rem;">Home</a></li>
+        <li style="color: var(--dark-muted); font-size: 0.9rem;">/</li>
+        <li style="color: var(--primary); font-size: 0.9rem;">FAQ</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- FAQ Content -->
+<section style="background: var(--light); padding: 64px 0;">
+  <div class="container" style="max-width: 820px;">
+
+    <!-- Intro -->
+    <div style="background: var(--white); border-radius: var(--radius-md); padding: 36px; border: 1px solid var(--border-color); margin-bottom: 44px; text-align: center;">
+      <p style="font-size: 1.05rem; color: var(--dark-muted); line-height: 1.8; margin: 0;">
+        Find answers to the most common questions about shopping on {{ site_settings.business_name }}. If you cannot find what you are looking for, please do not hesitate to <a href="{% url 'contact' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">contact our support team</a>.
+      </p>
+    </div>
+
+    <!-- ===== ORDERS ===== -->
+    <div style="margin-bottom: 40px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <span style="width: 38px; height: 38px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fa-solid fa-bag-shopping" style="color: var(--white); font-size: 0.95rem;"></i>
+        </span>
+        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin: 0;">Orders</h2>
+      </div>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          How do I place an order?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem; transition: transform 0.2s;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); margin-top: 0; padding-top: 18px;">
+          Placing an order is simple. Browse our catalog, select your desired product, choose your size or variant if applicable, and click <strong>Add to Cart</strong>. When you are ready, proceed to checkout, enter your delivery address and payment details, then confirm your order. You will receive an email confirmation immediately after.
+        </div>
+      </details>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          Can I modify or cancel my order after placing it?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          You may cancel or modify your order within <strong>1 hour</strong> of placing it, provided it has not yet been processed. To request a change, contact our support team immediately via the Contact page or call our helpline. Once an order is in the processing or shipping stage, it cannot be modified.
+        </div>
+      </details>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          How do I track my order status?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          Log in to your account and navigate to <strong>My Orders</strong>. Each order displays a real-time status — Pending, Processing, Shipped, or Delivered. Once your order is shipped, you will receive an email with a tracking number and a link to monitor delivery progress.
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== DELIVERY ===== -->
+    <div style="margin-bottom: 40px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <span style="width: 38px; height: 38px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fa-solid fa-truck-fast" style="color: var(--white); font-size: 0.95rem;"></i>
+        </span>
+        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin: 0;">Delivery</h2>
+      </div>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          How long does delivery take?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          Delivery times vary by location and the shipping option selected at checkout. Standard delivery typically takes <strong>3 - 5 business days</strong>. Express delivery is available in select areas and arrives within <strong>1 - 2 business days</strong>. Same-day delivery is offered within Lagos for orders placed before 12:00pm.
+        </div>
+      </details>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          Is free shipping available?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          Yes. We offer <strong>free standard shipping</strong> on all orders above a minimum threshold. The qualifying amount is displayed on the cart page and may vary by promotional period. Keep an eye on our homepage for current free-shipping promotions.
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== RETURNS & REFUNDS ===== -->
+    <div style="margin-bottom: 40px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <span style="width: 38px; height: 38px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fa-solid fa-rotate-left" style="color: var(--white); font-size: 0.95rem;"></i>
+        </span>
+        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin: 0;">Returns &amp; Refunds</h2>
+      </div>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          What is your return policy?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          We offer a <strong>7-day return window</strong> from the date of delivery. Items must be unused, in their original packaging, and accompanied by proof of purchase. Perishables, personal hygiene products, and digital downloads are not eligible for returns. Please review our full <a href="{% url 'shipping_returns' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">Shipping &amp; Returns</a> page for complete details.
+        </div>
+      </details>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          How long does a refund take to process?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          Once we receive and inspect the returned item, refunds are processed within <strong>3 - 5 business days</strong>. The refund will be credited to your original payment method. Bank transfer refunds may take an additional 2 - 3 business days depending on your bank.
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== PAYMENTS ===== -->
+    <div style="margin-bottom: 40px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <span style="width: 38px; height: 38px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fa-solid fa-credit-card" style="color: var(--white); font-size: 0.95rem;"></i>
+        </span>
+        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin: 0;">Payments</h2>
+      </div>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          What payment methods do you accept?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          We accept a variety of payment methods including debit and credit cards (Visa, Mastercard), bank transfers, and secure online payment gateways such as Paystack and Flutterwave. All payments are processed over an encrypted, SSL-secured connection to protect your financial information.
+        </div>
+      </details>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          Is it safe to save my card details on your platform?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          Yes. {{ site_settings.business_name }} does not store your raw card details on our servers. Payment tokenisation is handled by our certified payment partners, who are fully compliant with PCI-DSS standards. Your card information is encrypted and stored securely through our payment gateway provider.
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== ACCOUNT ===== -->
+    <div style="margin-bottom: 40px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <span style="width: 38px; height: 38px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fa-solid fa-user" style="color: var(--white); font-size: 0.95rem;"></i>
+        </span>
+        <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--dark); margin: 0;">Account</h2>
+      </div>
+
+      <details style="background: var(--white); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0; margin-bottom: 12px; overflow: hidden;">
+        <summary style="cursor: pointer; list-style: none; padding: 20px 24px; font-size: 0.97rem; font-weight: 600; color: var(--dark); display: flex; align-items: center; justify-content: space-between; user-select: none;">
+          How do I reset my password?
+          <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
+        </summary>
+        <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
+          On the login page, click <strong>Forgot Password?</strong> and enter the email address associated with your account. You will receive a password reset link via email within a few minutes. Follow the link to set a new password. If you do not receive the email, check your spam folder or contact our support team.
+        </div>
+      </details>
+    </div>
+
+    <!-- Still have questions -->
+    <div style="background: var(--primary); border-radius: var(--radius-md); padding: 40px; text-align: center;">
+      <i class="fa-solid fa-headset" style="font-size: 2rem; color: var(--white); margin-bottom: 14px; display: block;"></i>
+      <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--white); margin: 0 0 10px;">Still have a question?</h3>
+      <p style="font-size: 0.95rem; color: rgba(255,255,255,0.85); margin: 0 0 22px;">Our support team is happy to help you with anything you need.</p>
+      <a href="{% url 'contact' %}" style="display: inline-block; background: var(--white); color: var(--primary); text-decoration: none; padding: 12px 28px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.95rem;">
+        <i class="fa-solid fa-envelope" style="margin-right: 8px;"></i>Contact Support
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}{{ title }} | Admin{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block dashboard_content %}
+    <div class="dashboard-form-container">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_name">Product Name</label>
+                {{ form.name }}
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <label for="id_category">Category</label>
+                    {{ form.category }}
+                </div>
+                <div class="form-group">
+                    <label for="id_supplier">Supplier (Optional)</label>
+                    {{ form.supplier }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_description">Product Description</label>
+                {{ form.description }}
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <label for="id_price">Original Price ({{ site_settings.currency_symbol }})</label>
+                    {{ form.price }}
+                </div>
+                <div class="form-group">
+                    <label for="id_discount_price">Discounted Price (Optional)</label>
+                    {{ form.discount_price }}
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <label for="id_current_stock">Initial Stock Quantity</label>
+                    {{ form.current_stock }}
+                </div>
+                <div class="form-group">
+                    <label for="id_reorder_level">Reorder Threshold Level</label>
+                    {{ form.reorder_level }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_image">Product Image File (Cloudinary CDN)</label>
+                {{ form.image }}
+            </div>
+
+            <div style="display:flex; gap:30px; margin-top:15px; margin-bottom:15px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    {{ form.is_featured }}
+                    <label for="id_is_featured" style="font-weight:600; font-size:14px; margin:0;">Is Featured Product</label>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    {{ form.is_active }}
+                    <label for="id_is_active" style="font-weight:600; font-size:14px; margin:0;">Is Active Product</label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'store:dashboard_products' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Product Details <i class="fa-solid fa-circle-check"></i></button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Site Settings | Admin{% endblock %}
+{% block page_title %}Store & Site Settings{% endblock %}
+
+{% block dashboard_content %}
+    <div class="dashboard-form-container">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_business_name">Business/Store Name</label>
+                {{ form.business_name }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_tagline">Business Tagline / Subtitle</label>
+                {{ form.tagline }}
+            </div>
+
+            <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <label for="id_email">Support Email Address</label>
+                    {{ form.email }}
+                </div>
+                <div class="form-group">
+                    <label for="id_phone">Support Phone Number</label>
+                    {{ form.phone }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_address">Physical Office Address</label>
+                {{ form.address }}
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <label for="id_currency_symbol">Currency Symbol</label>
+                    {{ form.currency_symbol }}
+                </div>
+                <div class="form-group">
+                    <label for="id_shipping_fee">Flat Shipping Fee</label>
+                    {{ form.shipping_fee }}
+                </div>
+                <div class="form-group">
+                    <label for="id_free_shipping_threshold">Free Shipping Threshold</label>
+                    {{ form.free_shipping_threshold }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_logo">Upload Store Logo (Cloudinary CDN)</label>
+                {{ form.logo }}
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
+                <div class="form-group">
+                    <label for="id_facebook_url">Facebook URL</label>
+                    {{ form.facebook_url }}
+                </div>
+                <div class="form-group">
+                    <label for="id_instagram_url">Instagram URL</label>
+                    {{ form.instagram_url }}
+                </div>
+                <div class="form-group">
+                    <label for="id_twitter_url">Twitter URL</label>
+                    {{ form.twitter_url }}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">
+                    Save Settings Configuration <i class="fa-solid fa-floppy-disk"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

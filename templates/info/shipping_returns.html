@@ -1,0 +1,121 @@
+{% extends 'base/base.html' %}
+{% block title %}Shipping & Returns | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+<div style="margin:40px 0; max-width:900px;">
+
+    <h2 style="font-size:26px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:12px;">
+        <i class="fa-solid fa-truck" style="color:var(--primary);"></i> Shipping &amp; Returns
+    </h2>
+    <p style="color:var(--dark-muted); margin-bottom:36px;">Everything you need to know about delivery and our return policy.</p>
+
+    <!-- Shipping Section -->
+    <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:32px; margin-bottom:28px;">
+        <h3 style="font-size:18px; font-weight:700; margin-bottom:20px; color:var(--dark); border-bottom:2px solid var(--primary); padding-bottom:10px; display:inline-block;">
+            <i class="fa-solid fa-truck-fast" style="color:var(--primary);"></i> Delivery Options
+        </h3>
+
+        <table class="cart-table" style="margin-bottom:20px;">
+            <thead>
+                <tr>
+                    <th>Delivery Type</th>
+                    <th>Estimated Time</th>
+                    <th>Cost</th>
+                    <th>Coverage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Standard Delivery</strong></td>
+                    <td>3 – 5 Business Days</td>
+                    <td>{{ site_settings.currency_symbol }}{{ site_settings.shipping_fee }}</td>
+                    <td>Nationwide</td>
+                </tr>
+                <tr>
+                    <td><strong>Express Delivery</strong></td>
+                    <td>1 – 2 Business Days</td>
+                    <td>{{ site_settings.currency_symbol }}3,500</td>
+                    <td>Major Cities</td>
+                </tr>
+                <tr>
+                    <td><strong>Same-Day Delivery</strong></td>
+                    <td>Within 8 Hours</td>
+                    <td>{{ site_settings.currency_symbol }}5,000</td>
+                    <td>Lagos Only</td>
+                </tr>
+                <tr>
+                    <td><strong>Free Shipping</strong></td>
+                    <td>3 – 5 Business Days</td>
+                    <td style="color:#2E7D32; font-weight:700;">Free</td>
+                    <td>Orders above {{ site_settings.currency_symbol }}{{ site_settings.free_shipping_threshold }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="background:#E8F5E9; border:1px solid #C8E6C9; border-radius:var(--radius-sm); padding:14px 18px; font-size:13px; color:#2E7D32;">
+            <i class="fa-solid fa-circle-check"></i> <strong>Free Shipping</strong> on all orders above {{ site_settings.currency_symbol }}{{ site_settings.free_shipping_threshold }}. No coupon needed — applied automatically at checkout.
+        </div>
+    </div>
+
+    <!-- Returns Section -->
+    <div style="background:var(--white); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:32px; margin-bottom:28px;">
+        <h3 style="font-size:18px; font-weight:700; margin-bottom:20px; color:var(--dark); border-bottom:2px solid var(--primary); padding-bottom:10px; display:inline-block;">
+            <i class="fa-solid fa-rotate-left" style="color:var(--primary);"></i> Return Policy
+        </h3>
+
+        <p style="color:var(--dark-muted); margin-bottom:24px; line-height:1.8;">
+            We offer a <strong>7-day return window</strong> from the date of delivery. If you are not satisfied with your purchase, you may return eligible items for a refund or exchange, subject to the conditions below.
+        </p>
+
+        <!-- Steps -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:28px;">
+            <div style="text-align:center; padding:24px 16px;">
+                <div style="width:52px; height:52px; border-radius:50%; background:var(--primary); color:#FFF; font-size:22px; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">1</div>
+                <h4 style="font-size:14px; font-weight:700; margin-bottom:8px;">Initiate Return</h4>
+                <p style="font-size:13px; color:var(--dark-muted);">Contact us via email or phone within 7 days of receiving your order.</p>
+            </div>
+            <div style="text-align:center; padding:24px 16px;">
+                <div style="width:52px; height:52px; border-radius:50%; background:var(--primary); color:#FFF; font-size:22px; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">2</div>
+                <h4 style="font-size:14px; font-weight:700; margin-bottom:8px;">Package Item</h4>
+                <p style="font-size:13px; color:var(--dark-muted);">Repack the item in its original packaging with all accessories included.</p>
+            </div>
+            <div style="text-align:center; padding:24px 16px;">
+                <div style="width:52px; height:52px; border-radius:50%; background:var(--primary); color:#FFF; font-size:22px; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;">3</div>
+                <h4 style="font-size:14px; font-weight:700; margin-bottom:8px;">Receive Refund</h4>
+                <p style="font-size:13px; color:var(--dark-muted);">Once received and inspected, your refund is processed within 3–5 business days.</p>
+            </div>
+        </div>
+
+        <h4 style="font-size:15px; font-weight:700; margin-bottom:12px;">Return Conditions</h4>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:10px;">
+            <li style="display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--dark-muted);">
+                <i class="fa-solid fa-circle-check" style="color:#2E7D32; margin-top:3px; flex-shrink:0;"></i> Item must be unused, unworn, and in original condition.
+            </li>
+            <li style="display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--dark-muted);">
+                <i class="fa-solid fa-circle-check" style="color:#2E7D32; margin-top:3px; flex-shrink:0;"></i> All original tags, packaging, and accessories must be intact.
+            </li>
+            <li style="display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--dark-muted);">
+                <i class="fa-solid fa-circle-check" style="color:#2E7D32; margin-top:3px; flex-shrink:0;"></i> Return must be initiated within 7 days of delivery.
+            </li>
+            <li style="display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--dark-muted);">
+                <i class="fa-solid fa-circle-xmark" style="color:#C62828; margin-top:3px; flex-shrink:0;"></i> Perishable goods, digital products, and items on final sale are not eligible.
+            </li>
+            <li style="display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--dark-muted);">
+                <i class="fa-solid fa-circle-xmark" style="color:#C62828; margin-top:3px; flex-shrink:0;"></i> Items that are damaged due to customer misuse will not be refunded.
+            </li>
+        </ul>
+    </div>
+
+    <!-- Contact prompt -->
+    <div style="background:linear-gradient(135deg, #1a1a2e, #0f3460); border-radius:var(--radius-md); padding:28px 32px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+        <div>
+            <h4 style="color:#FFF; font-size:17px; font-weight:700; margin-bottom:6px;">Need Help with a Return?</h4>
+            <p style="color:rgba(255,255,255,0.65); font-size:14px;">Our customer care team is available Monday to Saturday, 9am – 6pm.</p>
+        </div>
+        <a href="{% url 'store:contact' %}" class="btn btn-primary">
+            <i class="fa-solid fa-headset"></i> Contact Support
+        </a>
+    </div>
+
+</div>
+{% endblock %}

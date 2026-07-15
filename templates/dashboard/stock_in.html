@@ -1,0 +1,39 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Stock In | Admin{% endblock %}
+{% block page_title %}Record Stock Entry (Stock In){% endblock %}
+
+{% block dashboard_content %}
+    <div class="dashboard-form-container">
+        <div style="background:#FFF3E0; border:1px solid #FFE082; padding:15px; border-radius:8px; display:flex; gap:10px; align-items:center; margin-bottom:25px; font-size:13px; color:#5D4037;">
+            <i class="fa-solid fa-square-plus" style="font-size:20px; color:#F57F17;"></i>
+            <span>Use this form to add inventory items received from suppliers to the warehouse stock database.</span>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_product">Select Product</label>
+                {{ form.product }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_quantity">Quantity Received</label>
+                {{ form.quantity }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_notes">Stock In Notes / Reference</label>
+                {{ form.notes }}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'store:dashboard_stock_history' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="background-color:#10B981;">
+                    Confirm Stock In <i class="fa-solid fa-circle-check"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

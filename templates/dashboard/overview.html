@@ -1,0 +1,168 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Overview | Admin Dashboard{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block dashboard_content %}
+    <!-- KPI summary cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-details">
+                <h3>Total Products</h3>
+                <div class="value">{{ total_products }}</div>
+            </div>
+            <div class="kpi-icon blue">
+                <i class="fa-solid fa-box"></i>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-details">
+                <h3>Low Stock Items</h3>
+                <div class="value">{{ low_stock_count }}</div>
+            </div>
+            <div class="kpi-icon orange">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-details">
+                <h3>Out of Stock</h3>
+                <div class="value">{{ out_of_stock_count }}</div>
+            </div>
+            <div class="kpi-icon red">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-details">
+                <h3>Total Paid Revenue</h3>
+                <div class="value">{{ site_settings.currency_symbol }}{{ total_sales }}</div>
+            </div>
+            <div class="kpi-icon green">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart and recent activities -->
+    <div class="dashboard-grid">
+        <!-- Sales charts card -->
+        <div class="panel-card">
+            <div class="panel-title">
+                <span>Sales Revenue Trend (Last 7 Days)</span>
+                <i class="fa-solid fa-chart-line" style="color:var(--accent);"></i>
+            </div>
+            <div style="height: 300px; position: relative;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent stock adjustments card -->
+        <div class="panel-card">
+            <div class="panel-title">
+                <span>Recent Stock Movements</span>
+                <a href="{% url 'store:dashboard_stock_history' %}" style="font-size:12px; color:var(--accent); font-weight:600;">View All</a>
+            </div>
+            <div class="movement-list">
+                {% for move in recent_movements %}
+                    <div class="movement-item">
+                        <div class="movement-meta">
+                            <h4>{{ move.product.name }}</h4>
+                            <p>{{ move.date|date:"M d, Y - H:i" }} | By: {{ move.performed_by.username|default:"System" }}</p>
+                        </div>
+                        <div class="movement-qty {% if move.quantity_change > 0 %}in{% else %}out{% endif %}">
+                            {% if move.quantity_change > 0 %}+{{ move.quantity_change }}{% else %}{{ move.quantity_change }}{% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p style="color:var(--dark-muted); font-size:13px; text-align:center; padding:20px 0;">No stock movements recorded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders table panel -->
+    <div class="panel-card">
+        <div class="panel-title">
+            <span>Recent Orders</span>
+        </div>
+        <div class="table-responsive">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Email</th>
+                        <th>Total Paid</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                        <tr>
+                            <td><strong>{{ order.order_number }}</strong></td>
+                            <td>{{ order.full_name }}</td>
+                            <td>{{ order.email }}</td>
+                            <td>{{ site_settings.currency_symbol }}{{ order.total_amount }}</td>
+                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="status-badge {% if order.status == 'paid' or order.status == 'delivered' %}success{% elif order.status == 'pending' %}warning{% else %}info{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:20px 0;">No orders received yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ chart_labels|safe }},
+                    datasets: [{
+                        label: 'Daily Paid Sales',
+                        data: {{ chart_sales|safe }},
+                        borderColor: '#4361EE',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#E2E8F0' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

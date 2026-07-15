@@ -1,0 +1,45 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Stock Out | Admin{% endblock %}
+{% block page_title %}Record Stock Dispatch (Stock Out){% endblock %}
+
+{% block dashboard_content %}
+    <div class="dashboard-form-container">
+        <div style="background:#FEE2E2; border:1px solid #FCA5A5; padding:15px; border-radius:8px; display:flex; gap:10px; align-items:center; margin-bottom:25px; font-size:13px; color:#991B1B;">
+            <i class="fa-solid fa-square-minus" style="font-size:20px; color:#EF4444;"></i>
+            <span>Use this form to record stock dispatches, damages, or manual inventory write-offs. Checked out amounts must exist in stock.</span>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div style="background:#FEE2E2; color:#B91C1C; padding:12px; border-radius:6px; margin-bottom:20px; font-size:13px; font-weight:600;">
+                    {{ form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="id_product">Select Product</label>
+                {{ form.product }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_quantity">Quantity Dispatched</label>
+                {{ form.quantity }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_notes">Reason for Dispatch / Notes</label>
+                {{ form.notes }}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'store:dashboard_stock_history' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="background-color:#EF4444;">
+                    Confirm Stock Out <i class="fa-solid fa-circle-check"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

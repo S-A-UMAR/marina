@@ -1,0 +1,88 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Inventory Reports | Admin{% endblock %}
+{% block page_title %}Stock & Inventory Reports{% endblock %}
+
+{% block dashboard_content %}
+    <div style="margin-bottom:30px; display:flex; justify-content:space-between; align-items:center;">
+        <p style="font-size:14px; color:var(--dark-muted);">Export real-time logs or audit stock depletion thresholds across all catalog items.</p>
+        <a href="?csv=true" class="btn btn-primary" style="background:#1E293B;"><i class="fa-solid fa-file-csv"></i> Download CSV Export</a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+        
+        <!-- Low stock panel -->
+        <div class="panel-card">
+            <div class="panel-title">
+                <span style="color:#D97706;"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock Threshold List</span>
+                <span class="status-badge warning">{{ low_stock_products.count }} items</span>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Product Info</th>
+                            <th>Stock</th>
+                            <th>Threshold</th>
+                            <th>Reorder</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prod in low_stock_products %}
+                            <tr>
+                                <td><strong>{{ prod.name }}</strong></td>
+                                <td><span style="color:#B45309; font-weight:700;">{{ prod.current_stock }}</span></td>
+                                <td>{{ prod.reorder_level }}</td>
+                                <td>
+                                    <a href="{% url 'store:dashboard_stock_in' %}?product={{ prod.id }}" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:11px;">Restock</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align:center; padding:15px 0; color:#64748B;">All product stocks are within normal ranges.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Out of stock panel -->
+        <div class="panel-card">
+            <div class="panel-title">
+                <span style="color:#DC2626;"><i class="fa-solid fa-circle-exclamation"></i> Out of Stock List</span>
+                <span class="status-badge danger">{{ out_of_stock_products.count }} items</span>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Product Info</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Restock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prod in out_of_stock_products %}
+                            <tr>
+                                <td><strong>{{ prod.name }}</strong></td>
+                                <td>{{ prod.category.name|default:"N/A" }}</td>
+                                <td>{{ site_settings.currency_symbol }}{{ prod.price }}</td>
+                                <td>
+                                    <a href="{% url 'store:dashboard_stock_in' %}?product={{ prod.id }}" class="btn btn-secondary btn-sm" style="padding:4px 8px; font-size:11px; background:#EFF6FF; color:#1D4ED8;">Restock</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align:center; padding:15px 0; color:#64748B;">No products are out of stock. Good job!</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

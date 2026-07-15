@@ -1,0 +1,90 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Search Results for "{{ query }}" | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+    <div class="section-title">
+        <div>
+            <h2>Search Results</h2>
+            <p style="font-size:14px; color:var(--dark-muted); margin-top:5px;">
+                {% if query %}Found results for "{{ query }}"{% else %}All products in store{% endif %}
+            </p>
+        </div>
+        
+        <!-- Sorting options -->
+        <form method="GET" style="display:flex; gap:10px; align-items:center;">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            <label for="sort" style="font-size:14px; font-weight:600;">Sort By:</label>
+            <select name="sort" id="sort" class="form-control" style="padding:6px 12px; font-size:13px;" onchange="this.form.submit()">
+                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+                <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- Products list -->
+    {% if products %}
+        <div class="product-grid">
+            {% for prod in products %}
+                <div class="product-card">
+                    {% if prod.discount_price %}
+                        <span class="discount-badge">-{{ prod.discount_percent }}%</span>
+                    {% endif %}
+                    <div class="product-image-container">
+                        {% if prod.image %}
+                            <img src="{{ prod.image.url }}" alt="{{ prod.name }}">
+                        {% else %}
+                            <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#F5F5F5;">
+                                <i class="fa-solid fa-image" style="font-size:48px; color:#CCC;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">
+                            <a href="{% url 'store:product_detail' prod.slug %}">{{ prod.name }}</a>
+                        </h3>
+                        <div class="product-price-row">
+                            {% if prod.discount_price %}
+                                <span class="current-price">{{ site_settings.currency_symbol }}{{ prod.discount_price }}</span>
+                                <span class="original-price">{{ site_settings.currency_symbol }}{{ prod.price }}</span>
+                            {% else %}
+                                <span class="current-price">{{ site_settings.currency_symbol }}{{ prod.price }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'store:product_detail' prod.slug %}" class="btn btn-secondary btn-sm" style="width:100%;">
+                            <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if products.has_other_pages %}
+            <div class="pagination">
+                {% if products.has_previous %}
+                    <a href="?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"><i class="fa-solid fa-chevron-left"></i></a>
+                {% endif %}
+                {% for i in products.paginator.page_range %}
+                    {% if products.number == i %}
+                        <span class="active">{{ i }}</span>
+                    {% else %}
+                        <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if products.has_next %}
+                    <a href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"><i class="fa-solid fa-chevron-right"></i></a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    {% else %}
+        <div class="text-center" style="padding:80px 20px;">
+            <i class="fa-solid fa-magnifying-glass" style="font-size:72px; color:#CCC; margin-bottom:20px;"></i>
+            <h3>No results matched your search.</h3>
+            <p style="color:var(--dark-muted); margin-top:10px;">Try checking for spelling mistakes or browse general categories.</p>
+            <a href="{% url 'store:home' %}" class="btn btn-primary" style="margin-top:20px;">Back to Home</a>
+        </div>
+    {% endif %}
+{% endblock %}

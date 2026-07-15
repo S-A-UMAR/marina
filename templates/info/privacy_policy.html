@@ -1,0 +1,215 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Privacy Policy | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<section style="background: var(--dark); padding: 56px 0 40px;">
+  <div class="container">
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 10px;">
+      <i class="fa-solid fa-shield-halved" style="font-size: 2rem; color: var(--primary);"></i>
+      <h1 style="font-size: 2.2rem; font-weight: 700; color: var(--white); margin: 0;">Privacy Policy</h1>
+    </div>
+    <nav aria-label="breadcrumb">
+      <ol style="display: flex; gap: 8px; list-style: none; padding: 0; margin: 0;">
+        <li><a href="/" style="color: var(--dark-muted); text-decoration: none; font-size: 0.9rem;">Home</a></li>
+        <li style="color: var(--dark-muted); font-size: 0.9rem;">/</li>
+        <li style="color: var(--primary); font-size: 0.9rem;">Privacy Policy</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- Policy Content -->
+<section style="background: var(--light); padding: 64px 0;">
+  <div class="container" style="max-width: 860px;">
+
+    <!-- Last updated + intro banner -->
+    <div style="background: var(--white); border-radius: var(--radius-md); padding: 28px 36px; border: 1px solid var(--border-color); margin-bottom: 36px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <div style="font-size: 0.8rem; color: var(--dark-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 4px;">Last Updated</div>
+        <div style="font-size: 1rem; font-weight: 700; color: var(--dark);">July 1, 2025</div>
+      </div>
+      <div style="font-size: 0.88rem; color: var(--dark-muted); max-width: 480px; line-height: 1.7;">
+        This policy explains how {{ site_settings.business_name }} collects, uses, and protects your personal information when you use our website and services.
+      </div>
+    </div>
+
+    <!-- Policy Sections -->
+    <div style="background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden;">
+
+      {% for section in "" %}{% endfor %}
+
+      <!-- 1. Introduction -->
+      <div style="padding: 36px 44px; border-bottom: 1px solid var(--border-color);">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(255,87,34,0.1); border-radius: 50%; font-size: 0.8rem; color: var(--primary); font-weight: 700; flex-shrink: 0;">1</span>
+          Introduction
+        </h2>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 12px;">
+          Welcome to {{ site_settings.business_name }}. We are committed to protecting the privacy and security of your personal information. This Privacy Policy describes how we collect, use, disclose, and safeguard the data you provide when you visit our website, create an account, or make a purchase.
+        </p>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0;">
+          By accessing or using our services, you agree to the terms of this Privacy Policy. If you do not agree with any part of this policy, please discontinue use of our platform. We reserve the right to update this policy periodically; continued use of our services after changes constitutes your acceptance of the revised policy.
+        </p>
+      </div>
+
+      <!-- 2. Information We Collect -->
+      <div style="padding: 36px 44px; border-bottom: 1px solid var(--border-color); background: var(--light);">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(255,87,34,0.1); border-radius: 50%; font-size: 0.8rem; color: var(--primary); font-weight: 700; flex-shrink: 0;">2</span>
+          Information We Collect
+        </h2>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 14px;">We collect information in the following ways:</p>
+        <ul style="padding-left: 0; list-style: none; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-dot" style="color: var(--primary); margin-top: 4px; flex-shrink: 0;"></i>
+            <span><strong style="color: var(--dark);">Personal Identification:</strong> Name, email address, phone number, and delivery address collected during account registration and checkout.</span>
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-dot" style="color: var(--primary); margin-top: 4px; flex-shrink: 0;"></i>
+            <span><strong style="color: var(--dark);">Payment Information:</strong> Payment details processed securely through certified third-party gateways. We do not store raw card numbers on our servers.</span>
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-dot" style="color: var(--primary); margin-top: 4px; flex-shrink: 0;"></i>
+            <span><strong style="color: var(--dark);">Usage Data:</strong> Pages visited, products viewed, time spent on site, browser type, device information, and IP address collected automatically when you browse our platform.</span>
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-dot" style="color: var(--primary); margin-top: 4px; flex-shrink: 0;"></i>
+            <span><strong style="color: var(--dark);">Communications:</strong> Messages you send us via contact forms, customer support, or email correspondence.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 3. How We Use Your Information -->
+      <div style="padding: 36px 44px; border-bottom: 1px solid var(--border-color);">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(255,87,34,0.1); border-radius: 50%; font-size: 0.8rem; color: var(--primary); font-weight: 700; flex-shrink: 0;">3</span>
+          How We Use Your Information
+        </h2>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 14px;">Your information is used for the following purposes:</p>
+        <ul style="padding-left: 0; list-style: none; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-check" style="color: #4CAF50; margin-top: 4px; flex-shrink: 0;"></i>Processing and fulfilling your orders, including delivery and customer service
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-check" style="color: #4CAF50; margin-top: 4px; flex-shrink: 0;"></i>Sending order confirmations, shipping updates, and account notifications
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-check" style="color: #4CAF50; margin-top: 4px; flex-shrink: 0;"></i>Personalising your shopping experience and recommending relevant products
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-check" style="color: #4CAF50; margin-top: 4px; flex-shrink: 0;"></i>Improving our website, product catalog, and overall service quality
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-check" style="color: #4CAF50; margin-top: 4px; flex-shrink: 0;"></i>Detecting, preventing, and responding to fraud, abuse, or security threats
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-check" style="color: #4CAF50; margin-top: 4px; flex-shrink: 0;"></i>Sending promotional communications where you have opted in (you may unsubscribe at any time)
+          </li>
+        </ul>
+      </div>
+
+      <!-- 4. Information Sharing -->
+      <div style="padding: 36px 44px; border-bottom: 1px solid var(--border-color); background: var(--light);">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(255,87,34,0.1); border-radius: 50%; font-size: 0.8rem; color: var(--primary); font-weight: 700; flex-shrink: 0;">4</span>
+          Information Sharing
+        </h2>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 12px;">
+          We do not sell, rent, or trade your personal information to third parties. We may share your information only in the following limited circumstances:
+        </p>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 10px;">
+          <strong style="color: var(--dark);">Service Providers:</strong> Trusted logistics partners, payment processors, and technology vendors who assist in running our platform. These parties are bound by confidentiality agreements.
+        </p>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0;">
+          <strong style="color: var(--dark);">Legal Compliance:</strong> When required by applicable law, court order, or governmental authority to protect the rights, safety, or property of {{ site_settings.business_name }} or others.
+        </p>
+      </div>
+
+      <!-- 5. Cookies -->
+      <div style="padding: 36px 44px; border-bottom: 1px solid var(--border-color);">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(255,87,34,0.1); border-radius: 50%; font-size: 0.8rem; color: var(--primary); font-weight: 700; flex-shrink: 0;">5</span>
+          Cookies
+        </h2>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 12px;">
+          Our website uses cookies — small text files stored on your device — to enhance your browsing experience. Cookies help us remember your preferences, keep you logged in, and understand how you navigate our site.
+        </p>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0;">
+          You can configure your browser to refuse cookies or alert you when cookies are being sent. Please note that disabling certain cookies may affect the functionality of some parts of our website, such as the shopping cart and saved preferences.
+        </p>
+      </div>
+
+      <!-- 6. Data Security -->
+      <div style="padding: 36px 44px; border-bottom: 1px solid var(--border-color); background: var(--light);">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(255,87,34,0.1); border-radius: 50%; font-size: 0.8rem; color: var(--primary); font-weight: 700; flex-shrink: 0;">6</span>
+          Data Security
+        </h2>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 12px;">
+          We implement industry-standard technical and organisational measures to protect your data against unauthorised access, alteration, disclosure, or destruction. Our website is protected by SSL encryption, and access to personal data is restricted to authorised personnel only.
+        </p>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0;">
+          While we strive to use commercially acceptable means to protect your information, no method of transmission over the internet or electronic storage is 100% secure. We encourage you to use a strong password and protect your account credentials.
+        </p>
+      </div>
+
+      <!-- 7. Your Rights -->
+      <div style="padding: 36px 44px; border-bottom: 1px solid var(--border-color);">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(255,87,34,0.1); border-radius: 50%; font-size: 0.8rem; color: var(--primary); font-weight: 700; flex-shrink: 0;">7</span>
+          Your Rights
+        </h2>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 14px;">You have the following rights with respect to your personal data:</p>
+        <ul style="padding-left: 0; list-style: none; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-dot" style="color: var(--primary); margin-top: 4px; flex-shrink: 0;"></i>
+            <span><strong style="color: var(--dark);">Access:</strong> Request a copy of the personal information we hold about you.</span>
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-dot" style="color: var(--primary); margin-top: 4px; flex-shrink: 0;"></i>
+            <span><strong style="color: var(--dark);">Correction:</strong> Request correction of inaccurate or incomplete data.</span>
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-dot" style="color: var(--primary); margin-top: 4px; flex-shrink: 0;"></i>
+            <span><strong style="color: var(--dark);">Deletion:</strong> Request deletion of your account and associated data, subject to our legal obligations.</span>
+          </li>
+          <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7;">
+            <i class="fa-solid fa-circle-dot" style="color: var(--primary); margin-top: 4px; flex-shrink: 0;"></i>
+            <span><strong style="color: var(--dark);">Opt-Out:</strong> Unsubscribe from marketing communications at any time via the unsubscribe link in our emails or by contacting us.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 8. Contact -->
+      <div style="padding: 36px 44px;">
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--dark); margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: rgba(255,87,34,0.1); border-radius: 50%; font-size: 0.8rem; color: var(--primary); font-weight: 700; flex-shrink: 0;">8</span>
+          Contact Us
+        </h2>
+        <p style="font-size: 0.93rem; color: var(--dark-muted); line-height: 1.9; margin: 0 0 16px;">
+          If you have any questions, concerns, or requests regarding this Privacy Policy or the handling of your personal data, please do not hesitate to contact our Data Privacy team:
+        </p>
+        <div style="background: var(--light); border-radius: var(--radius-md); padding: 20px 24px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-size: 0.9rem; color: var(--dark-muted);">
+            <i class="fa-solid fa-building" style="color: var(--primary); width: 20px; margin-right: 8px;"></i>
+            <strong>{{ site_settings.business_name }}</strong>
+          </div>
+          <div style="font-size: 0.9rem; color: var(--dark-muted);">
+            <i class="fa-solid fa-envelope" style="color: var(--primary); width: 20px; margin-right: 8px;"></i>
+            {{ site_settings.email|default:"privacy@humjid.com" }}
+          </div>
+          <div style="font-size: 0.9rem; color: var(--dark-muted);">
+            <i class="fa-solid fa-location-dot" style="color: var(--primary); width: 20px; margin-right: 8px;"></i>
+            {{ site_settings.address|default:"Lagos, Nigeria" }}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

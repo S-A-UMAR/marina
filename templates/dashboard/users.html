@@ -1,0 +1,68 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Manage Users | Admin{% endblock %}
+{% block page_title %}Users Directory{% endblock %}
+
+{% block dashboard_content %}
+    <div style="background:#FFF; border:1px solid var(--border-color); border-radius:8px; padding:24px;">
+        <h3 style="font-size:16px; font-weight:700; margin-bottom:20px; color:var(--navy-blue);">Registered Accounts</h3>
+        
+        <div class="table-responsive">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email Address</th>
+                        <th>Role Status</th>
+                        <th>Date Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                        <tr>
+                            <td><strong>{{ u.username }}</strong></td>
+                            <td>{{ u.get_full_name|default:"N/A" }}</td>
+                            <td>{{ u.email|default:"N/A" }}</td>
+                            <td>
+                                <span class="status-badge {% if u.profile.role == 'admin' %}danger{% elif u.profile.role == 'staff' %}info{% else %}success{% endif %}">
+                                    {{ u.profile.get_role_display|default:"Customer" }}
+                                </span>
+                            </td>
+                            <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'store:dashboard_user_role' u.pk %}" style="color:var(--accent); font-weight:600; font-size:13px;">
+                                    <i class="fa-solid fa-user-shield"></i> Edit Role
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:20px 0;">No accounts registered.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if users.has_other_pages %}
+            <div class="pagination">
+                {% if users.has_previous %}
+                    <a href="?page={{ users.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a>
+                {% endif %}
+                {% for i in users.paginator.page_range %}
+                    {% if users.number == i %}
+                        <span class="active">{{ i }}</span>
+                    {% else %}
+                        <a href="?page={{ i }}">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if users.has_next %}
+                    <a href="?page={{ users.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

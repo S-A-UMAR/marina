@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Login | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+    <div class="auth-container">
+        <div class="text-center" style="margin-bottom: 30px;">
+            <i class="fa-solid fa-circle-user" style="font-size: 48px; color: var(--primary);"></i>
+            <h2 style="margin-top:10px; font-weight:700;">Account Login</h2>
+            <p style="font-size:13px; color:var(--dark-muted); margin-top:5px;">Welcome back to {{ site_settings.business_name }}</p>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                {{ form.username }}
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                {{ form.password }}
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px;">
+                Log In <i class="fa-solid fa-right-to-bracket"></i>
+            </button>
+        </form>
+        
+        <div class="text-center" style="margin-top: 25px; font-size: 13px; border-top:1px solid var(--border-color); padding-top:20px;">
+            <span style="color:var(--dark-muted)">New to {{ site_settings.business_name }}?</span>
+            <a href="{% url 'store:register' %}" style="color:var(--primary); font-weight:600; margin-left:5px;">Create an Account</a>
+        </div>
+    </div>
+{% endblock %}

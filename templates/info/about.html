@@ -1,0 +1,163 @@
+{% extends 'base/base.html' %}
+
+{% block title %}About Us | {{ site_settings.business_name }}{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<section style="background: var(--dark); padding: 56px 0 40px; margin-bottom: 0;">
+  <div class="container">
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 10px;">
+      <i class="fa-solid fa-circle-info" style="font-size: 2rem; color: var(--primary);"></i>
+      <h1 style="font-size: 2.2rem; font-weight: 700; color: var(--white); margin: 0;">About Us</h1>
+    </div>
+    <nav aria-label="breadcrumb">
+      <ol style="display: flex; gap: 8px; list-style: none; padding: 0; margin: 0;">
+        <li><a href="/" style="color: var(--dark-muted); text-decoration: none; font-size: 0.9rem;">Home</a></li>
+        <li style="color: var(--dark-muted); font-size: 0.9rem;">/</li>
+        <li style="color: var(--primary); font-size: 0.9rem;">About Us</li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- Hero / Mission Section -->
+<section style="background: var(--light); padding: 64px 0;">
+  <div class="container">
+    <div style="text-align: center; max-width: 700px; margin: 0 auto 52px;">
+      <span style="display: inline-block; background: var(--primary); color: var(--white); font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 16px; border-radius: 20px; margin-bottom: 18px;">Our Story</span>
+      <h2 style="font-size: 2rem; font-weight: 700; color: var(--dark); margin: 0 0 18px;">Built on Trust, Driven by Quality</h2>
+      <p style="font-size: 1.05rem; color: var(--dark-muted); line-height: 1.8; margin: 0;">
+        {{ site_settings.business_name }} was founded with a singular mission — to make premium shopping accessible to everyone. We believe quality products should not be a luxury, and every customer deserves a seamless, trustworthy experience from browse to delivery.
+      </p>
+    </div>
+
+    <!-- 2-col grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+      <!-- Who We Are -->
+      <div style="background: var(--white); border-radius: var(--radius-md); padding: 40px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <span style="width: 44px; height: 44px; background: rgba(255,87,34,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fa-solid fa-store" style="color: var(--primary); font-size: 1.1rem;"></i>
+          </span>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--dark); margin: 0;">Who We Are</h3>
+        </div>
+        <p style="color: var(--dark-muted); line-height: 1.8; margin: 0 0 14px;">
+          {{ site_settings.business_name }} is a leading e-commerce platform serving thousands of customers across the country. From electronics and fashion to home essentials and beauty, we curate a wide catalog of verified products from trusted brands and local sellers alike.
+        </p>
+        <p style="color: var(--dark-muted); line-height: 1.8; margin: 0;">
+          Our team is made up of passionate individuals dedicated to continuous improvement — from logistics to customer care, every department works in harmony to deliver an experience that keeps customers coming back.
+        </p>
+      </div>
+
+      <!-- Our Mission -->
+      <div style="background: var(--white); border-radius: var(--radius-md); padding: 40px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <span style="width: 44px; height: 44px; background: rgba(255,87,34,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fa-solid fa-bullseye" style="color: var(--primary); font-size: 1.1rem;"></i>
+          </span>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--dark); margin: 0;">Our Mission</h3>
+        </div>
+        <p style="color: var(--dark-muted); line-height: 1.8; margin: 0 0 14px;">
+          Our mission is to empower shoppers with access to authentic, high-quality products at fair prices — delivered swiftly, safely, and with full transparency. We are committed to building long-lasting relationships with our customers grounded in trust and accountability.
+        </p>
+        <p style="color: var(--dark-muted); line-height: 1.8; margin: 0;">
+          We strive to constantly raise the bar — adopting technology, refining our supply chain, and training our team — so that every interaction with {{ site_settings.business_name }} leaves you satisfied.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Row -->
+<section style="background: var(--primary); padding: 56px 0;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; text-align: center;">
+
+      <div style="padding: 24px;">
+        <div style="font-size: 2.8rem; font-weight: 800; color: var(--white); margin-bottom: 8px;">50K+</div>
+        <div style="font-size: 1rem; color: rgba(255,255,255,0.8); font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Products Listed</div>
+      </div>
+
+      <div style="padding: 24px; border-left: 1px solid rgba(255,255,255,0.2); border-right: 1px solid rgba(255,255,255,0.2);">
+        <div style="font-size: 2.8rem; font-weight: 800; color: var(--white); margin-bottom: 8px;">10K+</div>
+        <div style="font-size: 1rem; color: rgba(255,255,255,0.8); font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Happy Customers</div>
+      </div>
+
+      <div style="padding: 24px;">
+        <div style="font-size: 2.8rem; font-weight: 800; color: var(--white); margin-bottom: 8px;">5+</div>
+        <div style="font-size: 1rem; color: rgba(255,255,255,0.8); font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Years of Experience</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section style="background: var(--white); padding: 72px 0;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 52px;">
+      <span style="display: inline-block; background: rgba(255,87,34,0.1); color: var(--primary); font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 16px; border-radius: 20px; margin-bottom: 14px;">Our Advantages</span>
+      <h2 style="font-size: 1.9rem; font-weight: 700; color: var(--dark); margin: 0;">Why Choose {{ site_settings.business_name }}?</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+
+      <!-- Fast Delivery -->
+      <div style="background: var(--light); border-radius: var(--radius-md); padding: 36px 28px; text-align: center; border: 1px solid var(--border-color); transition: box-shadow 0.2s;">
+        <div style="width: 64px; height: 64px; background: rgba(255,87,34,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <i class="fa-solid fa-truck-fast" style="font-size: 1.6rem; color: var(--primary);"></i>
+        </div>
+        <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--dark); margin: 0 0 12px;">Fast Delivery</h4>
+        <p style="font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7; margin: 0;">We partner with reliable logistics providers to get your orders to your door as quickly as possible.</p>
+      </div>
+
+      <!-- Secure Payments -->
+      <div style="background: var(--light); border-radius: var(--radius-md); padding: 36px 28px; text-align: center; border: 1px solid var(--border-color);">
+        <div style="width: 64px; height: 64px; background: rgba(255,87,34,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <i class="fa-solid fa-shield-halved" style="font-size: 1.6rem; color: var(--primary);"></i>
+        </div>
+        <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--dark); margin: 0 0 12px;">Secure Payments</h4>
+        <p style="font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7; margin: 0;">All transactions are encrypted and processed through fully certified payment gateways. Shop with confidence.</p>
+      </div>
+
+      <!-- Easy Returns -->
+      <div style="background: var(--light); border-radius: var(--radius-md); padding: 36px 28px; text-align: center; border: 1px solid var(--border-color);">
+        <div style="width: 64px; height: 64px; background: rgba(255,87,34,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <i class="fa-solid fa-rotate-left" style="font-size: 1.6rem; color: var(--primary);"></i>
+        </div>
+        <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--dark); margin: 0 0 12px;">Easy Returns</h4>
+        <p style="font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7; margin: 0;">Not satisfied? Our hassle-free 7-day return policy ensures you can shop without worry.</p>
+      </div>
+
+      <!-- 24/7 Support -->
+      <div style="background: var(--light); border-radius: var(--radius-md); padding: 36px 28px; text-align: center; border: 1px solid var(--border-color);">
+        <div style="width: 64px; height: 64px; background: rgba(255,87,34,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <i class="fa-solid fa-headset" style="font-size: 1.6rem; color: var(--primary);"></i>
+        </div>
+        <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--dark); margin: 0 0 12px;">24/7 Support</h4>
+        <p style="font-size: 0.9rem; color: var(--dark-muted); line-height: 1.7; margin: 0;">Our dedicated support team is available around the clock to assist you with any questions or concerns.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Team Section -->
+<section style="background: var(--light); padding: 72px 0;">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <span style="display: inline-block; background: rgba(255,87,34,0.1); color: var(--primary); font-size: 0.75rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 16px; border-radius: 20px; margin-bottom: 14px;">The People Behind It</span>
+      <h2 style="font-size: 1.9rem; font-weight: 700; color: var(--dark); margin: 0 0 16px;">Meet Our Team</h2>
+      <p style="font-size: 1rem; color: var(--dark-muted); line-height: 1.8; max-width: 600px; margin: 0 auto;">
+        Our team is a diverse group of professionals — designers, developers, logistics experts, and customer advocates — all united by a shared passion for delivering excellence. Together, we work tirelessly every day to make your shopping experience with {{ site_settings.business_name }} the best it can be.
+      </p>
+    </div>
+    <div style="text-align: center; padding: 40px; background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <i class="fa-solid fa-users" style="font-size: 3rem; color: var(--border-color); margin-bottom: 16px; display: block;"></i>
+      <p style="color: var(--dark-muted); font-size: 0.95rem; margin: 0;">Team profiles coming soon. We are growing — and we would love for you to grow with us.</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

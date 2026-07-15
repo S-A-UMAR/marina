@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard | {{ site_settings.business_name }}{% endblock %}</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main and Dashboard styles -->
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="dashboard-body">
+
+    <!-- Left Collapsible Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-box-archive" style="font-size: 24px; color: var(--sidebar-active);"></i>
+            <h2 class="sidebar-logo">HUMJID<span>Admin</span></h2>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="{% if request.resolver_match.url_name == 'dashboard_overview' %}active{% endif %}">
+                <a href="{% url 'store:dashboard_overview' %}">
+                    <i class="fa-solid fa-gauge"></i>
+                    <span>Overview</span>
+                </a>
+            </li>
+            <li class="{% if 'products' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_products' %}">
+                    <i class="fa-solid fa-box"></i>
+                    <span>Products</span>
+                </a>
+            </li>
+            <li class="{% if 'categories' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_categories' %}">
+                    <i class="fa-solid fa-tags"></i>
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li class="{% if 'suppliers' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_suppliers' %}">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                    <span>Suppliers</span>
+                </a>
+            </li>
+            
+            <li style="padding: 10px 24px 5px; font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.5px;">INVENTORY</li>
+            <li class="{% if 'stock/in' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_stock_in' %}">
+                    <i class="fa-solid fa-square-plus"></i>
+                    <span>Stock In</span>
+                </a>
+            </li>
+            <li class="{% if 'stock/out' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_stock_out' %}">
+                    <i class="fa-solid fa-square-minus"></i>
+                    <span>Stock Out</span>
+                </a>
+            </li>
+            <li class="{% if 'stock/history' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_stock_history' %}">
+                    <i class="fa-solid fa-history"></i>
+                    <span>History</span>
+                </a>
+            </li>
+            <li class="{% if 'reports' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_reports' %}">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            
+            <li style="padding: 10px 24px 5px; font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.5px;">SETTINGS</li>
+            <li class="{% if 'users' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_users' %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            <li class="{% if 'settings' in request.path %}active{% endif %}">
+                <a href="{% url 'store:dashboard_settings' %}">
+                    <i class="fa-solid fa-gears"></i>
+                    <span>Site Settings</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <p>Logged in as: <strong>{{ request.user.username }}</strong></p>
+            <a href="{% url 'store:home' %}" style="color: var(--sidebar-active); margin-top: 5px; display: inline-block;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Store
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main">
+        <!-- Banner Header -->
+        <header class="dashboard-header">
+            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+            <div class="user-badge">
+                <span>{{ request.user.get_full_name|default:request.user.username }}</span>
+                <i class="fa-regular fa-circle-user" style="font-size: 24px;"></i>
+            </div>
+        </header>
+
+        <!-- Message Alerts -->
+        {% if messages %}
+            <div class="messages-container" style="margin-bottom: 20px;">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <span>{{ message }}</span>
+                        <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="this.parentElement.remove()"></i>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block dashboard_content %}{% endblock %}
+    </main>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

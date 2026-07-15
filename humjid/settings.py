@@ -122,10 +122,17 @@ if CLOUDINARY_CLOUD_NAME:
         'API_KEY': env('CLOUDINARY_API_KEY', default=''),
         'API_SECRET': env('CLOUDINARY_API_SECRET', default=''),
     }
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-else:
-    MEDIA_ROOT = BASE_DIR / 'media'
 
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage" if CLOUDINARY_CLOUD_NAME else "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

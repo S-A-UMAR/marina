@@ -28,7 +28,7 @@
     <!-- Intro -->
     <div style="background: var(--white); border-radius: var(--radius-md); padding: 36px; border: 1px solid var(--border-color); margin-bottom: 44px; text-align: center;">
       <p style="font-size: 1.05rem; color: var(--dark-muted); line-height: 1.8; margin: 0;">
-        Find answers to the most common questions about shopping on {{ site_settings.business_name }}. If you cannot find what you are looking for, please do not hesitate to <a href="{% url 'contact' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">contact our support team</a>.
+        Find answers to the most common questions about shopping on {{ site_settings.business_name }}. If you cannot find what you are looking for, please do not hesitate to <a href="{% url 'store:contact' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">contact our support team</a>.
       </p>
     </div>
 
@@ -117,7 +117,7 @@
           <i class="fa-solid fa-chevron-down" style="color: var(--primary); font-size: 0.8rem;"></i>
         </summary>
         <div style="padding: 0 24px 22px; color: var(--dark-muted); font-size: 0.93rem; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 18px;">
-          We offer a <strong>7-day return window</strong> from the date of delivery. Items must be unused, in their original packaging, and accompanied by proof of purchase. Perishables, personal hygiene products, and digital downloads are not eligible for returns. Please review our full <a href="{% url 'shipping_returns' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">Shipping &amp; Returns</a> page for complete details.
+          We offer a <strong>7-day return window</strong> from the date of delivery. Items must be unused, in their original packaging, and accompanied by proof of purchase. Perishables, personal hygiene products, and digital downloads are not eligible for returns. Please review our full <a href="{% url 'store:shipping_returns' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">Shipping &amp; Returns</a> page for complete details.
         </div>
       </details>
 
@@ -187,7 +187,7 @@
       <i class="fa-solid fa-headset" style="font-size: 2rem; color: var(--white); margin-bottom: 14px; display: block;"></i>
       <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--white); margin: 0 0 10px;">Still have a question?</h3>
       <p style="font-size: 0.95rem; color: rgba(255,255,255,0.85); margin: 0 0 22px;">Our support team is happy to help you with anything you need.</p>
-      <a href="{% url 'contact' %}" style="display: inline-block; background: var(--white); color: var(--primary); text-decoration: none; padding: 12px 28px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.95rem;">
+      <a href="{% url 'store:contact' %}" style="display: inline-block; background: var(--white); color: var(--primary); text-decoration: none; padding: 12px 28px; border-radius: var(--radius-md); font-weight: 700; font-size: 0.95rem;">
         <i class="fa-solid fa-envelope" style="margin-right: 8px;"></i>Contact Support
       </a>
     </div>

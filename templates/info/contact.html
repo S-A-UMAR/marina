@@ -2,6 +2,17 @@
 
 {% block title %}Contact Us | {{ site_settings.business_name }}{% endblock %}
 
+{% block extra_css %}
+<style>
+.contact-grid { display: grid; grid-template-columns: 1fr 400px; gap: 36px; align-items: start; }
+.contact-fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+@media (max-width: 768px) {
+  .contact-grid { grid-template-columns: 1fr; }
+  .contact-fields-row { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <!-- Page Header -->
@@ -34,7 +45,7 @@
     </div>
 
     <!-- 2-col layout -->
-    <div style="display: grid; grid-template-columns: 1fr 400px; gap: 36px; align-items: start;">
+    <div class="contact-grid">
 
       <!-- LEFT: Contact Form -->
       <div style="background: var(--white); border-radius: var(--radius-md); padding: 44px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
@@ -62,7 +73,7 @@
           <form method="POST" action="">
             {% csrf_token %}
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="contact-fields-row">
               <div>
                 <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--dark); margin-bottom: 8px;">Full Name <span style="color: var(--primary);">*</span></label>
                 <input type="text" name="name" class="form-control" placeholder="John Doe" required

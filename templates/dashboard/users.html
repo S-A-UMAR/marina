@@ -1,68 +1,76 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}Manage Users | Admin{% endblock %}
-{% block page_title %}Users Directory{% endblock %}
+{% block title %}Staff Access | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div style="background:#FFF; border:1px solid var(--border-color); border-radius:8px; padding:24px;">
-        <h3 style="font-size:16px; font-weight:700; margin-bottom:20px; color:var(--navy-blue);">Registered Accounts</h3>
-        
-        <div class="table-responsive">
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Name</th>
-                        <th>Email Address</th>
-                        <th>Role Status</th>
-                        <th>Date Joined</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in users %}
-                        <tr>
-                            <td><strong>{{ u.username }}</strong></td>
-                            <td>{{ u.get_full_name|default:"N/A" }}</td>
-                            <td>{{ u.email|default:"N/A" }}</td>
-                            <td>
-                                <span class="status-badge {% if u.profile.role == 'admin' %}danger{% elif u.profile.role == 'staff' %}info{% else %}success{% endif %}">
-                                    {{ u.profile.get_role_display|default:"Customer" }}
-                                </span>
-                            </td>
-                            <td>{{ u.date_joined|date:"M d, Y" }}</td>
-                            <td>
-                                <a href="{% url 'store:dashboard_user_role' u.pk %}" style="color:var(--accent); font-weight:600; font-size:13px;">
-                                    <i class="fa-solid fa-user-shield"></i> Edit Role
-                                </a>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="6" style="text-align:center; padding:20px 0;">No accounts registered.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        {% if users.has_other_pages %}
-            <div class="pagination">
-                {% if users.has_previous %}
-                    <a href="?page={{ users.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a>
-                {% endif %}
-                {% for i in users.paginator.page_range %}
-                    {% if users.number == i %}
-                        <span class="active">{{ i }}</span>
-                    {% else %}
-                        <a href="?page={{ i }}">{{ i }}</a>
-                    {% endif %}
-                {% endfor %}
-                {% if users.has_next %}
-                    <a href="?page={{ users.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a>
-                {% endif %}
-            </div>
-        {% endif %}
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Staff Access Control</h1>
+        <p class="staff-page-subtitle">Grant and revoke staff portal access to registered Marina Gadgets users.</p>
     </div>
+</div>
+
+<div class="data-table-wrapper">
+    <div class="data-table-header">
+        <form action="" method="GET" class="flex" style="gap:var(--space-sm);">
+            <div class="data-table-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" placeholder="Search by username or name..." value="{{ query }}">
+            </div>
+            <button type="submit" class="btn btn-ghost btn-sm">Search</button>
+        </form>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Date Joined</th>
+                <th style="text-align:right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td class="font-semibold">{{ user.username }}</td>
+                    <td>{{ user.get_full_name|default:'—' }}</td>
+                    <td>{{ user.email|default:'—' }}</td>
+                    <td>
+                        {% if user.profile.is_admin %}
+                            <span class="badge badge-danger">Admin</span>
+                        {% elif user.profile.is_staff_member %}
+                            <span class="badge badge-primary">Staff</span>
+                        {% else %}
+                            <span class="badge badge-gray">Customer</span>
+                        {% endif %}
+                    </td>
+                    <td class="td-muted" style="font-size:var(--font-size-xs);">{{ user.date_joined|date:"d M Y" }}</td>
+                    <td>
+                        <div class="table-actions" style="justify-content:flex-end;">
+                            <a href="{% url 'store:dashboard_user_role' user.id %}" class="action-btn action-btn-primary">
+                                <i class="fa-solid fa-user-shield"></i> Manage Role
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-center text-secondary" style="padding:var(--space-xl);">No matching users.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if users.has_other_pages %}
+        <div class="pagination" style="padding:var(--space-lg) 0;">
+            {% if users.has_previous %}<a href="?q={{ query }}&page={{ users.previous_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-left"></i></a>{% endif %}
+            {% for num in users.paginator.page_range %}
+                {% if users.number == num %}<span class="page-btn active">{{ num }}</span>
+                {% else %}<a href="?q={{ query }}&page={{ num }}" class="page-btn">{{ num }}</a>{% endif %}
+            {% endfor %}
+            {% if users.has_next %}<a href="?q={{ query }}&page={{ users.next_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-right"></i></a>{% endif %}
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

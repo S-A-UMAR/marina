@@ -1,0 +1,57 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Edit Brand | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Edit Brand</h1>
+        <p class="staff-page-subtitle">Modify the settings and information details of device brand: {{ brand.name }}.</p>
+    </div>
+    <a href="{% url 'store:dashboard_brands' %}" class="btn btn-ghost">
+        <i class="fa-solid fa-arrow-left"></i> Back to Brands
+    </a>
+</div>
+
+<div style="max-width: 580px; margin: 0 auto;">
+    <div class="card">
+        <div class="card-header">Brand Properties</div>
+        <div class="card-body">
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label" for="id_name">Brand Name</label>
+                    {{ form.name }}
+                </div>
+
+                {% if brand.logo %}
+                    <div style="margin-bottom: var(--space-md);">
+                        <span class="form-label">Current Logo</span>
+                        <img src="{{ brand.logo.url }}" alt="Logo" style="max-height: 48px; border-radius: 4px; border: 1px solid var(--color-border); padding: 4px;">
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label" for="id_logo">Upload New Logo</label>
+                    {{ form.logo }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_description">Brand Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="form-group flex items-center gap-sm">
+                    {{ form.is_active }}
+                    <label class="form-label" for="id_is_active" style="margin-bottom: 0;">Brand is Active</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full mt-lg">
+                    <i class="fa-solid fa-floppy-disk"></i> Update Brand details
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

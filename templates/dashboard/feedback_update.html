@@ -1,0 +1,46 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Update Feedback | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div><h1 class="staff-page-title">Review Feedback Case</h1></div>
+    <a href="{% url 'store:dashboard_feedback' %}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<div style="display:grid; grid-template-columns:3fr 2fr; gap:var(--space-xl); align-items:start;">
+    <!-- Original message -->
+    <div class="card">
+        <div class="card-header">Feedback Details</div>
+        <div class="card-body" style="font-size:var(--font-size-sm); line-height:1.7; color:var(--color-text-secondary);">
+            <p><strong>From:</strong> {{ feedback.name }}</p>
+            <p><strong>Phone:</strong> {{ feedback.phone|default:'N/A' }}</p>
+            <p><strong>Email:</strong> {{ feedback.email|default:'N/A' }}</p>
+            <p><strong>Category:</strong> {{ feedback.get_category_display }}</p>
+            <p><strong>Subject:</strong> {{ feedback.subject }}</p>
+            <hr class="divider">
+            <p style="white-space:pre-wrap;">{{ feedback.message }}</p>
+        </div>
+    </div>
+
+    <!-- Status Update -->
+    <div class="card">
+        <div class="card-header">Update Status &amp; Response</div>
+        <div class="card-body">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Change Status</label>
+                    {{ form.status }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Internal Staff Notes</label>
+                    {{ form.staff_notes }}
+                    <span class="form-help">These notes are internal and not shown to the customer.</span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full mt-md"><i class="fa-solid fa-floppy-disk"></i> Save Update</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

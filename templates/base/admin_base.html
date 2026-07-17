@@ -1,127 +1,139 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-NG">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Dashboard | {{ site_settings.business_name }}{% endblock %}</title>
-    <!-- FontAwesome Icons -->
+    <title>{% block title %}Staff Portal | Marina{% endblock %}</title>
+    
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Main and Dashboard styles -->
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body class="dashboard-body">
+<body>
 
-    <!-- Left Collapsible Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <i class="fa-solid fa-box-archive" style="font-size: 24px; color: var(--sidebar-active);"></i>
-            <h2 class="sidebar-logo">HUMJID<span>Admin</span></h2>
-        </div>
-        
-        <ul class="sidebar-menu">
-            <li class="{% if request.resolver_match.url_name == 'dashboard_overview' %}active{% endif %}">
-                <a href="{% url 'store:dashboard_overview' %}">
-                    <i class="fa-solid fa-gauge"></i>
-                    <span>Overview</span>
-                </a>
-            </li>
-            <li class="{% if 'products' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_products' %}">
-                    <i class="fa-solid fa-box"></i>
-                    <span>Products</span>
-                </a>
-            </li>
-            <li class="{% if 'categories' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_categories' %}">
-                    <i class="fa-solid fa-tags"></i>
-                    <span>Categories</span>
-                </a>
-            </li>
-            <li class="{% if 'suppliers' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_suppliers' %}">
-                    <i class="fa-solid fa-truck-ramp-box"></i>
-                    <span>Suppliers</span>
-                </a>
-            </li>
-            
-            <li style="padding: 10px 24px 5px; font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.5px;">INVENTORY</li>
-            <li class="{% if 'stock/in' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_stock_in' %}">
-                    <i class="fa-solid fa-square-plus"></i>
-                    <span>Stock In</span>
-                </a>
-            </li>
-            <li class="{% if 'stock/out' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_stock_out' %}">
-                    <i class="fa-solid fa-square-minus"></i>
-                    <span>Stock Out</span>
-                </a>
-            </li>
-            <li class="{% if 'stock/history' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_stock_history' %}">
-                    <i class="fa-solid fa-history"></i>
-                    <span>History</span>
-                </a>
-            </li>
-            <li class="{% if 'reports' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_reports' %}">
-                    <i class="fa-solid fa-file-invoice"></i>
-                    <span>Reports</span>
-                </a>
-            </li>
-            
-            <li style="padding: 10px 24px 5px; font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.5px;">SETTINGS</li>
-            <li class="{% if 'users' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_users' %}">
-                    <i class="fa-solid fa-users"></i>
-                    <span>Users</span>
-                </a>
-            </li>
-            <li class="{% if 'settings' in request.path %}active{% endif %}">
-                <a href="{% url 'store:dashboard_settings' %}">
-                    <i class="fa-solid fa-gears"></i>
-                    <span>Site Settings</span>
-                </a>
-            </li>
-        </ul>
-
-        <div class="sidebar-footer">
-            <p>Logged in as: <strong>{{ request.user.username }}</strong></p>
-            <a href="{% url 'store:home' %}" style="color: var(--sidebar-active); margin-top: 5px; display: inline-block;">
-                <i class="fa-solid fa-arrow-left"></i> Back to Store
-            </a>
-        </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="dashboard-main">
-        <!-- Banner Header -->
-        <header class="dashboard-header">
-            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
-            <div class="user-badge">
-                <span>{{ request.user.get_full_name|default:request.user.username }}</span>
-                <i class="fa-regular fa-circle-user" style="font-size: 24px;"></i>
-            </div>
-        </header>
-
-        <!-- Message Alerts -->
-        {% if messages %}
-            <div class="messages-container" style="margin-bottom: 20px;">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        <span>{{ message }}</span>
-                        <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="this.parentElement.remove()"></i>
+    <!-- Header bar -->
+    <header style="position: sticky; top: 0; z-index: 100;">
+        <div class="container" style="max-width: 100%; padding: 0 var(--space-xl);">
+            <div class="navbar-top" style="justify-content: space-between;">
+                <a href="{% url 'store:home' %}" class="logo" style="margin-right: 0;">
+                    <i class="fa-solid fa-mobile-screen-button text-primary"></i>
+                    <div>
+                        <span class="logo-text">Marina Staff</span>
+                        <span class="logo-sub">Operations Hub</span>
                     </div>
-                {% endfor %}
+                </a>
+                
+                <div class="nav-actions">
+                    <a href="{% url 'store:home' %}" class="btn btn-secondary btn-sm" target="_blank">
+                        <i class="fa-solid fa-store"></i> View Live Store
+                    </a>
+                    <a href="{% url 'store:logout' %}" class="btn btn-ghost btn-sm" style="color: var(--color-danger);">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </a>
+                </div>
             </div>
-        {% endif %}
+        </div>
+    </header>
 
-        {% block dashboard_content %}{% endblock %}
-    </main>
+    <div class="staff-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="staff-sidebar">
+            <div class="staff-sidebar-user">
+                <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                <span class="user-role">{{ request.user.profile.get_role_display }}</span>
+            </div>
 
+            <nav class="staff-nav">
+                <div class="staff-nav-section-label">Overview</div>
+                <a href="{% url 'store:dashboard_overview' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_overview' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </a>
+
+                <div class="staff-nav-section-label">Sales &amp; Orders</div>
+                <a href="{% url 'store:dashboard_orders' %}" class="staff-nav-item {% if 'order' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-receipt"></i> Customer Orders
+                </a>
+                <a href="{% url 'store:dashboard_customers' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_customers' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i> Customers
+                </a>
+
+                <div class="staff-nav-section-label">Catalog</div>
+                <a href="{% url 'store:dashboard_products' %}" class="staff-nav-item {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-box"></i> Products
+                </a>
+                <a href="{% url 'store:dashboard_brands' %}" class="staff-nav-item {% if 'brand' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-tag"></i> Brands
+                </a>
+                <a href="{% url 'store:dashboard_categories' %}" class="staff-nav-item {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-tags"></i> Categories
+                </a>
+
+                <div class="staff-nav-section-label">Inventory</div>
+                <a href="{% url 'store:dashboard_stock_in' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_stock_in' %}active{% endif %}">
+                    <i class="fa-solid fa-circle-plus"></i> Stock In
+                </a>
+                <a href="{% url 'store:dashboard_stock_out' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_stock_out' %}active{% endif %}">
+                    <i class="fa-solid fa-circle-minus"></i> Stock Out
+                </a>
+                <a href="{% url 'store:dashboard_stock_history' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_stock_history' %}active{% endif %}">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Stock Audit Log
+                </a>
+
+                <div class="staff-nav-section-label">Marketing &amp; Rewards</div>
+                <a href="{% url 'store:dashboard_banners' %}" class="staff-nav-item {% if 'banner' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-image"></i> Banners &amp; Hero
+                </a>
+                <a href="{% url 'store:dashboard_rewards' %}" class="staff-nav-item {% if 'reward' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-gift"></i> Rewards Program
+                </a>
+
+                <div class="staff-nav-section-label">Customer Feedback</div>
+                <a href="{% url 'store:dashboard_feedback' %}" class="staff-nav-item {% if 'feedback' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-comments"></i> User Suggestions
+                </a>
+
+                {% if request.user.profile.is_admin %}
+                <div class="staff-nav-section-label">System &amp; Administration</div>
+                <a href="{% url 'store:dashboard_reports' %}" class="staff-nav-item {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i> Analytics &amp; Reports
+                </a>
+                <a href="{% url 'store:dashboard_settings' %}" class="staff-nav-item {% if 'settings' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-gears"></i> Site Settings
+                </a>
+                <a href="{% url 'store:dashboard_users' %}" class="staff-nav-item {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-user-shield"></i> Staff Access
+                </a>
+                <a href="{% url 'store:dashboard_suppliers' %}" class="staff-nav-item {% if 'supplier' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fa-solid fa-truck-field"></i> Suppliers
+                </a>
+                {% endif %}
+            </nav>
+        </aside>
+
+        <!-- Main content area -->
+        <main class="staff-main">
+            <!-- Messages / Notifications container -->
+            {% if messages %}
+                <div class="mb-lg" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}" style="animation: none; position: static; max-width: 100%;">
+                            <span>{{ message }}</span>
+                            <i class="fa-solid fa-xmark close-btn" onclick="this.parentElement.remove()"></i>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Main scripts -->
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

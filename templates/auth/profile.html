@@ -1,89 +1,108 @@
 {% extends 'base/base.html' %}
 
-{% block title %}My Profile | {{ site_settings.business_name }}{% endblock %}
+{% block title %}My Profile Settings | Marina Gadgets{% endblock %}
 
 {% block content %}
-    <div style="margin: 40px 0;">
-        <h2 style="font-size:24px; font-weight:700; margin-bottom:30px; border-bottom:1px solid var(--border-color); padding-bottom:15px;">
-            <i class="fa-solid fa-address-card"></i> Profile Settings
-        </h2>
-        
-        <div class="profile-layout" style="display:grid; grid-template-columns: 280px 1fr; gap:40px;">
-            
-            <!-- Side profile card -->
-            <div>
-                <div style="background:#FFF; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:30px; text-align:center;">
-                    <div style="width:120px; height:120px; border-radius:50%; margin:0 auto 20px; overflow:hidden; border:3px solid var(--primary); background:var(--light);">
+<div class="my-marina-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="my-marina-nav">
+        <div class="my-marina-nav-header">
+            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+            <span class="user-role">Customer Member</span>
+        </div>
+        <nav class="flex" style="flex-direction: column;">
+            <a href="{% url 'store:my_marina' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-gauge-high"></i> Dashboard Overview
+            </a>
+            <a href="{% url 'store:my_orders' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-clock-rotate-left"></i> My Orders
+            </a>
+            <a href="{% url 'store:wishlist' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-heart"></i> My Wishlist
+            </a>
+            <a href="{% url 'store:my_rewards' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-gift"></i> Rewards &amp; Appreciation
+            </a>
+            <a href="{% url 'store:my_notifications' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-bell"></i> Notifications
+            </a>
+            <a href="{% url 'store:profile' %}" class="my-marina-nav-item active">
+                <i class="fa-solid fa-id-card"></i> Personal Profile
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Profile Edit Form -->
+    <div class="card">
+        <div class="card-header">Personal Profile Settings</div>
+        <div class="card-body">
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div style="display: grid; grid-template-columns: 80px 1fr; gap: var(--space-lg); align-items: center; margin-bottom: var(--space-xl); background: var(--color-surface); padding: var(--space-md); border-radius: var(--radius-md);">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; background: var(--color-primary-light); color: var(--color-primary); display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid var(--color-border);">
                         {% if profile.avatar %}
                             <img src="{{ profile.avatar.url }}" alt="avatar" style="width:100%; height:100%; object-fit:cover;">
                         {% else %}
-                            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#FFF3E0;">
-                                <i class="fa-solid fa-user-gear" style="font-size:48px; color:var(--primary);"></i>
-                            </div>
+                            <i class="fa-solid fa-user"></i>
                         {% endif %}
                     </div>
-                    
-                    <h3 style="font-size:18px; font-weight:700;">{{ request.user.get_full_name|default:request.user.username }}</h3>
-                    <p style="font-size:12px; color:var(--dark-muted); margin-top:5px;">Role: <strong style="text-transform:capitalize;">{{ profile.role }}</strong></p>
-                    <p style="font-size:11px; color:#999; margin-top:5px;">Member since: {{ request.user.date_joined|date:"M d, Y" }}</p>
-                    <a href="{% url 'store:logout' %}" style="display:inline-flex; align-items:center; gap:6px; margin-top:16px; font-size:13px; font-weight:600; color:#C62828; padding:8px 16px; border:1px solid #FFCDD2; border-radius:var(--radius-md); background:#FFEBEE; transition:var(--transition);">
-                        <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-                    </a>
-                </div>
-            </div>
-
-            <!-- Profile Settings forms -->
-            <div style="background:#FFF; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:40px;">
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    
-                    <div class="checkout-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                        <div class="form-group">
-                            <label for="first_name">First Name</label>
-                            <input type="text" name="first_name" id="first_name" class="form-control" value="{{ request.user.first_name }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="last_name">Last Name</label>
-                            <input type="text" name="last_name" id="last_name" class="form-control" value="{{ request.user.last_name }}">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" name="email" id="email" class="form-control" value="{{ request.user.email }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_phone">Phone Number</label>
-                        {{ form.phone }}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_address">Shipping Address</label>
-                        {{ form.address }}
-                    </div>
-
-                    <div class="checkout-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                        <div class="form-group">
-                            <label for="id_city">City</label>
-                            {{ form.city }}
-                        </div>
-                        <div class="form-group">
-                            <label for="id_state">State</label>
-                            {{ form.state }}
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="margin-top:10px;">
-                        <label for="id_avatar">Update Profile Avatar</label>
+                    <div>
+                        <span class="font-semibold" style="display: block; font-size: var(--font-size-base);">Profile Avatar Image</span>
+                        <span class="text-secondary" style="font-size: var(--font-size-xs); display: block; margin-bottom: var(--space-xs);">Upload a custom photo (JPEG or PNG format).</span>
                         {{ form.avatar }}
                     </div>
+                </div>
 
-                    <button type="submit" class="btn btn-primary" style="margin-top:20px; padding:12px 30px;">
-                        Save Changes <i class="fa-solid fa-floppy-disk"></i>
-                    </button>
-                </form>
-            </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                    <div class="form-group">
+                        <label class="form-label" for="id_first_name">First Name</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_last_name">Last Name</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                    <div class="form-group">
+                        <label class="form-label" for="id_email">Email Address</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_phone">Phone Number</label>
+                        {{ form.phone }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_address">Delivery Address</label>
+                    {{ form.address }}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                    <div class="form-group">
+                        <label class="form-label" for="id_city">City</label>
+                        {{ form.city }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_state">State</label>
+                        {{ form.state }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_preferred_contact">Preferred Contact Method</label>
+                    {{ form.preferred_contact }}
+                    <span class="form-help">Choose how you prefer our team to verify order invoices.</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full btn-lg mt-md">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Profile Details
+                </button>
+            </form>
         </div>
     </div>
+</div>
 {% endblock %}

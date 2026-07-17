@@ -1,76 +1,108 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}{{ title }} | Admin{% endblock %}
-{% block page_title %}{{ title }}{% endblock %}
+{% block title %}{{ title }} | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div class="dashboard-form-container">
-        <form method="POST" enctype="multipart/form-data">
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">{{ title }}</h1>
+        <p class="staff-page-subtitle">Update shop catalog product details and stock status settings.</p>
+    </div>
+    <a href="{% url 'store:dashboard_products' %}" class="btn btn-ghost">
+        <i class="fa-solid fa-arrow-left"></i> Back to Products
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">{{ title }} Information</div>
+    <div class="card-body">
+        <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="id_name">Product Name</label>
-                {{ form.name }}
-            </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="staff-form-grid">
+                <div class="form-group staff-form-full">
+                    <label class="form-label" for="id_name">Product Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <span class="form-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.name.errors.as_text }}</span>
+                    {% endif %}
+                </div>
+
                 <div class="form-group">
-                    <label for="id_category">Category</label>
+                    <label class="form-label" for="id_sku">SKU Number (Unique)</label>
+                    {{ form.sku }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_condition">Product Condition</label>
+                    {{ form.condition }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_brand">Brand Manufacturer</label>
+                    {{ form.brand }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_category">Store Category</label>
                     {{ form.category }}
                 </div>
-                <div class="form-group">
-                    <label for="id_supplier">Supplier (Optional)</label>
-                    {{ form.supplier }}
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label for="id_description">Product Description</label>
-                {{ form.description }}
-            </div>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                <div class="form-group">
-                    <label for="id_price">Original Price ({{ site_settings.currency_symbol }})</label>
-                    {{ form.price }}
+                <div class="form-group staff-form-full">
+                    <label class="form-label" for="id_short_description">Short Summary Description</label>
+                    {{ form.short_description }}
                 </div>
-                <div class="form-group">
-                    <label for="id_discount_price">Discounted Price (Optional)</label>
-                    {{ form.discount_price }}
-                </div>
-            </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <div class="form-group staff-form-full">
+                    <label class="form-label" for="id_description">Full Specification Description</label>
+                    {{ form.description }}
+                </div>
+
                 <div class="form-group">
-                    <label for="id_current_stock">Initial Stock Quantity</label>
+                    <label class="form-label" for="id_selling_price">Selling Price (₦)</label>
+                    {{ form.selling_price }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_previous_price">Previous Price (₦ - optional for discounts)</label>
+                    {{ form.previous_price }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_current_stock">Initial Stock Quantity</label>
                     {{ form.current_stock }}
                 </div>
+
                 <div class="form-group">
-                    <label for="id_reorder_level">Reorder Threshold Level</label>
-                    {{ form.reorder_level }}
+                    <label class="form-label" for="id_low_stock_threshold">Low Stock Alert Threshold</label>
+                    {{ form.low_stock_threshold }}
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="id_image">Product Image File (Cloudinary CDN)</label>
-                {{ form.image }}
-            </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_cover_image">Product Cover Image</label>
+                    {{ form.cover_image }}
+                </div>
 
-            <div style="display:flex; gap:30px; margin-top:15px; margin-bottom:15px;">
-                <div style="display:flex; align-items:center; gap:8px;">
+                <div class="form-group">
+                    <label class="form-label" for="id_status">Publication Status</label>
+                    {{ form.status }}
+                </div>
+
+                <div class="form-group flex items-center gap-sm">
                     {{ form.is_featured }}
-                    <label for="id_is_featured" style="font-weight:600; font-size:14px; margin:0;">Is Featured Product</label>
+                    <label class="form-label" for="id_is_featured" style="margin-bottom:0;">Feature on Homepage Banner Grid</label>
                 </div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                    {{ form.is_active }}
-                    <label for="id_is_active" style="font-weight:600; font-size:14px; margin:0;">Is Active Product</label>
+
+                <div class="form-group flex items-center gap-sm">
+                    {{ form.is_new_arrival }}
+                    <label class="form-label" for="id_is_new_arrival" style="margin-bottom:0;">Mark as New Arrival Tag</label>
                 </div>
             </div>
 
-            <div class="form-actions">
-                <a href="{% url 'store:dashboard_products' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Save Product Details <i class="fa-solid fa-circle-check"></i></button>
-            </div>
+            <button type="submit" class="btn btn-primary btn-lg mt-lg">
+                <i class="fa-solid fa-floppy-disk"></i> Save Product Details
+            </button>
         </form>
     </div>
+</div>
 {% endblock %}

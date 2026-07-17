@@ -1,0 +1,40 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Shipping & Delivery | Marina Gadgets Kano{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb"><a href="{% url 'store:home' %}">Home</a><span class="sep">/</span><span class="current">Shipping Policy</span></nav>
+
+<div style="max-width:800px; margin:0 auto; padding-bottom:var(--space-xxl);">
+    <div class="text-center mb-xl">
+        <h1 class="font-bold text-primary mb-sm" style="font-size:var(--font-size-3xl);">Shipping &amp; Delivery</h1>
+        <p class="text-secondary" style="font-size:var(--font-size-md);">Fast, safe, and transparent delivery across Nigeria.</p>
+    </div>
+
+    <div class="card mb-lg">
+        <div class="card-body" style="line-height:1.7; color:var(--color-text-secondary); padding:var(--space-xl);">
+            <h2 class="font-bold text-primary mb-md" style="font-size:var(--font-size-xl);">Same-Day Kano Delivery</h2>
+            <p class="mb-md">Because we are based right here in Kano, we pride ourselves on exceptional local delivery speed.</p>
+            <ul style="list-style-type:disc; padding-left:var(--space-xl); margin-bottom:var(--space-md);">
+                <li>Orders placed before <strong>3:00 PM</strong> are delivered the exact same day.</li>
+                <li>Orders placed after 3:00 PM are delivered the next morning.</li>
+                <li>You can opt to pick up your order directly from our store by choosing "Request a Call" at checkout.</li>
+            </ul>
+            <p><strong>Cost:</strong> Standard Kano delivery is ₦{{ site_settings.default_shipping_fee|floatformat:0 }} (Free for orders over ₦{{ site_settings.free_shipping_threshold|floatformat:0 }}).</p>
+        </div>
+    </div>
+
+    <div class="card mb-lg">
+        <div class="card-body" style="line-height:1.7; color:var(--color-text-secondary); padding:var(--space-xl);">
+            <h2 class="font-bold text-primary mb-md" style="font-size:var(--font-size-xl);">Nationwide Shipping</h2>
+            <p class="mb-md">We ship to all 36 states in Nigeria using trusted logistics partners (e.g., GIG Logistics, DHL).</p>
+            <ul style="list-style-type:disc; padding-left:var(--space-xl); margin-bottom:var(--space-md);">
+                <li><strong>Abuja & Kaduna:</strong> Usually arrives within 1-2 business days.</li>
+                <li><strong>Lagos & South-West:</strong> Usually arrives within 2-3 business days.</li>
+                <li><strong>South-East & South-South:</strong> Usually arrives within 3-4 business days.</li>
+            </ul>
+            <p><strong>Package Security:</strong> Every device sent outside Kano is photographed, packed securely with bubble wrap, and sealed with tamper-proof tape before being handed over to the courier. We will send you the tracking number as soon as it ships.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Rewards Program | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Marina Appreciation Rewards</h1>
+        <p class="staff-page-subtitle">Issue, manage, and track customer reward credits, discounts, and exclusive benefits.</p>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:2fr 1fr; gap:var(--space-xl); align-items:start;">
+    <!-- Rewards list -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title">All Issued Rewards</h2>
+        </div>
+        <div class="staff-panel-body" style="padding:0;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        <th>Reason</th>
+                        <th>Expires</th>
+                        <th>Status</th>
+                        <th style="text-align:right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rew in rewards %}
+                        <tr>
+                            <td>
+                                <strong style="font-size:var(--font-size-sm);">{{ rew.user.get_full_name|default:rew.user.username }}</strong>
+                                <span class="td-muted" style="font-size:10px; display:block;">{{ rew.user.username }}</span>
+                            </td>
+                            <td><span class="badge badge-primary" style="font-size:10px;">{{ rew.get_reward_type_display }}</span></td>
+                            <td class="font-bold text-success">{{ rew.value }}</td>
+                            <td class="td-muted" style="font-size:var(--font-size-xs); max-width:160px;">{{ rew.reason|truncatewords:8 }}</td>
+                            <td class="td-muted" style="font-size:var(--font-size-xs);">{{ rew.expiry_date|date:"d M Y"|default:'No Expiry' }}</td>
+                            <td>
+                                <span class="badge {% if rew.status == 'active' %}badge-success{% elif rew.status == 'redeemed' %}badge-primary{% else %}badge-gray{% endif %}">
+                                    {{ rew.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-end;">
+                                    <a href="{% url 'store:dashboard_reward_edit' rew.id %}" class="action-btn action-btn-primary"><i class="fa-solid fa-pen"></i></a>
+                                    <a href="{% url 'store:dashboard_reward_delete' rew.id %}" class="action-btn action-btn-danger" onclick="return confirm('Revoke this reward?')"><i class="fa-solid fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7" class="text-center text-secondary" style="padding:var(--space-xl);">No rewards issued yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Issue New Reward Form -->
+    <div class="card">
+        <div class="card-header"><i class="fa-solid fa-gift text-success"></i> Issue New Reward</div>
+        <div class="card-body">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group"><label class="form-label">Customer Account</label>{{ form.user }}</div>
+                <div class="form-group"><label class="form-label">Reward Type</label>{{ form.reward_type }}</div>
+                <div class="form-group"><label class="form-label">Value / Amount</label>{{ form.value }}</div>
+                <div class="form-group"><label class="form-label">Reason</label>{{ form.reason }}</div>
+                <div class="form-group"><label class="form-label">Expiry Date (optional)</label>{{ form.expiry_date }}</div>
+                <button type="submit" class="btn btn-primary btn-full mt-md"><i class="fa-solid fa-gift"></i> Issue Reward</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

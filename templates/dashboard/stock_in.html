@@ -1,39 +1,80 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}Stock In | Admin{% endblock %}
-{% block page_title %}Record Stock Entry (Stock In){% endblock %}
+{% block title %}Stock In | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div class="dashboard-form-container">
-        <div style="background:#FFF3E0; border:1px solid #FFE082; padding:15px; border-radius:8px; display:flex; gap:10px; align-items:center; margin-bottom:25px; font-size:13px; color:#5D4037;">
-            <i class="fa-solid fa-square-plus" style="font-size:20px; color:#F57F17;"></i>
-            <span>Use this form to add inventory items received from suppliers to the warehouse stock database.</span>
-        </div>
-        
-        <form method="POST">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="id_product">Select Product</label>
-                {{ form.product }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_quantity">Quantity Received</label>
-                {{ form.quantity }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_notes">Stock In Notes / Reference</label>
-                {{ form.notes }}
-            </div>
-
-            <div class="form-actions">
-                <a href="{% url 'store:dashboard_stock_history' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary" style="background-color:#10B981;">
-                    Confirm Stock In <i class="fa-solid fa-circle-check"></i>
-                </button>
-            </div>
-        </form>
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Inventory — Stock In</h1>
+        <p class="staff-page-subtitle">Record incoming device units into the warehouse. Every addition is logged in the audit trail.</p>
     </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1.5fr; gap:var(--space-xl); align-items:start;">
+    <!-- Stock In Form -->
+    <div class="card">
+        <div class="card-header"><i class="fa-solid fa-circle-plus text-success"></i> Add Stock to Product</div>
+        <div class="card-body">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Product</label>
+                    {{ form.product }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quantity to Add</label>
+                    {{ form.quantity }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cost Price Per Unit (₦)</label>
+                    {{ form.cost_price }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Supplier Reference / Source</label>
+                    {{ form.supplier_reference }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Internal Notes</label>
+                    {{ form.notes }}
+                </div>
+                <button type="submit" class="btn btn-primary btn-full btn-lg mt-md">
+                    <i class="fa-solid fa-circle-plus"></i> Record Stock In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recent Stock In Log -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title">Recent Stock-In Records</h2>
+        </div>
+        <div class="staff-panel-body" style="padding:0;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Units Added</th>
+                        <th>Cost/Unit</th>
+                        <th>By</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in recent_logs %}
+                        <tr>
+                            <td><strong style="font-size:var(--font-size-sm);">{{ log.product.name }}</strong></td>
+                            <td class="text-success font-bold">+{{ log.quantity }}</td>
+                            <td>{% if log.cost_price %}₦{{ log.cost_price|floatformat:0 }}{% else %}—{% endif %}</td>
+                            <td class="td-muted" style="font-size:var(--font-size-xs);">{{ log.recorded_by.username|default:'System' }}</td>
+                            <td class="td-muted" style="font-size:var(--font-size-xs);">{{ log.created_at|date:"d M Y, H:i" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-center text-secondary" style="padding:var(--space-xl);">No stock-in records yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

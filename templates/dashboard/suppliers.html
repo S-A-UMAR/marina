@@ -1,74 +1,73 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}Manage Suppliers | Admin{% endblock %}
-{% block page_title %}Suppliers Directory{% endblock %}
+{% block title %}Suppliers | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:30px;">
-        
-        <!-- Suppliers List Table -->
-        <div style="background:#FFF; border:1px solid var(--border-color); border-radius:8px; padding:24px;">
-            <h3 style="font-size:16px; font-weight:700; margin-bottom:20px; color:var(--navy-blue);">Registered Suppliers</h3>
-            
-            <div class="table-responsive">
-                <table class="dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Supplier Name</th>
-                            <th>Contact Email</th>
-                            <th>Phone Number</th>
-                            <th>Address Location</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for sup in suppliers %}
-                            <tr>
-                                <td><strong>{{ sup.name }}</strong></td>
-                                <td>{{ sup.contact_email|default:"N/A" }}</td>
-                                <td>{{ sup.phone|default:"N/A" }}</td>
-                                <td>{{ sup.address|default:"N/A"|truncatechars:30 }}</td>
-                                <td>
-                                    <div style="display:flex; gap:10px;">
-                                        <a href="{% url 'store:dashboard_supplier_edit' sup.pk %}" style="color:var(--accent); font-size:15px;"><i class="fa-solid fa-pen-to-square"></i></a>
-                                        <a href="{% url 'store:dashboard_supplier_delete' sup.pk %}" style="color:var(--danger); font-size:15px;" onclick="return confirm('Are you sure you want to delete this supplier?')"><i class="fa-solid fa-trash-can"></i></a>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="5" style="text-align:center; padding:20px 0;">No suppliers registered.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Supplier Registry</h1>
+        <p class="staff-page-subtitle">Manage device suppliers, contact details, and their associated product sourcing records.</p>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:2fr 1fr; gap:var(--space-xl); align-items:start;">
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title">All Suppliers</h2>
         </div>
+        <div class="staff-panel-body" style="padding:0;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Supplier Name</th>
+                        <th>Phone</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th style="text-align:right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supp in suppliers %}
+                        <tr>
+                            <td>
+                                <strong>{{ supp.name }}</strong>
+                                <span class="td-muted" style="font-size:10px; display:block;">{{ supp.notes|truncatewords:6 }}</span>
+                            </td>
+                            <td>{{ supp.phone|default:'—' }}</td>
+                            <td>{{ supp.location|default:'—' }}</td>
+                            <td>
+                                <span class="badge {% if supp.is_active %}badge-success{% else %}badge-gray{% endif %}">
+                                    {% if supp.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions" style="justify-content:flex-end;">
+                                    <a href="{% url 'store:dashboard_supplier_edit' supp.id %}" class="action-btn action-btn-primary"><i class="fa-solid fa-pen"></i> Edit</a>
+                                    <a href="{% url 'store:dashboard_supplier_delete' supp.id %}" class="action-btn action-btn-danger" onclick="return confirm('Delete supplier?')"><i class="fa-solid fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-center text-secondary" style="padding:var(--space-xl);">No suppliers registered.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        <!-- Add Supplier Form -->
-        <div style="background:#FFF; border:1px solid var(--border-color); border-radius:8px; padding:24px; height:fit-content;">
-            <h3 style="font-size:16px; font-weight:700; margin-bottom:20px; color:var(--navy-blue);">Add New Supplier</h3>
-            
-            <form method="POST">
+    <div class="card">
+        <div class="card-header">Add New Supplier</div>
+        <div class="card-body">
+            <form action="" method="POST">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="id_name">Supplier Name</label>
-                    {{ form.name }}
-                </div>
-                <div class="form-group">
-                    <label for="id_contact_email">Contact Email</label>
-                    {{ form.contact_email }}
-                </div>
-                <div class="form-group">
-                    <label for="id_phone">Phone Number</label>
-                    {{ form.phone }}
-                </div>
-                <div class="form-group">
-                    <label for="id_address">Office Address</label>
-                    {{ form.address }}
-                </div>
-                <button type="submit" class="btn btn-primary" style="width:100%;">Create Supplier <i class="fa-solid fa-plus"></i></button>
+                <div class="form-group"><label class="form-label">Supplier Name</label>{{ form.name }}</div>
+                <div class="form-group"><label class="form-label">Phone</label>{{ form.phone }}</div>
+                <div class="form-group"><label class="form-label">Location / City</label>{{ form.location }}</div>
+                <div class="form-group"><label class="form-label">Notes</label>{{ form.notes }}</div>
+                <div class="form-group flex items-center gap-sm">{{ form.is_active }}<label class="form-label" style="margin-bottom:0;">Active</label></div>
+                <button type="submit" class="btn btn-primary btn-full mt-md"><i class="fa-solid fa-circle-plus"></i> Add Supplier</button>
             </form>
         </div>
     </div>
+</div>
 {% endblock %}

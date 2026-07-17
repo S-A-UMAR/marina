@@ -1,179 +1,318 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Welcome | {{ site_settings.business_name }}{% endblock %}
-
-{% block category_nav %}
-    {% for category in categories %}
-        <a href="{% url 'store:category_page' category.slug %}" class="category-link">{{ category.name }}</a>
-    {% endfor %}
-{% endblock %}
+{% block title %}Marina Gadgets Kano | Premium Electronics & Gadgets{% endblock %}
 
 {% block content %}
-    <!-- Hero Banner -->
-    <section class="hero-section">
-        <!-- Background decorative blobs -->
-        <div class="hero-blob hero-blob-1"></div>
-        <div class="hero-blob hero-blob-2"></div>
-
-        <div class="hero-left">
-            <span class="hero-eyebrow">
-                <i class="fa-solid fa-bolt"></i> Flash Deals Updated Daily
-            </span>
-            <h1 class="hero-headline">
-                Shop Smarter.<br>
-                <span class="hero-headline-accent">Save Bigger.</span>
-            </h1>
-            <p class="hero-subtext">
-                Millions of products. Unbeatable prices. Lightning-fast delivery straight to your door.
-            </p>
-            <div class="hero-cta-group">
-                <a href="{% url 'store:search_results' %}" class="btn btn-primary btn-lg hero-btn-primary">
-                    <i class="fa-solid fa-bag-shopping"></i> Shop Now
-                </a>
-                <a href="{% url 'store:search_results' %}?sort=discount" class="btn hero-btn-deals">
-                    <i class="fa-solid fa-fire"></i> Hot Deals
-                </a>
-            </div>
-
-            <!-- Trust stats bar -->
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <strong>50K+</strong>
-                    <span>Products</span>
-                </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <strong>10K+</strong>
-                    <span>Happy Customers</span>
-                </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <strong>24h</strong>
-                    <span>Fast Delivery</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="hero-right">
-            <!-- Floating product showcase cards -->
-            <div class="hero-showcase">
-                <div class="showcase-main-card">
-                    <i class="fa-solid fa-box-open"></i>
-                    <span>New Arrivals</span>
-                </div>
-                <div class="showcase-badge-card badge-deal">
-                    <i class="fa-solid fa-tag"></i>
-                    <strong>Up to 60% Off</strong>
-                </div>
-                <div class="showcase-badge-card badge-shipping">
-                    <i class="fa-solid fa-truck-fast"></i>
-                    <strong>Free Shipping</strong>
-                </div>
-                <div class="showcase-badge-card badge-secure">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <strong>Secure Checkout</strong>
-                </div>
-                <div class="hero-circle-ring"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Category Carousel/Grid -->
-    <div class="section-title">
-        <h2>Shop by Category</h2>
-    </div>
-    <div class="category-grid">
-        {% for cat in categories %}
-            <a href="{% url 'store:category_page' cat.slug %}" class="category-card">
-                {% if cat.image %}
-                    <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
-                {% else %}
-                    <div style="width:60px; height:60px; border-radius:50%; background:#FBE9E7; margin:0 auto 10px; display:flex; align-items:center; justify-content:center;">
-                        <i class="fa-solid fa-table-cells" style="color:var(--primary); font-size:24px;"></i>
-                    </div>
+<!-- Hero Section -->
+{% if hero_banners %}
+    <!-- Carousel of Banners -->
+    <div class="hero-section" style="background: none; padding: 0; min-height: auto;">
+        {% for banner in hero_banners %}
+            <div class="hero-slide" style="background: linear-gradient(135deg, #0F2756 0%, #185ABD 60%, #1E6FD9 100%); border-radius: var(--radius-xl); overflow: hidden; width: 100%; display: {% if forloop.first %}flex{% else %}none{% endif %}; align-items: center; min-height: 420px; position: relative;">
+                {% if banner.image %}
+                    <img src="{{ banner.image.url }}" alt="{{ banner.title }}" style="position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; z-index: 0; pointer-events: none;">
                 {% endif %}
-                <h3>{{ cat.name }}</h3>
-            </a>
-        {% empty %}
-            <p>No categories available.</p>
+                <div class="hero-content" style="position: relative; z-index: 1;">
+                    <div class="hero-tag">
+                        <i class="fa-solid fa-bolt text-warning"></i> Marina Featured
+                    </div>
+                    <h1 class="hero-title">{{ banner.title }}</h1>
+                    <p class="hero-subtitle">{{ banner.subtitle }}</p>
+                    <div class="hero-actions">
+                        <a href="{{ banner.link_url|default:'#' }}" class="btn-hero-primary">
+                            {{ banner.link_text|default:'Shop Now' }} <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
     </div>
+{% else %}
+    <!-- Fallback default Hero Section -->
+    <div class="hero-section" style="background: linear-gradient(135deg, #0b1a3a 0%, #15459b 50%, #1a5ec3 100%); border-radius: var(--radius-xl); overflow: hidden; position: relative; padding: var(--space-xxxl) var(--space-xl); display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-xl); min-height: 480px; box-shadow: 0 20px 40px rgba(15, 39, 86, 0.15); border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: var(--space-xxxl);">
+        <!-- Background decorative elements -->
+        <div style="position: absolute; top: -10%; right: -10%; width: 450px; height: 450px; background: radial-gradient(circle, rgba(30, 111, 217, 0.15) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+        <div style="position: absolute; bottom: -20%; left: 10%; width: 350px; height: 350px; background: radial-gradient(circle, rgba(30, 111, 217, 0.1) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
 
-    <!-- Featured Products -->
-    {% if featured_products %}
-        <div class="section-title">
-            <h2>Featured Products</h2>
-            <a href="{% url 'store:search_results' %}">View All</a>
+        <div class="hero-content" style="flex: 1 1 500px; padding: 0; max-width: 600px; z-index: 1;">
+            <div class="hero-tag" style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: var(--space-xs) var(--space-md); border-radius: var(--radius-pill); font-size: var(--font-size-xs); font-weight: 600; display: inline-flex; align-items: center; gap: var(--space-sm); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-lg);">
+                <i class="fa-solid fa-shield-halved text-success"></i> Genuine UK Used &amp; New
+            </div>
+            <h1 class="hero-title" style="font-size: clamp(32px, 4vw, 52px); font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: var(--space-md); letter-spacing: -0.02em;">
+                {{ site_settings.hero_title }}
+            </h1>
+            <p class="hero-subtitle" style="font-size: clamp(15px, 2vw, 18px); color: rgba(255, 255, 255, 0.85); line-height: 1.6; margin-bottom: var(--space-xl); max-width: 520px;">
+                {{ site_settings.hero_subtitle }}
+            </p>
+            <div class="hero-actions" style="display: flex; flex-wrap: wrap; gap: var(--space-md); margin-bottom: var(--space-xl);">
+                <a href="{% url 'store:search_results' %}" class="btn-hero-primary" style="background: #fff; color: #0F2756; padding: 14px 28px; border-radius: var(--radius-lg); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: var(--space-sm); transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                    Browse All Products <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <a href="https://wa.me/{{ site_settings.whatsapp_number }}" target="_blank" class="btn-hero-secondary" style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 14px 28px; border-radius: var(--radius-lg); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: var(--space-sm); transition: background 0.2s;">
+                    <i class="fa-brands fa-whatsapp" style="color: #25D366; font-size: 1.2rem;"></i> Chat with Us
+                </a>
+            </div>
+            <div class="hero-trust" style="display: flex; gap: var(--space-xl);">
+                <div class="hero-trust-item" style="display: flex; align-items: center; gap: var(--space-xs); color: rgba(255,255,255,0.9); font-size: var(--font-size-sm); font-weight: 500;">
+                    <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
+                    <span>Tested &amp; Trusted</span>
+                </div>
+                <div class="hero-trust-item" style="display: flex; align-items: center; gap: var(--space-xs); color: rgba(255,255,255,0.9); font-size: var(--font-size-sm); font-weight: 500;">
+                    <i class="fa-solid fa-truck" style="color: #3B82F6;"></i>
+                    <span>Same-day Kano delivery</span>
+                </div>
+            </div>
         </div>
-        <div class="product-grid">
-            {% for prod in featured_products %}
-                <div class="product-card">
-                    {% if prod.discount_price %}
-                        <span class="discount-badge">-{{ prod.discount_percent }}%</span>
+
+        <!-- Decorative Right Showcase (Smartphone & Laptop Grid mockups) -->
+        <div style="flex: 1 1 400px; display: flex; justify-content: center; align-items: center; position: relative; z-index: 1; min-height: 280px;">
+            <div style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-xl); padding: var(--space-lg); width: 100%; max-width: 420px; box-shadow: 0 30px 60px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: var(--space-md); position: relative;">
+                <!-- Glowing corner accent -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);"></div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: var(--font-size-xs); font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em;">Featured Gadget</span>
+                    <span style="background: rgba(16, 185, 129, 0.2); color: #34D399; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-pill); text-transform: uppercase;">In Stock</span>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-md); align-items: center;">
+                    <div style="background: rgba(255,255,255,0.1); border-radius: var(--radius-lg); padding: var(--space-sm); width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #fff; box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);">
+                        <i class="fa-solid fa-laptop"></i>
+                    </div>
+                    <div>
+                        <h4 style="font-size: var(--font-size-md); font-weight: 700; color: #fff; margin: 0 0 4px 0;">MacBook Pro M1</h4>
+                        <p style="font-size: var(--font-size-xs); color: rgba(255,255,255,0.6); margin: 0;">16GB RAM / 512GB SSD</p>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-xs); border-top: 1px solid rgba(255,255,255,0.06); padding-top: var(--space-md);">
+                    <div>
+                        <span style="display: block; font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase;">Special Offer</span>
+                        <span style="font-size: var(--font-size-lg); font-weight: 800; color: #fff;">₦650,000</span>
+                    </div>
+                    <a href="{% url 'store:search_results' %}?q=MacBook" style="background: #3B82F6; color: #fff; font-size: var(--font-size-sm); font-weight: 700; text-decoration: none; padding: 10px 18px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); transition: background 0.2s;">
+                        Details <i class="fa-solid fa-arrow-right" style="font-size: var(--font-size-xs);"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Popular Categories -->
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">Popular Categories</h2>
+    </div>
+    <div class="categories-grid">
+        {% for cat in categories %}
+            <a href="{% url 'store:category_page' cat.slug %}" class="category-card">
+                <div class="category-card-img">
+                    {% if cat.image %}
+                        <img src="{{ cat.image.url }}" alt="{{ cat.name }}">
+                    {% elif cat.icon %}
+                        <i class="{{ cat.icon }}"></i>
+                    {% else %}
+                        <i class="fa-solid fa-microchip"></i>
                     {% endif %}
-                    <div class="product-image-container">
-                        {% if prod.image %}
-                            <img src="{{ prod.image.url }}" alt="{{ prod.name }}">
-                        {% else %}
-                            <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#F5F5F5;">
-                                <i class="fa-solid fa-image" style="font-size:48px; color:#CCC;"></i>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">
-                            <a href="{% url 'store:product_detail' prod.slug %}">{{ prod.name }}</a>
-                        </h3>
-                        <div class="product-price-row">
-                            {% if prod.discount_price %}
-                                <span class="current-price">{{ site_settings.currency_symbol }}{{ prod.discount_price }}</span>
-                                <span class="original-price">{{ site_settings.currency_symbol }}{{ prod.price }}</span>
-                            {% else %}
-                                <span class="current-price">{{ site_settings.currency_symbol }}{{ prod.price }}</span>
-                            {% endif %}
-                        </div>
-                        <a href="{% url 'store:product_detail' prod.slug %}" class="btn btn-secondary btn-sm" style="width:100%;">
-                            <i class="fa-solid fa-eye"></i> View Details
-                        </a>
-                    </div>
                 </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+                <span class="category-card-name">{{ cat.name }}</span>
+                <span class="category-card-count">{{ cat.product_count }} items</span>
+            </a>
+        {% empty %}
+            <div class="empty-state" style="grid-column: 1/-1;">
+                <p>No categories available. Seed the database to display default catalog.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
 
-    <!-- Big Discount Campaign -->
-    {% if discount_products %}
-        <div class="section-title">
-            <h2>Hot Discounts & Deals</h2>
-        </div>
-        <div class="product-grid">
-            {% for prod in discount_products %}
-                <div class="product-card">
-                    <span class="discount-badge">-{{ prod.discount_percent }}%</span>
-                    <div class="product-image-container">
-                        {% if prod.image %}
-                            <img src="{{ prod.image.url }}" alt="{{ prod.name }}">
-                        {% else %}
-                            <div style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#F5F5F5;">
-                                <i class="fa-solid fa-image" style="font-size:48px; color:#CCC;"></i>
-                            </div>
+<!-- Promo Banners Split -->
+{% if promo_banners %}
+    <div class="section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-lg);">
+        {% for banner in promo_banners %}
+            <div style="background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: var(--radius-lg); padding: var(--space-xl); color: #fff; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px; position: relative; overflow: hidden; box-shadow: var(--shadow-1);">
+                {% if banner.image %}
+                    <img src="{{ banner.image.url }}" alt="{{ banner.title }}" style="position: absolute; top:0; right:0; width:50%; height:100%; object-fit:cover; opacity:0.3; z-index:0;">
+                {% endif %}
+                <div style="position: relative; z-index: 1; max-width: 60%;">
+                    <h3 style="font-size: var(--font-size-lg); font-weight:700; margin-bottom: var(--space-sm);">{{ banner.title }}</h3>
+                    <p style="font-size: var(--font-size-xs); opacity: 0.8; margin-bottom: var(--space-md);">{{ banner.subtitle }}</p>
+                </div>
+                <a href="{{ banner.link_url|default:'#' }}" class="btn btn-primary btn-sm" style="align-self: flex-start; z-index: 1;">
+                    {{ banner.link_text|default:'Learn More' }}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Featured Products -->
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">Featured Gadgets</h2>
+        <a href="{% url 'store:search_results' %}?sort=featured" class="btn btn-ghost btn-sm">
+            View All <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+    <div class="product-grid">
+        {% for prod in featured_products %}
+            <div class="product-card">
+                <a href="{% url 'store:product_detail' prod.slug %}" class="product-card-img" aria-label="{{ prod.name }}">
+                    {% if prod.cover_image %}
+                        <img src="{{ prod.cover_image.url }}" alt="{{ prod.name }}" loading="lazy">
+                    {% else %}
+                        <div class="no-image"><i class="fa-solid fa-image"></i></div>
+                    {% endif %}
+                </a>
+                
+                <div class="product-card-actions">
+                    <form action="{% url 'store:add_to_wishlist' %}" method="POST" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ prod.id }}">
+                        <button type="submit" class="product-card-action-btn" title="Add to Wishlist">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="product-card-body">
+                    <span class="product-card-brand">{{ prod.brand.name|default:'Generic' }}</span>
+                    <a href="{% url 'store:product_detail' prod.slug %}" class="product-card-name">{{ prod.name }}</a>
+                    
+                    <div class="product-card-price">
+                        <span class="price-current">₦{{ prod.selling_price|floatformat:0 }}</span>
+                        {% if prod.is_discounted %}
+                            <span class="price-previous">₦{{ prod.previous_price|floatformat:0 }}</span>
                         {% endif %}
                     </div>
-                    <div class="product-info">
-                        <h3 class="product-title">
-                            <a href="{% url 'store:product_detail' prod.slug %}">{{ prod.name }}</a>
-                        </h3>
-                        <div class="product-price-row">
-                            <span class="current-price">{{ site_settings.currency_symbol }}{{ prod.discount_price }}</span>
-                            <span class="original-price">{{ site_settings.currency_symbol }}{{ prod.price }}</span>
-                        </div>
-                        <a href="{% url 'store:product_detail' prod.slug %}" class="btn btn-secondary btn-sm" style="width:100%;">
-                            <i class="fa-solid fa-eye"></i> View Details
-                        </a>
+                </div>
+
+                <div class="product-card-footer">
+                    <a href="{% url 'store:product_detail' prod.slug %}" class="btn btn-secondary btn-sm">
+                        View Product
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state" style="grid-column: 1/-1;">
+                <p>No featured products yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Shop by Brand -->
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">Shop by Brand</h2>
+    </div>
+    <div class="brands-strip">
+        {% for brand in brands %}
+            <a href="{% url 'store:brand_detail' brand.slug %}" class="brand-chip">
+                {% if brand.logo %}
+                    <img src="{{ brand.logo.url }}" alt="{{ brand.name }}">
+                {% endif %}
+                <span>{{ brand.name }}</span>
+            </a>
+        {% empty %}
+            <div class="empty-state" style="grid-column: 1/-1;">
+                <p>No brands registered.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- New Arrivals -->
+<section class="section">
+    <div class="section-header">
+        <h2 class="section-title">New Arrivals</h2>
+        <a href="{% url 'store:search_results' %}?sort=newest" class="btn btn-ghost btn-sm">
+            View All <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    </div>
+    <div class="product-grid">
+        {% for prod in new_arrivals %}
+            <div class="product-card">
+                <a href="{% url 'store:product_detail' prod.slug %}" class="product-card-img" aria-label="{{ prod.name }}">
+                    {% if prod.cover_image %}
+                        <img src="{{ prod.cover_image.url }}" alt="{{ prod.name }}" loading="lazy">
+                    {% else %}
+                        <div class="no-image"><i class="fa-solid fa-image"></i></div>
+                    {% endif %}
+                </a>
+
+                <div class="product-card-actions">
+                    <form action="{% url 'store:add_to_wishlist' %}" method="POST" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ prod.id }}">
+                        <button type="submit" class="product-card-action-btn" title="Add to Wishlist">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="product-card-body">
+                    <span class="product-card-brand">{{ prod.brand.name|default:'Generic' }}</span>
+                    <a href="{% url 'store:product_detail' prod.slug %}" class="product-card-name">{{ prod.name }}</a>
+
+                    <div class="product-card-price">
+                        <span class="price-current">₦{{ prod.selling_price|floatformat:0 }}</span>
+                        {% if prod.is_discounted %}
+                            <span class="price-previous">₦{{ prod.previous_price|floatformat:0 }}</span>
+                        {% endif %}
                     </div>
                 </div>
-            {% endfor %}
+
+                <div class="product-card-footer">
+                    <a href="{% url 'store:product_detail' prod.slug %}" class="btn btn-secondary btn-sm">
+                        View Product
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state" style="grid-column: 1/-1;">
+                <p>No new arrivals yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Why Choose Marina -->
+<section class="section why-marina">
+    <h2 class="text-center font-bold mb-sm" style="font-size: var(--font-size-xl);">Why Choose Marina Gadgets?</h2>
+    <p class="text-center text-secondary mb-xl">We set the standard for gadgets sales in Kano State.</p>
+    <div class="why-marina-grid">
+        <div class="why-item">
+            <div class="why-item-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <h4>100% Genuine Products</h4>
+            <p>Every UK used or brand new device undergoes diagnostic testing and verification by our tech experts.</p>
         </div>
-    {% endif %}
+        <div class="why-item">
+            <div class="why-item-icon"><i class="fa-solid fa-truck-fast"></i></div>
+            <h4>Super Fast Dispatch</h4>
+            <p>Same-day delivery within Kano and highly organized vehicle shipping with sealed package photos for other states.</p>
+        </div>
+        <div class="why-item">
+            <div class="why-item-icon"><i class="fa-solid fa-headset"></i></div>
+            <h4>Real Human Support</h4>
+            <p>Direct WhatsApp chats, phone support, and request-a-call capabilities with real staff members.</p>
+        </div>
+        <div class="why-item">
+            <div class="why-item-icon"><i class="fa-solid fa-gift"></i></div>
+            <h4>Marina Appreciation</h4>
+            <p>Earn discount credits, priority service and rewards for shopping and helping us build a better platform.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Build Marina With Us CTA -->
+<section class="build-marina-cta">
+    <h2>Build Marina With Us</h2>
+    <p>We are constantly improving our shopping experience. Share your suggestions, report bugs, or request products you would like us to stock!</p>
+    <a href="{% url 'store:feedback' %}" class="btn btn-secondary" style="background:#fff; color:var(--color-primary);">
+        <i class="fa-solid fa-comments"></i> Send Us Your Feedback
+    </a>
+</section>
 {% endblock %}

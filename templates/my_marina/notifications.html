@@ -1,0 +1,98 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Notifications | Marina Gadgets{% endblock %}
+
+{% block content %}
+<div class="my-marina-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="my-marina-nav">
+        <div class="my-marina-nav-header">
+            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+            <span class="user-role">Customer Member</span>
+        </div>
+        <nav class="flex" style="flex-direction: column;">
+            <a href="{% url 'store:my_marina' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-gauge-high"></i> Dashboard Overview
+            </a>
+            <a href="{% url 'store:my_orders' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-clock-rotate-left"></i> My Orders
+            </a>
+            <a href="{% url 'store:wishlist' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-heart"></i> My Wishlist
+            </a>
+            <a href="{% url 'store:my_rewards' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-gift"></i> Rewards &amp; Appreciation
+            </a>
+            <a href="{% url 'store:my_notifications' %}" class="my-marina-nav-item active">
+                <i class="fa-solid fa-bell"></i> Notifications
+            </a>
+            <a href="{% url 'store:profile' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-id-card"></i> Personal Profile
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Notifications Content -->
+    <div>
+        <h1 class="font-bold mb-sm" style="font-size: var(--font-size-xl);">Notifications</h1>
+        <p class="text-secondary mb-xl">Keep up to date with order alerts, payments confirmations, and suggestions updates.</p>
+
+        {% if notifications %}
+            <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                {% for notif in notifications %}
+                    <div class="card" style="border-left: 4px solid {% if notif.is_read %}var(--color-border){% else %}var(--color-primary){% endif %};">
+                        <div class="card-body flex" style="gap: var(--space-md); align-items: flex-start;">
+                            <div class="stat-card-icon" style="background: var(--color-primary-light); color: var(--color-primary); margin-bottom: 0; flex-shrink: 0; width:36px; height:36px; font-size: 15px;">
+                                {% if notif.event_type == 'order_received' or notif.event_type == 'packing' or notif.event_type == 'dispatch' or notif.event_type == 'delivered' %}
+                                    <i class="fa-solid fa-box-open"></i>
+                                {% elif notif.event_type == 'payment_confirmed' %}
+                                    <i class="fa-solid fa-credit-card"></i>
+                                {% elif notif.event_type == 'reward' %}
+                                    <i class="fa-solid fa-gift"></i>
+                                {% elif notif.event_type == 'feedback' %}
+                                    <i class="fa-solid fa-comments"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-bell"></i>
+                                {% endif %}
+                            </div>
+
+                            <div style="flex: 1;">
+                                <div class="flex-between">
+                                    <strong style="font-size: var(--font-size-sm); color: var(--color-text-primary);">{{ notif.title }}</strong>
+                                    <span style="font-size: 10px; color: var(--color-text-muted);">{{ notif.created_at|date:"d M Y, H:i" }}</span>
+                                </div>
+                                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-top: 4px;">{{ notif.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if notifications.has_other_pages %}
+                <div class="pagination">
+                    {% if notifications.has_previous %}
+                        <a href="?page={{ notifications.previous_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-left"></i></a>
+                    {% endif %}
+                    {% for num in notifications.paginator.page_range %}
+                        {% if notifications.number == num %}
+                            <span class="page-btn active">{{ num }}</span>
+                        {% else %}
+                            <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if notifications.has_next %}
+                        <a href="?page={{ notifications.next_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-right"></i></a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fa-regular fa-bell-slash"></i></div>
+                <h3>All caught up!</h3>
+                <p>You have no notifications or messages at this time.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

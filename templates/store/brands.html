@@ -1,0 +1,36 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Shop by Brand | Marina Gadgets{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb">
+    <a href="{% url 'store:home' %}">Home</a>
+    <span class="sep">/</span>
+    <span class="current">Brands</span>
+</nav>
+
+<h1 class="font-bold mb-sm" style="font-size: var(--font-size-xl);">Shop by Brand</h1>
+<p class="text-secondary mb-xl">Explore premium electronics and mobile devices from the world's leading tech manufacturers.</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-lg);">
+    {% for brand in brands %}
+        <a href="{% url 'store:brand_detail' brand.slug %}" class="card text-center" style="display: flex; flex-direction: column; align-items: center; padding: var(--space-xl); text-decoration: none; transition: transform var(--duration-card);">
+            <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: var(--color-surface); border-radius: var(--radius-md); margin-bottom: var(--space-md); overflow: hidden;">
+                {% if brand.logo %}
+                    <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                {% else %}
+                    <i class="fa-solid fa-tag text-primary" style="font-size: 32px;"></i>
+                {% endif %}
+            </div>
+            
+            <h3 class="font-bold text-primary mb-xs" style="font-size: var(--font-size-md);">{{ brand.name }}</h3>
+            <p class="text-secondary mb-md" style="font-size: var(--font-size-sm); line-height: 1.4;">{{ brand.description|truncatewords:12 }}</p>
+            <span class="badge badge-primary">{{ brand.product_count }} published devices</span>
+        </a>
+    {% empty %}
+        <div class="empty-state" style="grid-column: 1/-1;">
+            <p>No brands currently registered.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

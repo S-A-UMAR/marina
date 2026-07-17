@@ -1,0 +1,102 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Manage Brands | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Device Brands</h1>
+        <p class="staff-page-subtitle">Add and configure device brand manufacturers for customer filters.</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-xl); align-items: start;">
+    <!-- Brand list table -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title">Active Brands</h2>
+        </div>
+        <div class="staff-panel-body" style="padding:0;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Logo</th>
+                        <th>Brand Name</th>
+                        <th>Slug</th>
+                        <th>Devices Count</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for brand in brands %}
+                        <tr>
+                            <td>
+                                <div style="width: 32px; height: 32px; overflow: hidden; background: var(--color-surface); border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--color-border);">
+                                    {% if brand.logo %}
+                                        <img src="{{ brand.logo.url }}" alt="" style="max-height:100%; max-width:100%; object-fit:contain;">
+                                    {% else %}
+                                        <i class="fa-solid fa-tag text-primary"></i>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td><strong>{{ brand.name }}</strong></td>
+                            <td class="td-mono text-secondary" style="font-size: var(--font-size-xs);">{{ brand.slug }}</td>
+                            <td>{{ brand.product_count }} items</td>
+                            <td>
+                                <span class="badge {% if brand.is_active %}badge-success{% else %}badge-gray{% endif %}">
+                                    {% if brand.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions" style="justify-content: flex-end;">
+                                    <a href="{% url 'store:dashboard_brand_edit' brand.id %}" class="action-btn action-btn-primary"><i class="fa-solid fa-pen"></i> Edit</a>
+                                    <a href="{% url 'store:dashboard_brand_delete' brand.id %}" class="action-btn action-btn-danger" onclick="return confirm('Are you sure you want to delete this brand?')"><i class="fa-solid fa-trash"></i> Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-secondary">No brands found. Add your first brand.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create brand form card -->
+    <div class="card">
+        <div class="card-header">Add New Brand</div>
+        <div class="card-body">
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label" for="id_name">Brand Name</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_logo">Brand Logo</label>
+                    {{ form.logo }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_description">Description (optional)</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="form-group flex items-center gap-sm">
+                    {{ form.is_active }}
+                    <label class="form-label" for="id_is_active" style="margin-bottom:0;">Brand is Active</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full mt-md">
+                    <i class="fa-solid fa-circle-plus"></i> Save Brand
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

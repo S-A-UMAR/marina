@@ -5,37 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ site_settings.business_name }}{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Shop millions of products at the best prices on {{ site_settings.business_name }}. Fast delivery, secure checkout.{% endblock %}">
+    <meta name="description" content="{% block meta_description %}Premium gadgets and accessories at the best prices on {{ site_settings.business_name }}. Fast delivery in Kano and nationwide.{% endblock %}">
+    
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-    <!-- ================================================
-         SIDEBAR DRAWER OVERLAY
-    ================================================= -->
+    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- ================================================
-         SIDEBAR DRAWER
-    ================================================= -->
+    <!-- Sidebar Drawer -->
     <aside class="sidebar-drawer" id="sidebarDrawer" aria-label="Site navigation">
-
-        <!-- Sidebar Header -->
         <div class="sidebar-header">
             <a href="{% url 'store:home' %}" class="sidebar-logo">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <span>{{ site_settings.business_name }}</span>
+                <i class="fa-solid fa-mobile-screen-button text-primary"></i>
+                <span>Marina</span>
             </a>
             <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <!-- User Profile Strip -->
+        <!-- User Profile Info -->
         <div class="sidebar-user">
             {% if request.user.is_authenticated %}
                 <div class="sidebar-avatar">
@@ -50,207 +46,237 @@
                     <span>{{ request.user.email }}</span>
                 </div>
             {% else %}
-                <div class="sidebar-avatar sidebar-avatar-guest">
+                <div class="sidebar-avatar">
                     <i class="fa-regular fa-user"></i>
                 </div>
                 <div class="sidebar-user-info">
                     <strong>Welcome, Guest</strong>
-                    <span>Sign in for the full experience</span>
+                    <span>Shop with trust</span>
                 </div>
             {% endif %}
         </div>
 
-        <!-- Guest login buttons -->
         {% if not request.user.is_authenticated %}
         <div class="sidebar-auth-btns">
-            <a href="{% url 'store:login' %}" class="btn btn-primary" style="flex:1; justify-content:center;">
+            <a href="{% url 'store:login' %}" class="btn btn-primary btn-sm" style="flex: 1;">
                 <i class="fa-solid fa-right-to-bracket"></i> Sign In
             </a>
-            <a href="{% url 'store:register' %}" class="btn btn-secondary" style="flex:1; justify-content:center;">
+            <a href="{% url 'store:register' %}" class="btn btn-secondary btn-sm" style="flex: 1;">
                 <i class="fa-solid fa-user-plus"></i> Register
             </a>
         </div>
         {% endif %}
 
-        <!-- Sidebar Nav -->
         <nav class="sidebar-nav">
-
-            <!-- SHOP -->
             <div class="sidebar-section-label">Shop</div>
-            <a href="{% url 'store:home' %}" class="sidebar-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-                <span class="sidebar-icon"><i class="fa-solid fa-house"></i></span>
-                Home
+            <a href="{% url 'store:home' %}" class="sidebar-link">
+                <span class="sidebar-icon"><i class="fa-solid fa-house"></i></span> Home
             </a>
             <a href="{% url 'store:search_results' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-boxes-stacked"></i></span>
-                All Products
+                <span class="sidebar-icon"><i class="fa-solid fa-boxes-stacked"></i></span> All Products
             </a>
-            <a href="{% url 'store:search_results' %}?sort=discount" class="sidebar-link">
-                <span class="sidebar-icon sidebar-icon-fire"><i class="fa-solid fa-fire"></i></span>
-                Hot Deals
-                <span class="sidebar-badge">Sale</span>
-            </a>
-            <a href="{% url 'store:search_results' %}?sort=newest" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-star"></i></span>
-                New Arrivals
+            <a href="{% url 'store:brands' %}" class="sidebar-link">
+                <span class="sidebar-icon"><i class="fa-solid fa-tag"></i></span> Shop by Brand
             </a>
 
+            <div class="sidebar-section-label">My Marina</div>
             {% if request.user.is_authenticated %}
-            <!-- MY ACCOUNT -->
-            <div class="sidebar-section-label">My Account</div>
-            <a href="{% url 'store:profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                <span class="sidebar-icon"><i class="fa-regular fa-user"></i></span>
-                My Profile
-            </a>
-            <a href="{% url 'store:my_orders' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-box"></i></span>
-                My Orders
-            </a>
-            <a href="{% url 'store:cart' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-cart-shopping"></i></span>
-                Shopping Cart
-                {% if cart_count > 0 %}
-                    <span class="sidebar-badge sidebar-badge-primary">{{ cart_count }}</span>
-                {% endif %}
-            </a>
+                <a href="{% url 'store:my_marina' %}" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fa-solid fa-user-gear"></i></span> Dashboard
+                </a>
+                <a href="{% url 'store:my_orders' %}" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fa-solid fa-clock-rotate-left"></i></span> Orders
+                </a>
+                <a href="{% url 'store:wishlist' %}" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fa-solid fa-heart"></i></span> Wishlist
+                    {% if wishlist_count > 0 %}
+                        <span class="sidebar-badge sidebar-badge-primary">{{ wishlist_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'store:my_rewards' %}" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fa-solid fa-gift"></i></span> Rewards
+                </a>
+                <a href="{% url 'store:my_notifications' %}" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fa-solid fa-bell"></i></span> Notifications
+                </a>
+            {% else %}
+                <a href="{% url 'store:login' %}" class="sidebar-link">
+                    <span class="sidebar-icon"><i class="fa-solid fa-right-to-bracket"></i></span> Log In
+                </a>
             {% endif %}
 
-            {% if request.user.is_staff or request.user.is_authenticated and request.user.profile.is_staff_or_admin %}
-            <!-- ADMIN -->
-            <div class="sidebar-section-label">Admin</div>
+            {% if request.user.is_authenticated and request.user.profile.is_staff_member %}
+            <div class="sidebar-section-label">Staff Portal</div>
             <a href="{% url 'store:dashboard_overview' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-chart-line"></i></span>
-                Dashboard
-            </a>
-            <a href="{% url 'store:dashboard_products' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-layer-group"></i></span>
-                Manage Products
-            </a>
-            <a href="{% url 'store:order_list' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-list-check"></i></span>
-                Manage Orders
+                <span class="sidebar-icon"><i class="fa-solid fa-chart-line"></i></span> Staff Dashboard
             </a>
             {% endif %}
 
-            <!-- INFORMATION -->
             <div class="sidebar-section-label">Information</div>
-            <a href="{% url 'store:about' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-circle-info"></i></span>
-                About Us
+            <a href="{% url 'store:info_about' %}" class="sidebar-link">
+                <span class="sidebar-icon"><i class="fa-solid fa-circle-info"></i></span> About Us
             </a>
-            <a href="{% url 'store:contact' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-envelope"></i></span>
-                Contact Us
+            <a href="{% url 'store:info_contact' %}" class="sidebar-link">
+                <span class="sidebar-icon"><i class="fa-solid fa-headset"></i></span> Contact SupportUs
             </a>
-            <a href="{% url 'store:faq' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-circle-question"></i></span>
-                FAQ &amp; Support
+            <a href="{% url 'store:feedback' %}" class="sidebar-link">
+                <span class="sidebar-icon"><i class="fa-solid fa-comments"></i></span> Build Marina With Us
             </a>
-            <a href="{% url 'store:shipping_returns' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-truck"></i></span>
-                Shipping &amp; Returns
+            <a href="{% url 'store:info_faq' %}" class="sidebar-link">
+                <span class="sidebar-icon"><i class="fa-solid fa-circle-question"></i></span> FAQ & Support
             </a>
-            <a href="{% url 'store:privacy_policy' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-shield-halved"></i></span>
-                Privacy Policy
-            </a>
-            <a href="{% url 'store:terms' %}" class="sidebar-link">
-                <span class="sidebar-icon"><i class="fa-solid fa-file-contract"></i></span>
-                Terms of Service
-            </a>
-
         </nav>
 
-        <!-- Sidebar Footer -->
         <div class="sidebar-footer">
             {% if request.user.is_authenticated %}
                 <a href="{% url 'store:logout' %}" class="sidebar-logout">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Sign Out
-                </a>
-            {% else %}
-                <a href="{% url 'store:login' %}" class="sidebar-logout sidebar-login-alt">
-                    <i class="fa-solid fa-right-to-bracket"></i>
-                    Sign In to your Account
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
                 </a>
             {% endif %}
             <p class="sidebar-copyright">&copy; 2026 {{ site_settings.business_name }}</p>
         </div>
-
     </aside>
 
-    <!-- ================================================
-         TOP & STICKY NAVIGATION
-    ================================================= -->
-    <header>
-        <div class="container">
-            <div class="navbar-top">
-
-                <!-- Hamburger / Menu trigger -->
-                <button class="nav-menu-btn" id="sidebarOpen" aria-label="Open menu">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-
-                <!-- Brand logo -->
-                <a href="{% url 'store:home' %}" class="logo">
-                    <i class="fa-solid fa-bag-shopping"></i> {{ site_settings.business_name }}
-                </a>
-
-                <!-- Search bar -->
-                <form action="{% url 'store:search_results' %}" method="GET" class="search-bar">
-                    <input type="text" name="q" placeholder="Search for products, categories..." value="{{ request.GET.q }}">
-                    <button type="submit">
-                        <i class="fa-solid fa-magnifying-glass"></i>
+    <!-- Top Navigation Header — Floating Glassmorphic Capsule -->
+    <div class="header-wrapper">
+        <header>
+            <div class="container">
+                <div class="navbar-top">
+                    <!-- Hamburger — pill capsule -->
+                    <button class="nav-menu-btn" id="sidebarOpen" aria-label="Open menu">
+                        <i class="fa-solid fa-bars"></i>
                     </button>
-                </form>
 
-                <!-- Nav actions: dashboard and cart -->
-                <div class="nav-actions">
-                    {% if request.user.is_authenticated %}
-                        {% if request.user.is_staff or request.user.profile.is_staff_or_admin %}
-                            <a href="{% url 'store:dashboard_overview' %}" class="nav-item">
-                                <i class="fa-solid fa-chart-line"></i>
-                                <span>Dashboard</span>
+                    <!-- Logo -->
+                    <a href="{% url 'store:home' %}" class="logo">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <div>
+                            <span class="logo-text">Marina</span>
+                            <span class="logo-sub">Gadgets Kano</span>
+                        </div>
+                    </a>
+
+                    <!-- Search Bar — pill -->
+                    <form action="{% url 'store:search_results' %}" method="GET" class="search-bar">
+                        <input type="text" name="q" placeholder="Search iPhones, Laptops, Gadgets..." value="{{ request.GET.q|default:'' }}">
+                        <button type="submit">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </form>
+
+                    <!-- Nav Actions -->
+                    <div class="nav-actions">
+                        {% if request.user.is_authenticated %}
+                            <a href="{% url 'store:my_marina' %}" class="nav-item">
+                                <i class="fa-regular fa-user"></i>
+                                <span>Account</span>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'store:login' %}" class="nav-btn-login">
+                                <i class="fa-solid fa-right-to-bracket"></i> Sign In
                             </a>
                         {% endif %}
-                    {% endif %}
-                    <a href="{% url 'store:cart' %}" class="nav-item" style="position: relative;">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span>Cart</span>
-                        {% if cart_count > 0 %}
-                            <span class="badge">{{ cart_count }}</span>
-                        {% endif %}
-                    </a>
-                </div>
 
-            </div>
+                        <a href="{% url 'store:wishlist' %}" class="nav-item">
+                            <i class="fa-regular fa-heart"></i>
+                            <span>Wishlist</span>
+                            {% if wishlist_count > 0 %}
+                                <span class="badge">{{ wishlist_count }}</span>
+                            {% endif %}
+                        </a>
 
-            <!-- Category Navigation -->
-            <div class="navbar-bottom">
-                <a href="{% url 'store:home' %}" class="category-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
-                <a href="{% url 'store:search_results' %}" class="category-link">All Products</a>
-                {% block category_nav %}{% endblock %}
-            </div>
-        </div>
-    </header>
-
-    <!-- Alert Messaging System -->
-    <div class="container">
-        {% if messages %}
-            <div class="messages-container">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        <span>{{ message }}</span>
-                        <i class="fa-solid fa-xmark" style="cursor: pointer;" onclick="this.parentElement.remove()"></i>
+                        <a href="{% url 'store:cart' %}" class="nav-item">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span>Cart</span>
+                            {% if cart_count > 0 %}
+                                <span class="badge">{{ cart_count }}</span>
+                            {% endif %}
+                        </a>
                     </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Category Strip — sits below the floating capsule -->
+        <div class="container">
+            <div class="navbar-bottom">
+                <a href="{% url 'store:home' %}" class="category-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <a href="{% url 'store:search_results' %}" class="category-link {% if request.resolver_match.url_name == 'search_results' and not request.GET.q %}active{% endif %}">
+                    <i class="fa-solid fa-boxes-stacked"></i> All Products
+                </a>
+                <a href="{% url 'store:brands' %}" class="category-link {% if request.resolver_match.url_name == 'brands' %}active{% endif %}">
+                    <i class="fa-solid fa-tag"></i> Brands
+                </a>
+                {% for cat in nav_categories %}
+                    <a href="{% url 'store:category_page' cat.slug %}" class="category-link {% if category.slug == cat.slug %}active{% endif %}">
+                        {% if cat.slug == 'smartphones-tablets' %}
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        {% elif cat.slug == 'laptops-computers' %}
+                            <i class="fa-solid fa-laptop"></i>
+                        {% elif cat.slug == 'audio-sound' %}
+                            <i class="fa-solid fa-headphones"></i>
+                        {% elif cat.slug == 'smart-wearables' %}
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        {% elif cat.slug == 'gadget-accessories' %}
+                            <i class="fa-solid fa-plug"></i>
+                        {% else %}
+                            <i class="fa-solid fa-laptop-code"></i>
+                        {% endif %}
+                        {{ cat.name }}
+                    </a>
                 {% endfor %}
             </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a href="{% url 'store:home' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="{% url 'store:brands' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'brands' %}active{% endif %}">
+                <i class="fa-solid fa-tag"></i>
+                <span>Brands</span>
+            </a>
+            <a href="{% url 'store:search_results' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'search_results' %}active{% endif %}">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <span>Search</span>
+            </a>
+            <a href="{% url 'store:wishlist' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
+                <i class="fa-regular fa-heart"></i>
+                <span>Wishlist</span>
+                {% if wishlist_count > 0 %}
+                    <span class="badge">{{ wishlist_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{% if request.user.is_authenticated %}{% url 'store:my_marina' %}{% else %}{% url 'store:login' %}{% endif %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'my_marina' %}active{% endif %}">
+                <i class="fa-regular fa-user"></i>
+                <span>My Marina</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Messages / Toasts notifications -->
+    <div class="messages-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <span>{{ message }}</span>
+                    <i class="fa-solid fa-xmark close-btn" onclick="this.parentElement.remove()"></i>
+                </div>
+            {% endfor %}
         {% endif %}
     </div>
 
     <!-- Main Content Area -->
-    <main class="container">
-        {% block content %}{% endblock %}
+    <main>
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
     <!-- Footer -->
@@ -258,20 +284,27 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-column">
-                    <h4>About {{ site_settings.business_name }}</h4>
-                    <p>{{ site_settings.tagline|default:"Your premium e-commerce destination for quality products." }}</p>
-                    <p style="margin-top: 15px;"><i class="fa-solid fa-phone"></i> {{ site_settings.phone }}</p>
-                    <p><i class="fa-solid fa-envelope"></i> {{ site_settings.email }}</p>
+                    <a href="{% url 'store:home' %}" class="footer-logo">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <span>Marina Gadgets</span>
+                    </a>
+                    <p>{{ site_settings.tagline }}</p>
+                    <p class="mt-md"><i class="fa-solid fa-location-dot mr-sm"></i> {{ site_settings.address|linebreaksbr }}</p>
+                    <p><i class="fa-solid fa-phone mr-sm"></i> {{ site_settings.phone }}</p>
+                    {% if site_settings.whatsapp_number %}
+                        <p><i class="fa-brands fa-whatsapp mr-sm"></i> <a href="https://wa.me/{{ site_settings.whatsapp_number }}" target="_blank" style="color: inherit;">+{{ site_settings.whatsapp_number }}</a></p>
+                    {% endif %}
+                    <p><i class="fa-solid fa-envelope mr-sm"></i> {{ site_settings.email }}</p>
                 </div>
 
                 <div class="footer-column">
-                    <h4>Customer Care</h4>
+                    <h4>Customer Hub</h4>
                     <ul>
-                        <li><a href="{% url 'store:contact' %}">Contact Us</a></li>
-                        <li><a href="{% url 'store:faq' %}">FAQ &amp; Support</a></li>
-                        <li><a href="{% url 'store:shipping_returns' %}">Shipping &amp; Returns</a></li>
-                        <li><a href="{% url 'store:privacy_policy' %}">Privacy Policy</a></li>
-                        <li><a href="{% url 'store:terms' %}">Terms of Service</a></li>
+                        <li><a href="{% url 'store:info_contact' %}">Contact Support</a></li>
+                        <li><a href="{% url 'store:feedback' %}">Feedback &amp; Suggestions</a></li>
+                        <li><a href="{% url 'store:info_faq' %}">FAQ &amp; Help</a></li>
+                        <li><a href="{% url 'store:info_shipping' %}">Shipping Policy</a></li>
+                        <li><a href="{% url 'store:info_warranty' %}">Warranty Policy</a></li>
                     </ul>
                 </div>
 
@@ -279,31 +312,30 @@
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="{% url 'store:home' %}">Home Store</a></li>
-                        <li><a href="{% url 'store:search_results' %}">All Products</a></li>
-                        <li><a href="{% url 'store:about' %}">About Us</a></li>
-                        <li><a href="{% url 'store:cart' %}">Shopping Cart</a></li>
-                        {% if request.user.is_authenticated %}
-                            <li><a href="{% url 'store:my_orders' %}">My Orders</a></li>
-                            <li><a href="{% url 'store:profile' %}">Account Settings</a></li>
-                        {% endif %}
+                        <li><a href="{% url 'store:search_results' %}">Browse Products</a></li>
+                        <li><a href="{% url 'store:brands' %}">All Brands</a></li>
+                        <li><a href="{% url 'store:info_about' %}">About Marina</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-column">
-                    <h4>Follow Us</h4>
-                    <div class="social-links" style="margin-bottom:16px;">
+                    <h4>Follow &amp; Pay</h4>
+                    <div class="social-links">
                         {% if site_settings.facebook_url %}
-                            <a href="{{ site_settings.facebook_url }}" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
+                            <a href="{{ site_settings.facebook_url }}" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
                         {% endif %}
                         {% if site_settings.instagram_url %}
-                            <a href="{{ site_settings.instagram_url }}" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="{{ site_settings.instagram_url }}" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
                         {% endif %}
                         {% if site_settings.twitter_url %}
-                            <a href="{{ site_settings.twitter_url }}" aria-label="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
+                            <a href="{{ site_settings.twitter_url }}" target="_blank" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                        {% endif %}
+                        {% if site_settings.whatsapp_url %}
+                            <a href="{{ site_settings.whatsapp_url }}" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
                         {% endif %}
                     </div>
-                    <p style="font-size:12px; color:#777;">Secure &amp; encrypted checkout</p>
-                    <div style="display:flex; gap:8px; margin-top:10px; font-size:22px; color:#888;">
+                    <p style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Secure OPay &amp; Paystack payment methods.</p>
+                    <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 24px; color: rgba(255,255,255,0.4);">
                         <i class="fa-brands fa-cc-visa"></i>
                         <i class="fa-brands fa-cc-mastercard"></i>
                         <i class="fa-solid fa-mobile-screen"></i>
@@ -313,14 +345,12 @@
 
             <div class="footer-bottom">
                 <p>&copy; 2026 {{ site_settings.business_name }}. All rights reserved.</p>
-                <p style="font-size:12px; color:#555;">Designed for Nigeria. Built with care.</p>
+                <p>Kano, Nigeria.</p>
             </div>
         </div>
     </footer>
 
-
-
-    <!-- Main JavaScript -->
+    <!-- Global Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

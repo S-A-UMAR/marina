@@ -1,45 +1,74 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}Stock Out | Admin{% endblock %}
-{% block page_title %}Record Stock Dispatch (Stock Out){% endblock %}
+{% block title %}Stock Out | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div class="dashboard-form-container">
-        <div style="background:#FEE2E2; border:1px solid #FCA5A5; padding:15px; border-radius:8px; display:flex; gap:10px; align-items:center; margin-bottom:25px; font-size:13px; color:#991B1B;">
-            <i class="fa-solid fa-square-minus" style="font-size:20px; color:#EF4444;"></i>
-            <span>Use this form to record stock dispatches, damages, or manual inventory write-offs. Checked out amounts must exist in stock.</span>
-        </div>
-        
-        <form method="POST">
-            {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-                <div style="background:#FEE2E2; color:#B91C1C; padding:12px; border-radius:6px; margin-bottom:20px; font-size:13px; font-weight:600;">
-                    {{ form.non_field_errors.0 }}
-                </div>
-            {% endif %}
-
-            <div class="form-group">
-                <label for="id_product">Select Product</label>
-                {{ form.product }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_quantity">Quantity Dispatched</label>
-                {{ form.quantity }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_notes">Reason for Dispatch / Notes</label>
-                {{ form.notes }}
-            </div>
-
-            <div class="form-actions">
-                <a href="{% url 'store:dashboard_stock_history' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary" style="background-color:#EF4444;">
-                    Confirm Stock Out <i class="fa-solid fa-circle-check"></i>
-                </button>
-            </div>
-        </form>
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Inventory — Stock Out</h1>
+        <p class="staff-page-subtitle">Record manual stock removals, damages, returns, or write-offs. Logged with reason.</p>
     </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1.5fr; gap:var(--space-xl); align-items:start;">
+    <div class="card">
+        <div class="card-header"><i class="fa-solid fa-circle-minus text-danger"></i> Remove Units from Stock</div>
+        <div class="card-body">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Product</label>
+                    {{ form.product }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quantity to Remove</label>
+                    {{ form.quantity }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reason</label>
+                    {{ form.reason }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    {{ form.notes }}
+                </div>
+                <button type="submit" class="btn btn-danger btn-full btn-lg mt-md">
+                    <i class="fa-solid fa-circle-minus"></i> Record Stock Out
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title">Recent Stock-Out Records</h2>
+        </div>
+        <div class="staff-panel-body" style="padding:0;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Units Out</th>
+                        <th>Reason</th>
+                        <th>By</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in recent_logs %}
+                        <tr>
+                            <td><strong style="font-size:var(--font-size-sm);">{{ log.product.name }}</strong></td>
+                            <td class="text-danger font-bold">-{{ log.quantity }}</td>
+                            <td>{{ log.get_reason_display|default:log.reason }}</td>
+                            <td class="td-muted" style="font-size:var(--font-size-xs);">{{ log.recorded_by.username|default:'System' }}</td>
+                            <td class="td-muted" style="font-size:var(--font-size-xs);">{{ log.created_at|date:"d M Y, H:i" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="text-center text-secondary" style="padding:var(--space-xl);">No stock-out records yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

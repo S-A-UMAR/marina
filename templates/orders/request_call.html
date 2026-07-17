@@ -1,0 +1,29 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Phone Call Scheduled | Marina Gadgets{% endblock %}
+
+{% block content %}
+<div style="max-width: 580px; margin: 0 auto; text-align: center; padding: var(--space-xxl) 0;">
+    <div class="stat-card-icon" style="width: 80px; height: 80px; background: var(--color-warning-light); color: var(--color-warning); font-size: 42px; margin: 0 auto var(--space-lg); border-radius: var(--radius-lg);">
+        <i class="fa-solid fa-phone-volume"></i>
+    </div>
+
+    <h1 class="font-bold text-primary mb-sm" style="font-size: var(--font-size-2xl);">Phone Call Scheduled!</h1>
+    <p class="text-secondary mb-xl" style="font-size: var(--font-size-base); line-height: 1.6;">
+        We've received your checkout request with Reference <strong class="td-mono text-primary font-bold">#{{ order.order_number }}</strong>. A Marina sales specialist will call you at <strong class="text-primary font-bold">{{ order.phone }}</strong> shortly to verify your delivery and complete payment details.
+    </p>
+
+    <div class="card mb-xl">
+        <div class="card-body">
+            <h3 class="font-semibold text-secondary mb-sm" style="font-size: var(--font-size-sm); text-transform: uppercase; letter-spacing: 0.05em;">What happens next?</h3>
+            <ul style="text-align: left; display: flex; flex-direction: column; gap: var(--space-md); font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.5;">
+                <li style="display: flex; gap: var(--space-sm);"><i class="fa-solid fa-1 text-primary" style="margin-top: 4px;"></i> <span>Our team logs the call request and checks the active stock availability.</span></li>
+                <li style="display: flex; gap: var(--space-sm);"><i class="fa-solid fa-2 text-primary" style="margin-top: 4px;"></i> <span>We call you to confirm your address details and payment preferences.</span></li>
+                <li style="display: flex; gap: var(--space-sm);"><i class="fa-solid fa-3 text-primary" style="margin-top: 4px;"></i> <span>Once confirmed, shipping dispatch is scheduled immediately.</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <a href="{% url 'store:home' %}" class="btn btn-primary btn-full btn-lg mb-sm">Return to Store</a>
+</div>
+{% endblock %}

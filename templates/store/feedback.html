@@ -1,0 +1,62 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Build Marina With Us | Suggestions & Feedback{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb">
+    <a href="{% url 'store:home' %}">Home</a>
+    <span class="sep">/</span>
+    <span class="current">Build Marina With Us</span>
+</nav>
+
+<div style="max-width: 680px; margin: 0 auto;">
+    <div class="text-center mb-xl">
+        <h1 class="font-bold text-primary mb-sm" style="font-size: var(--font-size-2xl);">Build Marina With Us</h1>
+        <p class="text-secondary">At Marina Gadgets Kano, we believe in co-creating the best customer experience. Send suggestions, request products, or report website bugs directly to our operations team.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'store:feedback' %}" method="POST">
+                {% csrf_token %}
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                    <div class="form-group">
+                        <label class="form-label" for="id_name">Your Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_phone">Phone Number (optional)</label>
+                        {{ form.phone }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_email">Email Address (optional)</label>
+                    {{ form.email }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_category">Feedback Type</label>
+                    {{ form.category }}
+                    <span class="form-help">Select the category that best describes your message.</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_subject">Subject</label>
+                    {{ form.subject }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_message">Details / Message</label>
+                    {{ form.message }}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full btn-lg mt-md">
+                    <i class="fa-solid fa-paper-plane"></i> Send Feedback
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

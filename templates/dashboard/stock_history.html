@@ -1,97 +1,78 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}Stock Movements History | Admin{% endblock %}
-{% block page_title %}Stock Movements History Log{% endblock %}
+{% block title %}Stock Audit Log | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div style="background:#FFF; border:1px solid var(--border-color); border-radius:8px; padding:24px;">
-        
-        <!-- Filters panel -->
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:25px;">
-            <form method="GET" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                <!-- Product select filter -->
-                <select name="product" class="form-control" style="width:200px; padding:8px 12px; font-size:13px;">
-                    <option value="">All Products</option>
-                    {% for prod in products %}
-                        <option value="{{ prod.id }}" {% if prod_id == prod.id|stringformat:"i" %}selected{% endif %}>{{ prod.name }}</option>
-                    {% endfor %}
-                </select>
-
-                <!-- Movement type select filter -->
-                <select name="type" class="form-control" style="width:160px; padding:8px 12px; font-size:13px;">
-                    <option value="">All Movement Types</option>
-                    <option value="IN" {% if move_type == 'IN' %}selected{% endif %}>Stock In</option>
-                    <option value="OUT" {% if move_type == 'OUT' %}selected{% endif %}>Stock Out</option>
-                    <option value="ADJUST" {% if move_type == 'ADJUST' %}selected{% endif %}>Manual Adjust</option>
-                </select>
-
-                <button type="submit" class="btn btn-secondary" style="padding:8px 16px;"><i class="fa-solid fa-filter"></i> Filter</button>
-                <a href="{% url 'store:dashboard_stock_history' %}" class="btn btn-secondary btn-sm" style="padding:10px 15px;"><i class="fa-solid fa-rotate-left"></i> Reset</a>
-            </form>
-
-            <div style="display:flex; gap:10px;">
-                <a href="{% url 'store:dashboard_stock_in' %}" class="btn btn-primary" style="background:#10B981;"><i class="fa-solid fa-square-plus"></i> Stock In</a>
-                <a href="{% url 'store:dashboard_stock_out' %}" class="btn btn-primary" style="background:#EF4444;"><i class="fa-solid fa-square-minus"></i> Stock Out</a>
-            </div>
-        </div>
-
-        <!-- History Table -->
-        <div class="table-responsive">
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Product Info</th>
-                        <th>Movement Type</th>
-                        <th>Quantity Change</th>
-                        <th>Performed By</th>
-                        <th>Notes / Logs</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for move in movements %}
-                        <tr>
-                            <td>{{ move.date|date:"M d, Y - H:i:s" }}</td>
-                            <td><strong>{{ move.product.name }}</strong></td>
-                            <td>
-                                <span class="status-badge {% if move.movement_type == 'IN' %}success{% elif move.movement_type == 'OUT' %}danger{% else %}info{% endif %}">
-                                    {{ move.get_movement_type_display }}
-                                </span>
-                            </td>
-                            <td>
-                                <strong class="{% if move.quantity_change > 0 %}text-primary{% else %}text-danger{% endif %}" style="font-size:15px;">
-                                    {% if move.quantity_change > 0 %}+{% endif %}{{ move.quantity_change }}
-                                </strong>
-                            </td>
-                            <td>{{ move.performed_by.username|default:"System Engine" }}</td>
-                            <td><span style="font-size:12px; color:#64748B;">{{ move.notes|default:"N/A" }}</span></td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="6" style="text-align:center; padding:20px 0;">No stock movements history match the filters.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        {% if movements.has_other_pages %}
-            <div class="pagination">
-                {% if movements.has_previous %}
-                    <a href="?page={{ movements.previous_page_number }}{% if prod_id %}&product={{ prod_id }}{% endif %}{% if move_type %}&type={{ move_type }}{% endif %}"><i class="fa-solid fa-chevron-left"></i></a>
-                {% endif %}
-                {% for i in movements.paginator.page_range %}
-                    {% if movements.number == i %}
-                        <span class="active">{{ i }}</span>
-                    {% else %}
-                        <a href="?page={{ i }}{% if prod_id %}&product={{ prod_id }}{% endif %}{% if move_type %}&type={{ move_type }}{% endif %}">{{ i }}</a>
-                    {% endif %}
-                {% endfor %}
-                {% if movements.has_next %}
-                    <a href="?page={{ movements.next_page_number }}{% if prod_id %}&product={{ prod_id }}{% endif %}{% if move_type %}&type={{ move_type }}{% endif %}"><i class="fa-solid fa-chevron-right"></i></a>
-                {% endif %}
-            </div>
-        {% endif %}
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Stock Audit Log</h1>
+        <p class="staff-page-subtitle">Full tamper-proof history of all stock-in and stock-out movements across the catalog.</p>
     </div>
+    <a href="?export=csv" class="btn btn-secondary btn-sm"><i class="fa-solid fa-file-arrow-down"></i> Export CSV</a>
+</div>
+
+<div class="data-table-wrapper">
+    <div class="data-table-header">
+        <form action="" method="GET" class="flex" style="gap:var(--space-sm); flex-wrap:wrap;">
+            <div class="data-table-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" placeholder="Search product name..." value="{{ query }}">
+            </div>
+            <div class="data-table-filters">
+                <select name="type" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Movements</option>
+                    <option value="in" {% if type_filter == 'in' %}selected{% endif %}>Stock In (+)</option>
+                    <option value="out" {% if type_filter == 'out' %}selected{% endif %}>Stock Out (-)</option>
+                    <option value="sale" {% if type_filter == 'sale' %}selected{% endif %}>Sales Deduction</option>
+                </select>
+                <button type="submit" class="btn btn-ghost btn-sm">Filter</button>
+                <a href="?" class="btn btn-ghost btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Movement Type</th>
+                <th>Quantity</th>
+                <th>Reference</th>
+                <th>Notes</th>
+                <th>Recorded By</th>
+                <th>Date &amp; Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td><strong style="font-size:var(--font-size-sm);">{{ log.product.name }}</strong></td>
+                    <td>
+                        <span class="badge {% if log.movement_type == 'in' %}badge-success{% elif log.movement_type == 'sale' %}badge-primary{% else %}badge-danger{% endif %}">
+                            {{ log.get_movement_type_display }}
+                        </span>
+                    </td>
+                    <td class="font-bold {% if log.movement_type == 'in' %}text-success{% else %}text-danger{% endif %}">
+                        {% if log.movement_type == 'in' %}+{{ log.quantity }}{% else %}-{{ log.quantity }}{% endif %}
+                    </td>
+                    <td class="td-mono td-muted" style="font-size:var(--font-size-xs);">{{ log.reference|default:'—' }}</td>
+                    <td class="td-muted">{{ log.notes|truncatewords:8|default:'—' }}</td>
+                    <td class="td-muted" style="font-size:var(--font-size-xs);">{{ log.recorded_by.username|default:'System' }}</td>
+                    <td class="td-muted" style="font-size:var(--font-size-xs);">{{ log.created_at|date:"d M Y, H:i" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-center text-secondary" style="padding:var(--space-xl);">No inventory movement logs found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if logs.has_other_pages %}
+        <div class="pagination" style="padding:var(--space-lg) 0;">
+            {% if logs.has_previous %}<a href="?q={{ query }}&type={{ type_filter }}&page={{ logs.previous_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-left"></i></a>{% endif %}
+            {% for num in logs.paginator.page_range %}
+                {% if logs.number == num %}<span class="page-btn active">{{ num }}</span>
+                {% else %}<a href="?q={{ query }}&type={{ type_filter }}&page={{ num }}" class="page-btn">{{ num }}</a>{% endif %}
+            {% endfor %}
+            {% if logs.has_next %}<a href="?q={{ query }}&type={{ type_filter }}&page={{ logs.next_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-right"></i></a>{% endif %}
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Feedback Cases | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Feedback &amp; Suggestions</h1>
+        <p class="staff-page-subtitle">Review all customer submitted suggestions, product requests, and bug reports from the Build Marina portal.</p>
+    </div>
+</div>
+
+<div class="data-table-wrapper">
+    <div class="data-table-header">
+        <form action="" method="GET" class="flex" style="gap:var(--space-sm); flex-wrap:wrap; width:100%;">
+            <div class="data-table-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" placeholder="Search subject, name..." value="{{ query }}">
+            </div>
+            <div class="data-table-filters">
+                <select name="category" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat, label in category_choices %}
+                        <option value="{{ cat }}" {% if cat_filter == cat %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="status" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="reviewed" {% if status_filter == 'reviewed' %}selected{% endif %}>Reviewed</option>
+                    <option value="actioned" {% if status_filter == 'actioned' %}selected{% endif %}>Actioned</option>
+                    <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+                <a href="?" class="btn btn-ghost btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Submitted By</th>
+                <th>Category</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th style="text-align:right;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fb in feedback_list %}
+                <tr>
+                    <td>
+                        <strong>{{ fb.name }}</strong>
+                        <span class="td-muted" style="font-size:10px; display:block;">{{ fb.phone|default:fb.email|default:'No contact' }}</span>
+                    </td>
+                    <td><span class="badge badge-primary" style="font-size:10px;">{{ fb.get_category_display }}</span></td>
+                    <td><strong style="font-size:var(--font-size-sm);">{{ fb.subject }}</strong></td>
+                    <td class="td-muted" style="font-size:var(--font-size-xs); max-width:200px;">{{ fb.message|truncatewords:12 }}</td>
+                    <td>
+                        <span class="badge {% if fb.status == 'actioned' %}badge-success{% elif fb.status == 'reviewed' %}badge-primary{% elif fb.status == 'rejected' %}badge-danger{% else %}badge-warning{% endif %}">
+                            {{ fb.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="td-muted" style="font-size:var(--font-size-xs);">{{ fb.created_at|date:"d M Y" }}</td>
+                    <td>
+                        <div class="table-actions" style="justify-content:flex-end;">
+                            <a href="{% url 'store:dashboard_feedback_update' fb.id %}" class="action-btn action-btn-primary"><i class="fa-solid fa-pen"></i> Update</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-center text-secondary" style="padding:var(--space-xl);">No feedback received yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if feedback_list.has_other_pages %}
+        <div class="pagination" style="padding:var(--space-lg) 0;">
+            {% if feedback_list.has_previous %}<a href="?q={{ query }}&category={{ cat_filter }}&status={{ status_filter }}&page={{ feedback_list.previous_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-left"></i></a>{% endif %}
+            {% for num in feedback_list.paginator.page_range %}
+                {% if feedback_list.number == num %}<span class="page-btn active">{{ num }}</span>
+                {% else %}<a href="?q={{ query }}&category={{ cat_filter }}&status={{ status_filter }}&page={{ num }}" class="page-btn">{{ num }}</a>{% endif %}
+            {% endfor %}
+            {% if feedback_list.has_next %}<a href="?q={{ query }}&category={{ cat_filter }}&status={{ status_filter }}&page={{ feedback_list.next_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-right"></i></a>{% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

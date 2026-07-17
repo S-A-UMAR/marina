@@ -1,0 +1,144 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Order {{ order.order_number }} | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Order <span class="td-mono text-primary">#{{ order.order_number }}</span></h1>
+        <p class="staff-page-subtitle">Placed {{ order.created_at|date:"d M Y, H:i" }} via {{ order.get_checkout_method_display }}</p>
+    </div>
+    <a href="{% url 'store:dashboard_orders' %}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> All Orders</a>
+</div>
+
+<div style="display:grid; grid-template-columns:2fr 1fr; gap:var(--space-xl); align-items:start;">
+    <!-- Left Column: Items + Timeline -->
+    <div style="display:flex; flex-direction:column; gap:var(--space-lg);">
+        <!-- Order Items -->
+        <div class="staff-panel">
+            <div class="staff-panel-header">
+                <h2 class="staff-panel-title">Order Items</h2>
+                <span class="badge badge-primary">{{ order.items.count }} items</span>
+            </div>
+            <div class="staff-panel-body" style="padding:0;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Condition</th>
+                            <th>Unit Price</th>
+                            <th>Qty</th>
+                            <th style="text-align:right;">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td>
+                                    <strong style="font-size:var(--font-size-sm);">{{ item.product_name }}</strong>
+                                </td>
+                                <td><span class="badge badge-info" style="font-size:10px;">{{ item.condition_at_sale|default:'N/A' }}</span></td>
+                                <td>₦{{ item.price|floatformat:0 }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td class="font-semibold text-primary" style="text-align:right;">₦{{ item.subtotal|floatformat:0 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="flex-between" style="padding:var(--space-md) var(--space-md); font-size:var(--font-size-sm); border-top:1px solid var(--color-border);">
+                    <span class="text-secondary">Shipping</span>
+                    <span class="font-semibold">{% if order.shipping_cost == 0 %}FREE{% else %}₦{{ order.shipping_cost|floatformat:0 }}{% endif %}</span>
+                </div>
+                <div class="flex-between" style="padding:var(--space-md); font-size:var(--font-size-base); border-top:1px solid var(--color-border); font-weight:700;">
+                    <span>Grand Total</span>
+                    <span class="text-primary">₦{{ order.total_amount|floatformat:0 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Notes -->
+        {% if order.notes %}
+        <div class="card">
+            <div class="card-header">Customer Notes</div>
+            <div class="card-body text-secondary">{{ order.notes }}</div>
+        </div>
+        {% endif %}
+
+        <!-- Status Update Form -->
+        <div class="card">
+            <div class="card-header">Update Order Status</div>
+            <div class="card-body">
+                <form action="{% url 'store:dashboard_order_update_status' order.order_number %}" method="POST">
+                    {% csrf_token %}
+                    <div style="display:grid; grid-template-columns:1fr auto; gap:var(--space-sm); align-items:end;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label class="form-label">New Status</label>
+                            <select name="status" class="form-input">
+                                {% for stat, label in status_choices %}
+                                    <option value="{{ stat }}" {% if order.status == stat %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 18px;">
+                            <i class="fa-solid fa-rotate"></i> Update
+                        </button>
+                    </div>
+                    <div class="form-group mt-md">
+                        <label class="form-label">Internal Staff Note (optional)</label>
+                        <textarea name="staff_note" class="form-input" rows="2" placeholder="e.g. 'Package was sealed and photographed before dispatch'"></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Customer details + Delivery + Timeline -->
+    <div style="display:flex; flex-direction:column; gap:var(--space-lg);">
+        <!-- Current Status -->
+        <div class="card" style="text-align:center; padding:var(--space-lg);">
+            <span style="font-size:var(--font-size-xs); font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--color-text-muted);">Current Order Status</span>
+            <div style="margin-top:var(--space-sm);">
+                <span class="status-pill status-{{ order.status }}" style="font-size:var(--font-size-sm); padding:8px 20px;">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+            <div style="margin-top:var(--space-sm);">
+                <span class="badge {% if order.checkout_method == 'online' %}badge-primary{% elif order.checkout_method == 'whatsapp' %}badge-success{% else %}badge-warning{% endif %}">
+                    {{ order.get_checkout_method_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="card">
+            <div class="card-header">Customer Details</div>
+            <div class="card-body" style="font-size:var(--font-size-sm); color:var(--color-text-secondary); line-height:1.7;">
+                <p><strong>Name:</strong> {{ order.full_name }}</p>
+                <p><strong>Phone:</strong> {{ order.phone }}</p>
+                <p><strong>Email:</strong> {{ order.email }}</p>
+                {% if order.user %}
+                    <p><strong>Account:</strong> <a href="{% url 'store:dashboard_customers' %}?q={{ order.user.username }}" class="text-primary">{{ order.user.username }}</a></p>
+                {% else %}
+                    <p><strong>Account:</strong> <span class="td-muted">Guest Checkout</span></p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Delivery Info -->
+        <div class="card">
+            <div class="card-header">Delivery Address</div>
+            <div class="card-body" style="font-size:var(--font-size-sm); color:var(--color-text-secondary); line-height:1.7;">
+                <p>{{ order.address }}</p>
+                <p>{{ order.city }}, {{ order.state }}</p>
+            </div>
+        </div>
+
+        <!-- Quick WhatsApp Link for WhatsApp orders -->
+        {% if order.checkout_method == 'whatsapp' %}
+            <a href="https://wa.me/{{ site_settings.whatsapp_number }}?text=Hello! Regarding order {{ order.order_number }} for {{ order.full_name }}." target="_blank" class="btn btn-whatsapp btn-full">
+                <i class="fa-brands fa-whatsapp"></i> Open WhatsApp Chat
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

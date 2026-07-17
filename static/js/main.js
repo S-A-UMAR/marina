@@ -1,4 +1,6 @@
-/* HUMJID Global Storefront JS Utilities */
+/* ============================================================
+   MARINA GLOBAL JAVASCRIPT UTILITIES
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
 
     // -----------------------------------------------
@@ -10,15 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlay    = document.getElementById('sidebarOverlay');
 
     function openSidebar() {
-        drawer.classList.add('active');
-        overlay.classList.add('active');
+        if (drawer) drawer.classList.add('open');
+        if (overlay) overlay.classList.add('active');
         document.body.classList.add('sidebar-open');
         if (closeBtn) closeBtn.focus();
     }
 
     function closeSidebar() {
-        drawer.classList.remove('active');
-        overlay.classList.remove('active');
+        if (drawer) drawer.classList.remove('open');
+        if (overlay) overlay.classList.remove('active');
         document.body.classList.remove('sidebar-open');
         if (openBtn) openBtn.focus();
     }
@@ -29,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Close on Escape key
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && drawer && drawer.classList.contains('active')) {
+        if (e.key === 'Escape' && drawer && drawer.classList.contains('open')) {
             closeSidebar();
         }
     });
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -----------------------------------------------
-    // Auto-dismiss alert messages after 5 seconds
+    // Auto-dismiss alerts/messages after 5 seconds
     // -----------------------------------------------
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
@@ -62,16 +64,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------
     // Product Detail Page - Thumbnail Image Switcher
     // -----------------------------------------------
-    const thumbnails = document.querySelectorAll('.thumbnail');
-    const mainImg = document.querySelector('.main-image img');
+    const thumbnails = document.querySelectorAll('.gallery-thumb');
+    const mainImg = document.querySelector('.gallery-main img');
 
     if (thumbnails.length > 0 && mainImg) {
         thumbnails.forEach(thumb => {
             thumb.addEventListener('click', function() {
                 thumbnails.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                const newSrc = this.querySelector('img').src;
-                mainImg.src = newSrc;
+                const imgEl = this.querySelector('img');
+                if (imgEl) mainImg.src = imgEl.src;
+            });
+        });
+    }
+
+    // -----------------------------------------------
+    // Product Detail Page - Tabs Switcher
+    // -----------------------------------------------
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    if (tabBtns.length > 0) {
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                this.classList.add('active');
+                const targetContent = document.getElementById(targetTab);
+                if (targetContent) targetContent.classList.add('active');
             });
         });
     }
@@ -79,25 +101,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------
     // Product Detail Page - Quantity Selector +/- Buttons
     // -----------------------------------------------
-    const qtyInput = document.querySelector('.qty-input input');
-    const plusBtn  = document.querySelector('.qty-input .plus');
-    const minusBtn = document.querySelector('.qty-input .minus');
+    const qtyDisplay = document.querySelector('.qty-display');
+    const plusBtn  = document.querySelector('.qty-btn-plus');
+    const minusBtn = document.querySelector('.qty-btn-minus');
+    const hiddenQtyInput = document.getElementById('hiddenQuantity');
 
-    if (qtyInput) {
+    if (qtyDisplay && hiddenQtyInput) {
+        const max = parseInt(qtyDisplay.getAttribute('data-max')) || 999;
+        
         if (plusBtn) {
             plusBtn.addEventListener('click', () => {
-                const max = parseInt(qtyInput.getAttribute('max')) || 999;
-                let current = parseInt(qtyInput.value) || 1;
-                if (current < max) qtyInput.value = current + 1;
+                let current = parseInt(qtyDisplay.textContent) || 1;
+                if (current < max) {
+                    current += 1;
+                    qtyDisplay.textContent = current;
+                    hiddenQtyInput.value = current;
+                }
             });
         }
         if (minusBtn) {
             minusBtn.addEventListener('click', () => {
-                let current = parseInt(qtyInput.value) || 1;
-                if (current > 1) qtyInput.value = current - 1;
+                let current = parseInt(qtyDisplay.textContent) || 1;
+                if (current > 1) {
+                    current -= 1;
+                    qtyDisplay.textContent = current;
+                    hiddenQtyInput.value = current;
+                }
             });
         }
     }
-
 });
-

@@ -1,37 +1,29 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}Edit Category | Admin{% endblock %}
-{% block page_title %}Edit Category: {{ category.name }}{% endblock %}
+{% block title %}Edit Category | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div class="dashboard-form-container">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="id_name">Category Name</label>
-                {{ form.name }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_description">Description</label>
-                {{ form.description }}
-            </div>
-
-            <div class="form-group">
-                <label for="id_image">Category Icon/Image (Cloudinary CDN)</label>
-                {{ form.image }}
-            </div>
-
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:20px;">
-                {{ form.is_active }}
-                <label for="id_is_active" style="font-weight:600; font-size:14px; margin:0;">Is Active</label>
-            </div>
-
-            <div class="form-actions">
-                <a href="{% url 'store:dashboard_categories' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Save Category Changes <i class="fa-solid fa-circle-check"></i></button>
-            </div>
-        </form>
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Edit Category: {{ category.name }}</h1>
     </div>
+    <a href="{% url 'store:dashboard_categories' %}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+<div style="max-width:580px; margin:0 auto;">
+    <div class="card">
+        <div class="card-body">
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group"><label class="form-label">Category Name</label>{{ form.name }}</div>
+                <div class="form-group"><label class="form-label">Description</label>{{ form.description }}</div>
+                {% if category.image %}
+                    <div class="mb-md"><span class="form-label">Current Image</span><img src="{{ category.image.url }}" alt="" style="max-height:48px; border:1px solid var(--color-border); border-radius:4px; padding:4px;"></div>
+                {% endif %}
+                <div class="form-group"><label class="form-label">Upload New Image</label>{{ form.image }}</div>
+                <div class="form-group flex items-center gap-sm">{{ form.is_active }}<label class="form-label" style="margin-bottom:0;">Active & Visible</label></div>
+                <button type="submit" class="btn btn-primary btn-full mt-md"><i class="fa-solid fa-floppy-disk"></i> Update Category</button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,43 +1,38 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}Change User Role | Admin{% endblock %}
-{% block page_title %}Edit Role: {{ user_to_edit.username }}{% endblock %}
+{% block title %}Manage User Role | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div class="dashboard-form-container">
-        <div style="background:#FFF3E0; border:1px solid #FFE082; padding:15px; border-radius:8px; display:flex; gap:10px; align-items:center; margin-bottom:25px; font-size:13px; color:#5D4037;">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size:20px; color:#F57F17;"></i>
-            <span>Warning: Promoting a user to Staff or Admin gives them full access to view, edit, delete, and restock products on the inventory control system.</span>
+{% block content %}
+<div class="staff-page-header">
+    <div><h1 class="staff-page-title">Manage Role: {{ target_user.username }}</h1></div>
+    <a href="{% url 'store:dashboard_users' %}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+
+<div style="max-width:480px; margin:0 auto;">
+    <div class="card">
+        <div class="card-body">
+            <div style="display:flex; align-items:center; gap:var(--space-md); padding:var(--space-md); background:var(--color-surface); border-radius:var(--radius-md); margin-bottom:var(--space-lg);">
+                <div class="stat-card-icon" style="flex-shrink:0; width:48px; height:48px; font-size:20px; background:var(--color-primary-light); color:var(--color-primary);">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div>
+                    <strong style="display:block; font-size:var(--font-size-base);">{{ target_user.get_full_name|default:target_user.username }}</strong>
+                    <span class="text-secondary" style="font-size:var(--font-size-xs);">{{ target_user.email }}</span>
+                </div>
+            </div>
+
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Assign Portal Role</label>
+                    {{ form.role }}
+                    <span class="form-help">Roles control what sections of the Staff Portal this user can access.</span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full mt-md">
+                    <i class="fa-solid fa-user-pen"></i> Update User Role
+                </button>
+            </form>
         </div>
-
-        <form method="POST">
-            {% csrf_token %}
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                <div class="form-group">
-                    <label>First Name</label>
-                    <input type="text" class="form-control" value="{{ user_to_edit.first_name }}" readonly style="background:#F1F5F9; color:#64748B;">
-                </div>
-                <div class="form-group">
-                    <label>Last Name</label>
-                    <input type="text" class="form-control" value="{{ user_to_edit.last_name }}" readonly style="background:#F1F5F9; color:#64748B;">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" class="form-control" value="{{ user_to_edit.email }}" readonly style="background:#F1F5F9; color:#64748B;">
-            </div>
-
-            <div class="form-group">
-                <label for="id_role">Assign System Role</label>
-                {{ form.role }}
-            </div>
-
-            <div class="form-actions">
-                <a href="{% url 'store:dashboard_users' %}" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Update User Role <i class="fa-solid fa-circle-check"></i></button>
-            </div>
-        </form>
     </div>
+</div>
 {% endblock %}

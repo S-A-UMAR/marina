@@ -1,0 +1,98 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Customer Orders | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Customer Orders</h1>
+        <p class="staff-page-subtitle">Monitor, update, and manage all incoming orders and their dispatch stages.</p>
+    </div>
+    <a href="?export=csv" class="btn btn-secondary btn-sm">
+        <i class="fa-solid fa-file-arrow-down"></i> Export CSV
+    </a>
+</div>
+
+<div class="data-table-wrapper">
+    <div class="data-table-header">
+        <form action="" method="GET" class="flex" style="gap:var(--space-sm); flex-wrap:wrap; width:100%;">
+            <div class="data-table-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" placeholder="Search order ID, customer name..." value="{{ query }}">
+            </div>
+            <div class="data-table-filters">
+                <select name="status" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    {% for stat, label in status_choices %}
+                        <option value="{{ stat }}" {% if status_filter == stat %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <select name="method" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Methods</option>
+                    <option value="online" {% if method_filter == 'online' %}selected{% endif %}>Online</option>
+                    <option value="whatsapp" {% if method_filter == 'whatsapp' %}selected{% endif %}>WhatsApp</option>
+                    <option value="call" {% if method_filter == 'call' %}selected{% endif %}>Request-a-Call</option>
+                </select>
+                <button type="submit" class="btn btn-ghost btn-sm">Filter</button>
+                <a href="?" class="btn btn-ghost btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>City</th>
+                <th>Total</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th style="text-align:right;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td class="td-mono font-semibold text-primary" style="font-size:var(--font-size-xs);">{{ order.order_number }}</td>
+                    <td><strong>{{ order.full_name }}</strong></td>
+                    <td class="td-muted" style="font-size:var(--font-size-xs);">{{ order.phone }}</td>
+                    <td>{{ order.city }}, {{ order.state }}</td>
+                    <td class="font-semibold text-primary">₦{{ order.total_amount|floatformat:0 }}</td>
+                    <td>
+                        <span class="badge {% if order.checkout_method == 'online' %}badge-primary{% elif order.checkout_method == 'whatsapp' %}badge-success{% else %}badge-warning{% endif %}" style="font-size:10px;">
+                            {{ order.get_checkout_method_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span>
+                    </td>
+                    <td class="td-muted" style="font-size:var(--font-size-xs);">{{ order.created_at|date:"d M Y" }}</td>
+                    <td>
+                        <div class="table-actions" style="justify-content:flex-end;">
+                            <a href="{% url 'store:dashboard_order_detail' order.order_number %}" class="action-btn action-btn-primary">
+                                <i class="fa-solid fa-eye"></i> View
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="9" class="text-center text-secondary" style="padding:var(--space-xl);">No orders match the selected filters.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if orders.has_other_pages %}
+        <div class="pagination" style="padding:var(--space-lg) 0;">
+            {% if orders.has_previous %}<a href="?q={{ query }}&status={{ status_filter }}&method={{ method_filter }}&page={{ orders.previous_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-left"></i></a>{% endif %}
+            {% for num in orders.paginator.page_range %}
+                {% if orders.number == num %}<span class="page-btn active">{{ num }}</span>
+                {% else %}<a href="?q={{ query }}&status={{ status_filter }}&method={{ method_filter }}&page={{ num }}" class="page-btn">{{ num }}</a>{% endif %}
+            {% endfor %}
+            {% if orders.has_next %}<a href="?q={{ query }}&status={{ status_filter }}&method={{ method_filter }}&page={{ orders.next_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-right"></i></a>{% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,79 +1,68 @@
 {% extends 'base/admin_base.html' %}
 
-{% block title %}Site Settings | Admin{% endblock %}
-{% block page_title %}Store & Site Settings{% endblock %}
+{% block title %}Site Settings | Marina Admin{% endblock %}
 
-{% block dashboard_content %}
-    <div class="dashboard-form-container">
-        <form method="POST" enctype="multipart/form-data">
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Site Settings</h1>
+        <p class="staff-page-subtitle">Manage the global identity, branding, contact details, and integration keys for Marina Gadgets.</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="id_business_name">Business/Store Name</label>
-                {{ form.business_name }}
+
+            <!-- Branding Section -->
+            <h3 class="font-bold mb-md mt-sm" style="font-size:var(--font-size-base); border-bottom:1px solid var(--color-border); padding-bottom:var(--space-sm);">
+                <i class="fa-solid fa-store text-primary"></i> Branding &amp; Identity
+            </h3>
+            <div class="staff-form-grid">
+                <div class="form-group"><label class="form-label">Business Name</label>{{ form.business_name }}</div>
+                <div class="form-group"><label class="form-label">Tagline</label>{{ form.tagline }}</div>
+                <div class="form-group staff-form-full"><label class="form-label">Hero Headline</label>{{ form.hero_title }}</div>
+                <div class="form-group staff-form-full"><label class="form-label">Hero Subtitle</label>{{ form.hero_subtitle }}</div>
             </div>
 
-            <div class="form-group">
-                <label for="id_tagline">Business Tagline / Subtitle</label>
-                {{ form.tagline }}
+            <!-- Contact Section -->
+            <h3 class="font-bold mb-md mt-xl" style="font-size:var(--font-size-base); border-bottom:1px solid var(--color-border); padding-bottom:var(--space-sm);">
+                <i class="fa-solid fa-address-card text-primary"></i> Contact Information
+            </h3>
+            <div class="staff-form-grid">
+                <div class="form-group"><label class="form-label">Phone Number</label>{{ form.phone }}</div>
+                <div class="form-group"><label class="form-label">Email Address</label>{{ form.email }}</div>
+                <div class="form-group staff-form-full"><label class="form-label">Physical Address</label>{{ form.address }}</div>
+                <div class="form-group"><label class="form-label">WhatsApp Number (no +)</label>{{ form.whatsapp_number }}</div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:20px;">
-                <div class="form-group">
-                    <label for="id_email">Support Email Address</label>
-                    {{ form.email }}
-                </div>
-                <div class="form-group">
-                    <label for="id_phone">Support Phone Number</label>
-                    {{ form.phone }}
-                </div>
+            <!-- Social Media Section -->
+            <h3 class="font-bold mb-md mt-xl" style="font-size:var(--font-size-base); border-bottom:1px solid var(--color-border); padding-bottom:var(--space-sm);">
+                <i class="fa-solid fa-share-nodes text-primary"></i> Social Media URLs
+            </h3>
+            <div class="staff-form-grid">
+                <div class="form-group"><label class="form-label">Facebook URL</label>{{ form.facebook_url }}</div>
+                <div class="form-group"><label class="form-label">Instagram URL</label>{{ form.instagram_url }}</div>
+                <div class="form-group"><label class="form-label">Twitter/X URL</label>{{ form.twitter_url }}</div>
+                <div class="form-group"><label class="form-label">TikTok URL</label>{{ form.tiktok_url }}</div>
             </div>
 
-            <div class="form-group">
-                <label for="id_address">Physical Office Address</label>
-                {{ form.address }}
+            <!-- Commerce Settings -->
+            <h3 class="font-bold mb-md mt-xl" style="font-size:var(--font-size-base); border-bottom:1px solid var(--color-border); padding-bottom:var(--space-sm);">
+                <i class="fa-solid fa-cart-shopping text-primary"></i> Commerce &amp; Payments
+            </h3>
+            <div class="staff-form-grid">
+                <div class="form-group"><label class="form-label">Paystack Public Key</label>{{ form.paystack_public_key }}</div>
+                <div class="form-group"><label class="form-label">OPay Merchant ID</label>{{ form.opay_merchant_id }}</div>
+                <div class="form-group"><label class="form-label">Free Shipping Threshold (₦)</label>{{ form.free_shipping_threshold }}</div>
+                <div class="form-group"><label class="form-label">Default Shipping Fee (₦)</label>{{ form.default_shipping_fee }}</div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
-                <div class="form-group">
-                    <label for="id_currency_symbol">Currency Symbol</label>
-                    {{ form.currency_symbol }}
-                </div>
-                <div class="form-group">
-                    <label for="id_shipping_fee">Flat Shipping Fee</label>
-                    {{ form.shipping_fee }}
-                </div>
-                <div class="form-group">
-                    <label for="id_free_shipping_threshold">Free Shipping Threshold</label>
-                    {{ form.free_shipping_threshold }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="id_logo">Upload Store Logo (Cloudinary CDN)</label>
-                {{ form.logo }}
-            </div>
-
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
-                <div class="form-group">
-                    <label for="id_facebook_url">Facebook URL</label>
-                    {{ form.facebook_url }}
-                </div>
-                <div class="form-group">
-                    <label for="id_instagram_url">Instagram URL</label>
-                    {{ form.instagram_url }}
-                </div>
-                <div class="form-group">
-                    <label for="id_twitter_url">Twitter URL</label>
-                    {{ form.twitter_url }}
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">
-                    Save Settings Configuration <i class="fa-solid fa-floppy-disk"></i>
-                </button>
-            </div>
+            <button type="submit" class="btn btn-primary btn-lg mt-xl">
+                <i class="fa-solid fa-floppy-disk"></i> Save All Settings
+            </button>
         </form>
     </div>
+</div>
 {% endblock %}

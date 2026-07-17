@@ -1,0 +1,133 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Marina Dashboard | Marina Gadgets{% endblock %}
+
+{% block content %}
+<div class="my-marina-layout">
+    <!-- Dashboard Sidebar Navigation -->
+    <aside class="my-marina-nav">
+        <div class="my-marina-nav-header">
+            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+            <span class="user-role">Customer Member</span>
+        </div>
+        <nav class="flex" style="flex-direction: column;">
+            <a href="{% url 'store:my_marina' %}" class="my-marina-nav-item active">
+                <i class="fa-solid fa-gauge-high"></i> Dashboard Overview
+            </a>
+            <a href="{% url 'store:my_orders' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-clock-rotate-left"></i> My Orders
+            </a>
+            <a href="{% url 'store:wishlist' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-heart"></i> My Wishlist
+            </a>
+            <a href="{% url 'store:my_rewards' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-gift"></i> Rewards &amp; Appreciation
+            </a>
+            <a href="{% url 'store:my_notifications' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-bell"></i> Notifications
+                {% if unread_count > 0 %}
+                    <span class="sidebar-badge sidebar-badge-warning" style="margin-left: 8px;">{{ unread_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'store:profile' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-id-card"></i> Personal Profile
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Dashboard Content Area -->
+    <div>
+        <div class="mb-lg">
+            <h1 class="font-bold mb-xs" style="font-size: var(--font-size-xl);">Welcome back, {{ request.user.first_name|default:request.user.username }}!</h1>
+            <p class="text-secondary" style="font-size: var(--font-size-sm);">Manage your addresses, orders, rewards, and support cases all in one place.</p>
+        </div>
+
+        <!-- Metric summaries -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-icon" style="background: var(--color-primary-light); color: var(--color-primary);">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div class="stat-card-value">{{ active_order_count }}</div>
+                <div class="stat-card-label">Active Orders</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-icon" style="background: var(--color-danger-light); color: var(--color-danger);">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+                <div class="stat-card-value">{{ wishlist_count }}</div>
+                <div class="stat-card-label">Wishlisted Items</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-icon" style="background: var(--color-success-light); color: var(--color-success);">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+                <div class="stat-card-value">{{ active_rewards.count }}</div>
+                <div class="stat-card-label">Active Rewards</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-card-icon" style="background: var(--color-info-light); color: var(--color-info);">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <div class="stat-card-value">{{ unread_count }}</div>
+                <div class="stat-card-label">New Messages</div>
+            </div>
+        </div>
+
+        <!-- Recent orders list -->
+        <div class="card mb-xl">
+            <div class="card-header">Recent Orders</div>
+            <div class="card-body" style="padding: 0;">
+                {% if recent_orders %}
+                    <table class="spec-table" style="border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--color-surface); text-align: left; font-size: var(--font-size-xs); font-weight: 700; color: var(--color-text-secondary);">
+                                <th style="padding: var(--space-md);">Order ID</th>
+                                <th style="padding: var(--space-md);">Date</th>
+                                <th style="padding: var(--space-md);">Amount</th>
+                                <th style="padding: var(--space-md);">Checkout Method</th>
+                                <th style="padding: var(--space-md);">Status</th>
+                                <th style="padding: var(--space-md);">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                                <tr style="border-bottom: 1px solid var(--color-border-light);">
+                                    <td style="padding: var(--space-md);" class="td-mono font-semibold">{{ order.order_number }}</td>
+                                    <td style="padding: var(--space-md);">{{ order.created_at|date:"d M Y" }}</td>
+                                    <td style="padding: var(--space-md);">₦{{ order.total_amount|floatformat:0 }}</td>
+                                    <td style="padding: var(--space-md);">{{ order.get_checkout_method_display }}</td>
+                                    <td style="padding: var(--space-md);">
+                                        <span class="badge {% if order.status == 'delivered' or order.status == 'completed' %}badge-success{% elif order.status == 'cancelled' or order.status == 'failed' %}badge-danger{% else %}badge-warning{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: var(--space-md);">
+                                        {% if order.checkout_method == 'whatsapp' %}
+                                            <a href="{% url 'store:whatsapp_checkout' order.order_number %}" class="btn btn-secondary btn-sm" style="padding: 4px 8px;">Re-Open Link</a>
+                                        {% elif order.checkout_method == 'call' %}
+                                            <a href="{% url 'store:request_call' order.order_number %}" class="btn btn-ghost btn-sm" style="padding: 4px 8px; cursor: default;">Awaiting Call</a>
+                                        {% else %}
+                                            <a href="{% url 'store:order_confirm' order.order_number %}" class="btn btn-secondary btn-sm" style="padding: 4px 8px;">Receipt</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+                        <h3>No orders placed yet</h3>
+                        <p>Your shopping history is empty. Purchase devices using online checkouts or WhatsApp-assisted logs.</p>
+                        <a href="{% url 'store:search_results' %}" class="btn btn-primary btn-sm">Shop Now</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

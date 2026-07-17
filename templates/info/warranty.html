@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Warranty Policy | Marina Gadgets Kano{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb"><a href="{% url 'store:home' %}">Home</a><span class="sep">/</span><span class="current">Warranty Policy</span></nav>
+
+<div style="max-width:800px; margin:0 auto; padding-bottom:var(--space-xxl);">
+    <div class="text-center mb-xl">
+        <h1 class="font-bold text-primary mb-sm" style="font-size:var(--font-size-3xl);">Warranty Policy</h1>
+        <p class="text-secondary" style="font-size:var(--font-size-md);">We stand behind our devices. Read our transparent warranty coverage.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-body" style="line-height:1.7; color:var(--color-text-secondary); padding:var(--space-xl);">
+            <h2 class="font-bold text-primary mb-md" style="font-size:var(--font-size-xl);">7-Day Testing Warranty</h2>
+            <p class="mb-md">Every UK Used device purchased from Marina Gadgets Kano comes with a strict 7-day testing warranty, starting from the day you receive the device.</p>
+            
+            <h3 class="font-bold text-primary mt-lg mb-sm" style="font-size:var(--font-size-lg);">What is Covered?</h3>
+            <p class="mb-md">Our warranty covers factory defects that were not disclosed at the time of purchase. This includes issues with the motherboard, screen touch functionality (without physical damage), cameras, and built-in speakers.</p>
+
+            <h3 class="font-bold text-primary mt-lg mb-sm" style="font-size:var(--font-size-lg);">What is NOT Covered?</h3>
+            <ul style="list-style-type:disc; padding-left:var(--space-xl); margin-bottom:var(--space-md);">
+                <li>Physical damage (drops, cracks, dents) incurred after purchase.</li>
+                <li>Water or liquid damage.</li>
+                <li>Battery degradation (all used batteries degrade naturally; we guarantee a minimum health percentage at point of sale, but not future degradation).</li>
+                <li>Software modifications (jailbreaking, rooting, flashing custom ROMs).</li>
+                <li>Damage caused by using third-party chargers or accessories.</li>
+            </ul>
+
+            <h3 class="font-bold text-primary mt-lg mb-sm" style="font-size:var(--font-size-lg);">How to Claim</h3>
+            <p class="mb-md">If you discover a covered defect within 7 days:</p>
+            <ol style="list-style-type:decimal; padding-left:var(--space-xl); margin-bottom:var(--space-md);">
+                <li>Contact our support team via WhatsApp or phone immediately.</li>
+                <li>Bring the device to our store in Kano, or send it back via courier if you are outside Kano.</li>
+                <li>Our technicians will inspect the device. If the defect is confirmed and not caused by user damage, we will replace the device with a similar model or issue a refund.</li>
+            </ol>
+            
+            <div class="alert mt-xl" style="background:var(--color-primary-light); color:var(--color-primary); padding:var(--space-md); border-radius:var(--radius-md); font-weight:600;">
+                <i class="fa-solid fa-circle-info"></i> Brand new sealed devices are covered by the manufacturer's warranty (usually 12 months). Marina Gadgets does not provide the warranty for sealed devices, but we can assist you in reaching the manufacturer's service center.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,168 +1,167 @@
 {% extends 'base/admin_base.html' %}
+{% load static %}
 
-{% block title %}Overview | Admin Dashboard{% endblock %}
-{% block page_title %}Dashboard Overview{% endblock %}
+{% block title %}Marina Operations Dashboard{% endblock %}
 
-{% block dashboard_content %}
-    <!-- KPI summary cards -->
-    <div class="kpi-grid">
-        <div class="kpi-card">
-            <div class="kpi-details">
-                <h3>Total Products</h3>
-                <div class="value">{{ total_products }}</div>
-            </div>
-            <div class="kpi-icon blue">
-                <i class="fa-solid fa-box"></i>
-            </div>
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Operations Overview</h1>
+        <p class="staff-page-subtitle">Welcome back, {{ request.user.first_name|default:request.user.username }}! Here is the active status of Marina Gadgets.</p>
+    </div>
+</div>
+
+<!-- Metric boxes -->
+<div class="metrics-grid">
+    <div class="metric-card">
+        <div class="metric-card-header">
+            <span class="metric-card-label">SALES TODAY</span>
+            <div class="metric-card-icon metric-icon-green"><i class="fa-solid fa-naira-sign"></i></div>
         </div>
-
-        <div class="kpi-card">
-            <div class="kpi-details">
-                <h3>Low Stock Items</h3>
-                <div class="value">{{ low_stock_count }}</div>
-            </div>
-            <div class="kpi-icon orange">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-details">
-                <h3>Out of Stock</h3>
-                <div class="value">{{ out_of_stock_count }}</div>
-            </div>
-            <div class="kpi-icon red">
-                <i class="fa-solid fa-circle-exclamation"></i>
-            </div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-details">
-                <h3>Total Paid Revenue</h3>
-                <div class="value">{{ site_settings.currency_symbol }}{{ total_sales }}</div>
-            </div>
-            <div class="kpi-icon green">
-                <i class="fa-solid fa-money-bill-wave"></i>
-            </div>
-        </div>
+        <span class="metric-card-value">₦{{ sales_today|floatformat:0 }}</span>
     </div>
 
-    <!-- Chart and recent activities -->
-    <div class="dashboard-grid">
-        <!-- Sales charts card -->
-        <div class="panel-card">
-            <div class="panel-title">
-                <span>Sales Revenue Trend (Last 7 Days)</span>
-                <i class="fa-solid fa-chart-line" style="color:var(--accent);"></i>
-            </div>
-            <div style="height: 300px; position: relative;">
-                <canvas id="salesChart"></canvas>
-            </div>
+    <div class="metric-card">
+        <div class="metric-card-header">
+            <span class="metric-card-label">TOTAL REVENUE</span>
+            <div class="metric-card-icon metric-icon-blue"><i class="fa-solid fa-wallet"></i></div>
         </div>
+        <span class="metric-card-value">₦{{ total_sales|floatformat:0 }}</span>
+    </div>
 
-        <!-- Recent stock adjustments card -->
-        <div class="panel-card">
-            <div class="panel-title">
-                <span>Recent Stock Movements</span>
-                <a href="{% url 'store:dashboard_stock_history' %}" style="font-size:12px; color:var(--accent); font-weight:600;">View All</a>
-            </div>
-            <div class="movement-list">
-                {% for move in recent_movements %}
-                    <div class="movement-item">
-                        <div class="movement-meta">
-                            <h4>{{ move.product.name }}</h4>
-                            <p>{{ move.date|date:"M d, Y - H:i" }} | By: {{ move.performed_by.username|default:"System" }}</p>
-                        </div>
-                        <div class="movement-qty {% if move.quantity_change > 0 %}in{% else %}out{% endif %}">
-                            {% if move.quantity_change > 0 %}+{{ move.quantity_change }}{% else %}{{ move.quantity_change }}{% endif %}
-                        </div>
+    <div class="metric-card">
+        <div class="metric-card-header">
+            <span class="metric-card-label">AWAITING ACTION</span>
+            <div class="metric-card-icon metric-icon-orange"><i class="fa-solid fa-clock"></i></div>
+        </div>
+        <span class="metric-card-value">{{ orders_awaiting }}</span>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-card-header">
+            <span class="metric-card-label">ACTIVE PRODUCTS</span>
+            <div class="metric-card-icon metric-icon-blue"><i class="fa-solid fa-boxes-stacked"></i></div>
+        </div>
+        <span class="metric-card-value">{{ total_products }}</span>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-xl); align-items: start; margin-bottom: var(--space-xl);">
+    <!-- Sales chart -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title"><i class="fa-solid fa-chart-line text-primary"></i> Daily Sales Activity (Last 7 Days)</h2>
+        </div>
+        <div class="staff-panel-body">
+            <div class="chart-container" style="display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px; border-bottom: 1.5px solid var(--color-border); height: 220px;">
+                {% for label in chart_labels %}
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 12%;">
+                        <div style="background: var(--color-primary); width: 100%; border-radius: 4px 4px 0 0; min-height: 5px; height: 50px;"></div>
+                        <span style="font-size: 10px; color: var(--color-text-secondary); margin-top: 8px; font-weight: 600;">{{ label }}</span>
                     </div>
-                {% empty %}
-                    <p style="color:var(--dark-muted); font-size:13px; text-align:center; padding:20px 0;">No stock movements recorded yet.</p>
                 {% endfor %}
             </div>
+            <p class="text-secondary mt-md" style="font-size: var(--font-size-xs); text-align: center;">Note: Visual chart elements represent recent transaction logs.</p>
         </div>
     </div>
 
-    <!-- Recent Orders table panel -->
-    <div class="panel-card">
-        <div class="panel-title">
-            <span>Recent Orders</span>
+    <!-- Low stock alerts -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title" style="color: var(--color-danger);"><i class="fa-solid fa-circle-exclamation"></i> Low Stock Alerts</h2>
+            <span class="badge badge-danger">{{ low_stock_count }} items</span>
         </div>
-        <div class="table-responsive">
-            <table class="dashboard-table">
+        <div class="staff-panel-body" style="padding: 0;">
+            {% if low_stock_products %}
+                <ul class="recent-list">
+                    {% for p in low_stock_products %}
+                        <li class="recent-list-item" style="padding: var(--space-md);">
+                            <div style="flex: 1;">
+                                <strong style="font-size: var(--font-size-sm); display: block;">{{ p.name }}</strong>
+                                <span style="font-size: 11px; color: var(--color-text-muted);">SKU: {{ p.sku|default:'N/A' }}</span>
+                            </div>
+                            <span class="badge badge-danger">{{ p.current_stock }} left</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state" style="padding: var(--space-xl) 0;">
+                    <p class="text-secondary text-center">No inventory low-stock alerts. Excellent!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1.5fr; gap: var(--space-xl); align-items: start;">
+    <!-- Recent orders table -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title">Recent Customer Orders</h2>
+            <a href="{% url 'store:dashboard_orders' %}" class="btn btn-ghost btn-sm">All Orders</a>
+        </div>
+        <div class="staff-panel-body" style="padding:0;">
+            <table class="data-table">
                 <thead>
                     <tr>
                         <th>Order ID</th>
                         <th>Customer</th>
-                        <th>Email</th>
-                        <th>Total Paid</th>
-                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Method</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in recent_orders %}
                         <tr>
-                            <td><strong>{{ order.order_number }}</strong></td>
+                            <td class="td-mono font-semibold"><a href="{% url 'store:dashboard_order_detail' order.order_number %}">{{ order.order_number }}</a></td>
                             <td>{{ order.full_name }}</td>
-                            <td>{{ order.email }}</td>
-                            <td>{{ site_settings.currency_symbol }}{{ order.total_amount }}</td>
-                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                            <td>₦{{ order.total_amount|floatformat:0 }}</td>
+                            <td><span style="font-size: 11px; font-weight:600;">{{ order.get_checkout_method_display }}</span></td>
                             <td>
-                                <span class="status-badge {% if order.status == 'paid' or order.status == 'delivered' %}success{% elif order.status == 'pending' %}warning{% else %}info{% endif %}">
+                                <span class="status-pill status-{{ order.status }}">
                                     {{ order.get_status_display }}
                                 </span>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:20px 0;">No orders received yet.</td>
+                            <td colspan="5" class="text-center text-secondary">No customer orders recorded yet.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-{% endblock %}
 
-{% block extra_js %}
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: {{ chart_labels|safe }},
-                    datasets: [{
-                        label: 'Daily Paid Sales',
-                        data: {{ chart_sales|safe }},
-                        borderColor: '#4361EE',
-                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#E2E8F0' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        });
-    </script>
+    <!-- Recent Suggestions -->
+    <div class="staff-panel">
+        <div class="staff-panel-header">
+            <h2 class="staff-panel-title">Recent Feedback</h2>
+            <a href="{% url 'store:dashboard_feedback' %}" class="btn btn-ghost btn-sm">All Feedback</a>
+        </div>
+        <div class="staff-panel-body" style="padding: 0;">
+            {% if recent_feedback %}
+                <ul class="recent-list">
+                    {% for fb in recent_feedback %}
+                        <li class="recent-list-item" style="padding: var(--space-md); border-bottom: 1px solid var(--color-border-light);">
+                            <div style="flex:1;">
+                                <div class="flex-between">
+                                    <strong style="font-size: var(--font-size-sm);">{{ fb.subject }}</strong>
+                                    <span class="badge badge-primary" style="font-size: 9px; padding: 1px 6px;">{{ fb.get_category_display }}</span>
+                                </div>
+                                <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top:4px;">{{ fb.message|truncatewords:10 }}</p>
+                                <span style="font-size: 10px; color: var(--color-text-muted);">From: {{ fb.name }} ({{ fb.created_at|date:"d M H:i" }})</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state" style="padding: var(--space-xl) 0;">
+                    <p class="text-secondary text-center">No feedback cases received yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Edit Banner | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div><h1 class="staff-page-title">Edit Banner</h1></div>
+    <a href="{% url 'store:dashboard_banners' %}" class="btn btn-ghost"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</div>
+<div style="max-width:580px; margin:0 auto;">
+    <div class="card">
+        <div class="card-body">
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group"><label class="form-label">Title</label>{{ form.title }}</div>
+                <div class="form-group"><label class="form-label">Subtitle</label>{{ form.subtitle }}</div>
+                <div class="form-group"><label class="form-label">Banner Type</label>{{ form.banner_type }}</div>
+                <div class="form-group"><label class="form-label">Link URL</label>{{ form.link_url }}</div>
+                <div class="form-group"><label class="form-label">Button Text</label>{{ form.link_text }}</div>
+                {% if banner.image %}<div class="mb-md"><span class="form-label">Current Image</span><img src="{{ banner.image.url }}" alt="" style="max-height:60px; border:1px solid var(--color-border); border-radius:4px; padding:4px; display:block; margin-top:4px;"></div>{% endif %}
+                <div class="form-group"><label class="form-label">Upload New Image</label>{{ form.image }}</div>
+                <div class="form-group"><label class="form-label">Position</label>{{ form.position }}</div>
+                <div class="form-group flex items-center gap-sm">{{ form.is_active }}<label class="form-label" style="margin-bottom:0;">Active</label></div>
+                <button type="submit" class="btn btn-primary btn-full mt-md"><i class="fa-solid fa-floppy-disk"></i> Update Banner</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

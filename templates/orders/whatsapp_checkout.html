@@ -1,0 +1,41 @@
+{% extends 'base/base.html' %}
+
+{% block title %}WhatsApp Checkout Redirect | Marina Gadgets{% endblock %}
+
+{% block content %}
+<div style="max-width: 580px; margin: 0 auto; text-align: center; padding: var(--space-xxl) 0;">
+    <div class="stat-card-icon" style="width: 80px; height: 80px; background: #E8F8EF; color: #25D366; font-size: 42px; margin: 0 auto var(--space-lg); border-radius: var(--radius-lg);">
+        <i class="fa-brands fa-whatsapp"></i>
+    </div>
+    
+    <h1 class="font-bold text-primary mb-sm" style="font-size: var(--font-size-2xl);">WhatsApp Invoice Placed</h1>
+    <p class="text-secondary mb-xl" style="font-size: var(--font-size-base); line-height: 1.6;">
+        Your order reference <strong class="td-mono text-primary font-bold">#{{ order.order_number }}</strong> has been recorded in our system. Click the button below to send your cart details directly to our staff on WhatsApp to complete the delivery.
+    </p>
+
+    <div class="card mb-xl">
+        <div class="card-body" style="text-align: left; background: var(--color-surface);">
+            <strong style="display: block; font-size: var(--font-size-sm); margin-bottom: var(--space-xs);">Prefilled Invoice Message:</strong>
+            <pre style="white-space: pre-wrap; font-family: inherit; font-size: var(--font-size-xs); color: var(--color-text-secondary); line-height: 1.5; background: #fff; padding: var(--space-md); border-radius: var(--radius-sm); border: 1px solid var(--color-border);">
+Hello Marina! I'd like to complete my order.
+
+Order Reference: {{ order.order_number }}
+Name: {{ order.full_name }}
+Phone: {{ order.phone }}
+Delivery: {{ order.city }}, {{ order.state }}
+
+Items:
+{% for item in order.items.all %}• {{ item.quantity }}x {{ item.product_name }} - ₦{{ item.price|floatformat:0 }}
+{% endfor %}
+Total: ₦{{ order.total_amount|floatformat:0 }}
+            </pre>
+        </div>
+    </div>
+
+    <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-whatsapp btn-full btn-lg mb-sm">
+        <i class="fa-brands fa-whatsapp"></i> Redirect to WhatsApp Chat
+    </a>
+    
+    <a href="{% url 'store:home' %}" class="btn btn-ghost btn-sm">Return to Homepage</a>
+</div>
+{% endblock %}

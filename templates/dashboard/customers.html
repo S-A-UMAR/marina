@@ -1,0 +1,63 @@
+{% extends 'base/admin_base.html' %}
+
+{% block title %}Customers | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Customer Registry</h1>
+        <p class="staff-page-subtitle">View all registered customers, their purchase history, and profile details.</p>
+    </div>
+</div>
+
+<div class="data-table-wrapper">
+    <div class="data-table-header">
+        <form action="" method="GET" class="flex" style="gap:var(--space-sm);">
+            <div class="data-table-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" placeholder="Search by name, phone, username..." value="{{ query }}">
+            </div>
+            <button type="submit" class="btn btn-ghost btn-sm">Search</button>
+            {% if query %}<a href="?" class="btn btn-ghost btn-sm">Clear</a>{% endif %}
+        </form>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>City</th>
+                <th>Total Orders</th>
+                <th>Date Joined</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cust in customers %}
+                <tr>
+                    <td class="font-semibold">{{ cust.username }}</td>
+                    <td>{{ cust.get_full_name|default:'—' }}</td>
+                    <td>{{ cust.profile.phone|default:'—' }}</td>
+                    <td>{{ cust.email|default:'—' }}</td>
+                    <td>{{ cust.profile.city|default:'—' }}</td>
+                    <td class="font-bold text-primary">{{ cust.order_count }}</td>
+                    <td class="td-muted" style="font-size:var(--font-size-xs);">{{ cust.date_joined|date:"d M Y" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="text-center text-secondary" style="padding:var(--space-xl);">No customers found matching that search.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if customers.has_other_pages %}
+        <div class="pagination" style="padding:var(--space-lg) 0;">
+            {% if customers.has_previous %}<a href="?q={{ query }}&page={{ customers.previous_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-left"></i></a>{% endif %}
+            {% for num in customers.paginator.page_range %}
+                {% if customers.number == num %}<span class="page-btn active">{{ num }}</span>
+                {% else %}<a href="?q={{ query }}&page={{ num }}" class="page-btn">{{ num }}</a>{% endif %}
+            {% endfor %}
+            {% if customers.has_next %}<a href="?q={{ query }}&page={{ customers.next_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-right"></i></a>{% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

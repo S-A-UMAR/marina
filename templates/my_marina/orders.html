@@ -1,0 +1,126 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Orders | Marina Gadgets{% endblock %}
+
+{% block content %}
+<div class="my-marina-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="my-marina-nav">
+        <div class="my-marina-nav-header">
+            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+            <span class="user-role">Customer Member</span>
+        </div>
+        <nav class="flex" style="flex-direction: column;">
+            <a href="{% url 'store:my_marina' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-gauge-high"></i> Dashboard Overview
+            </a>
+            <a href="{% url 'store:my_orders' %}" class="my-marina-nav-item active">
+                <i class="fa-solid fa-clock-rotate-left"></i> My Orders
+            </a>
+            <a href="{% url 'store:wishlist' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-heart"></i> My Wishlist
+            </a>
+            <a href="{% url 'store:my_rewards' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-gift"></i> Rewards &amp; Appreciation
+            </a>
+            <a href="{% url 'store:my_notifications' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-bell"></i> Notifications
+                {% if wishlist_count > 0 %}
+                    <span class="sidebar-badge sidebar-badge-warning" style="margin-left: 8px;">{{ wishlist_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'store:profile' %}" class="my-marina-nav-item">
+                <i class="fa-solid fa-id-card"></i> Personal Profile
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Orders Content -->
+    <div>
+        <h1 class="font-bold mb-sm" style="font-size: var(--font-size-xl);">My Orders</h1>
+        <p class="text-secondary mb-xl">Track the dispatch progress and details of your active and past orders.</p>
+
+        {% if orders %}
+            <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+                {% for order in orders %}
+                    <div class="card">
+                        <div class="card-header flex-between" style="background: var(--color-surface);">
+                            <div>
+                                <span style="font-size: var(--font-size-xs); color: var(--color-text-secondary); display: block;">ORDER NUMBER</span>
+                                <strong class="td-mono text-primary" style="font-size: var(--font-size-sm);">{{ order.order_number }}</strong>
+                            </div>
+                            <div>
+                                <span style="font-size: var(--font-size-xs); color: var(--color-text-secondary); display: block; text-align: right;">ORDER DATE</span>
+                                <strong style="font-size: var(--font-size-sm); color: var(--color-text-primary);">{{ order.created_at|date:"d M Y, H:i" }}</strong>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Items Summary -->
+                            <div style="margin-bottom: var(--space-md);">
+                                <ul style="display: flex; flex-direction: column; gap: var(--space-xs);">
+                                    {% for item in order.items.all %}
+                                        <li style="font-size: var(--font-size-sm); color: var(--color-text-primary); display: flex; justify-content: space-between;">
+                                            <span>{{ item.quantity }}x {{ item.product_name }}</span>
+                                            <span class="font-semibold">₦{{ item.subtotal|floatformat:0 }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <hr class="divider" style="margin: var(--space-sm) 0;">
+
+                            <div class="flex-between">
+                                <div class="flex items-center gap-sm">
+                                    <span class="text-secondary" style="font-size: var(--font-size-sm);">Status:</span>
+                                    <span class="badge {% if order.status == 'delivered' or order.status == 'completed' %}badge-success{% elif order.status == 'cancelled' or order.status == 'failed' %}badge-danger{% else %}badge-warning{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-secondary" style="font-size: var(--font-size-xs); display: block;">TOTAL PAID</span>
+                                    <strong class="text-primary" style="font-size: var(--font-size-lg);">₦{{ order.total_amount|floatformat:0 }}</strong>
+                                </div>
+                            </div>
+                            
+                            <!-- Delivery actions -->
+                            {% if order.checkout_method == 'whatsapp' %}
+                                <div class="mt-md flex justify-end">
+                                    <a href="{% url 'store:whatsapp_checkout' order.order_number %}" class="btn btn-whatsapp btn-sm">
+                                        <i class="fa-brands fa-whatsapp"></i> Chat WhatsApp
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if orders.has_other_pages %}
+                <div class="pagination">
+                    {% if orders.has_previous %}
+                        <a href="?page={{ orders.previous_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-left"></i></a>
+                    {% endif %}
+                    {% for num in orders.paginator.page_range %}
+                        {% if orders.number == num %}
+                            <span class="page-btn active">{{ num }}</span>
+                        {% else %}
+                            <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if orders.has_next %}
+                        <a href="?page={{ orders.next_page_number }}" class="page-btn"><i class="fa-solid fa-chevron-right"></i></a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fa-solid fa-box-open"></i></div>
+                <h3>No orders placed</h3>
+                <p>You haven't placed any orders yet. Visit our shop catalog to purchase premium gadgets.</p>
+                <a href="{% url 'store:search_results' %}" class="btn btn-primary">Browse Shop</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

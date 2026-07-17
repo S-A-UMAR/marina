@@ -1,46 +1,15 @@
-import requests
-import uuid
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count, Avg, F
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.http import require_POST
+from django.db.models import Q, Count, Avg
 from django.conf import settings
-from django.utils import timezone
-from datetime import timedelta
 
-# Import models
-from apps.core.models import SiteSettings
-from apps.core.utils import get_cart, is_staff_member, is_admin_member
-from apps.accounts.models import UserProfile
-from apps.brands.models import Brand
 from apps.catalog.models import Category, Product, ProductImage, ProductSpecification, ProductReview
-from apps.cart.models import Cart, CartItem
+from apps.brands.models import Brand
 from apps.wishlist.models import Wishlist, WishlistItem
-from apps.orders.models import Order, OrderItem
-from apps.payments.models import Payment
-from apps.inventory.models import StockMovement, Supplier
-from apps.homepage.models import Banner
-from apps.feedback.models import Feedback
-from apps.rewards.models import Reward
-from apps.notifications.models import Notification
+from apps.catalog.forms import ReviewForm
 
-# Import helpers across apps
-
-# Import forms
-from apps.accounts.forms import RegisterForm, LoginForm, ProfileForm
-from apps.catalog.forms import ProductForm, BrandForm, CategoryForm, ReviewForm
-from apps.inventory.forms import SupplierForm, StockInForm, StockOutForm
-from apps.checkout.forms import CheckoutForm
-from apps.feedback.forms import FeedbackForm, FeedbackStatusForm
-from apps.rewards.forms import RewardForm
-from apps.homepage.forms import BannerForm
-from apps.core.forms import SiteSettingsForm
-from apps.dashboard.forms import DashboardUserForm
 
 def category_page(request, slug):
     """Products filtered by category with sorting and filtering."""
@@ -66,7 +35,7 @@ def category_page(request, slug):
         products_qs = products_qs.order_by('selling_price')
     elif sort == 'price_high':
         products_qs = products_qs.order_by('-selling_price')
-    elif sort == 'newest':
+    else:
         products_qs = products_qs.order_by('-created_at')
 
     paginator = Paginator(products_qs, 16)
@@ -87,6 +56,7 @@ def category_page(request, slug):
     }
     return render(request, 'store/category_page.html', context)
 
+
 def brand_list(request):
     """All brands page."""
     brands = Brand.objects.filter(is_active=True).annotate(
@@ -94,6 +64,7 @@ def brand_list(request):
     )
     context = {'brands': brands}
     return render(request, 'store/brands.html', context)
+
 
 def brand_detail(request, slug):
     """Products filtered by brand."""
@@ -114,6 +85,7 @@ def brand_detail(request, slug):
     products = paginator.get_page(request.GET.get('page'))
     context = {'brand': brand, 'products': products, 'sort': sort}
     return render(request, 'store/brand_detail.html', context)
+
 
 def search_results(request):
     """Product search with filters."""
@@ -147,6 +119,8 @@ def search_results(request):
         products_qs = products_qs.order_by('-created_at')
 
     paginator = Paginator(products_qs, 16)
+    # Evaluate count before pagination to avoid double query
+    result_count = products_qs.count()
     products = paginator.get_page(request.GET.get('page'))
     brands = Brand.objects.filter(is_active=True)
 
@@ -157,10 +131,11 @@ def search_results(request):
         'brand_filter': brand_filter,
         'condition_filter': condition_filter,
         'sort': sort,
-        'result_count': products_qs.count(),
+        'result_count': result_count,
         'condition_choices': Product.CONDITION_CHOICES,
     }
     return render(request, 'store/search_results.html', context)
+
 
 def product_detail(request, slug):
     """Full product detail page."""
@@ -215,8 +190,3 @@ def product_detail(request, slug):
         'whatsapp_number': getattr(settings, 'MARINA_WHATSAPP_NUMBER', ''),
     }
     return render(request, 'store/product_detail.html', context)
-
-# ===========================================================================
-# CART VIEWS
-# ===========================================================================
-

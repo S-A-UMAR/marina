@@ -19,10 +19,18 @@
 </head>
 <body>
 
+    <!-- Mobile overlay for sidebar -->
+    <div class="staff-overlay" id="staffOverlay" aria-hidden="true"></div>
+
     <!-- Header bar -->
-    <header style="position: sticky; top: 0; z-index: 100;">
+    <header style="position: sticky; top: 0; z-index: 200;">
         <div class="container" style="max-width: 100%; padding: 0 var(--space-xl);">
             <div class="navbar-top" style="justify-content: space-between;">
+                <!-- Hamburger button (mobile only) -->
+                <button class="staff-hamburger" id="staffHamburger" aria-label="Open navigation menu" aria-expanded="false" aria-controls="staffSidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
                 <a href="{% url 'store:home' %}" class="logo" style="margin-right: 0; display: flex; align-items: center; gap: 8px;">
                     <img src="{% static 'img/favicon.png' %}" alt="Logo" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                     <div>
@@ -33,10 +41,10 @@
                 
                 <div class="nav-actions">
                     <a href="{% url 'store:home' %}" class="btn btn-secondary btn-sm" target="_blank">
-                        <i class="fa-solid fa-store"></i> View Live Store
+                        <i class="fa-solid fa-store"></i> <span class="hide-xs">View Live Store</span>
                     </a>
                     <a href="{% url 'store:logout' %}" class="btn btn-ghost btn-sm" style="color: var(--color-danger);">
-                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hide-xs">Logout</span>
                     </a>
                 </div>
             </div>
@@ -45,7 +53,12 @@
 
     <div class="staff-layout">
         <!-- Sidebar Navigation -->
-        <aside class="staff-sidebar">
+        <aside class="staff-sidebar" id="staffSidebar" role="navigation" aria-label="Staff navigation">
+            <!-- Close button (mobile only) -->
+            <button class="staff-sidebar-close" id="staffSidebarClose" aria-label="Close navigation menu">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
             <div class="staff-sidebar-user">
                 <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
                 <span class="user-role">{{ request.user.profile.get_role_display }}</span>
@@ -138,6 +151,7 @@
 
     <!-- Main scripts -->
     <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

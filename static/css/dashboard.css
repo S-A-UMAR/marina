@@ -1,32 +1,37 @@
 /* ============================================================
    MARINA STAFF PORTAL CSS — dashboard.css
+   Full mobile-responsive rewrite
    ============================================================ */
 
-/* Layout */
+/* ── Layout ───────────────────────────────────────────────── */
 .staff-layout {
   display: flex;
-  min-height: calc(100vh - var(--header-height));
+  min-height: calc(100vh - var(--header-height, 60px));
   background: var(--color-surface);
 }
 
+/* ── Sidebar ──────────────────────────────────────────────── */
 .staff-sidebar {
   width: 260px;
   background: #fff;
   border-right: 1px solid var(--color-border);
   position: sticky;
-  top: var(--header-height);
-  height: calc(100vh - var(--header-height));
+  top: var(--header-height, 60px);
+  height: calc(100vh - var(--header-height, 60px));
   overflow-y: auto;
   flex-shrink: 0;
+  transition: transform 0.3s ease;
+  z-index: 150;
 }
 
 .staff-main {
   flex: 1;
   padding: var(--space-xl) var(--space-xxl);
-  min-width: 0;
+  min-width: 0; /* prevents flex blowout */
+  overflow-x: hidden;
 }
 
-/* Staff Sidebar */
+/* ── Sidebar user info ────────────────────────────────────── */
 .staff-sidebar-brand {
   display: flex;
   align-items: center;
@@ -57,6 +62,38 @@
   color: var(--color-text-muted);
 }
 
+/* Close button (hidden on desktop) */
+.staff-sidebar-close {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  z-index: 10;
+}
+.staff-sidebar-close:hover { color: var(--color-danger); background: var(--color-danger-light); }
+
+/* Hamburger (hidden on desktop) */
+.staff-hamburger {
+  display: none;
+  background: none;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-btn);
+}
+.staff-hamburger:hover { color: var(--color-primary); border-color: var(--color-primary); }
+
+/* ── Nav items ────────────────────────────────────────────── */
 .staff-nav { padding: var(--space-md) 0; }
 
 .staff-nav-section-label {
@@ -111,7 +148,22 @@
   border-radius: var(--radius-pill);
 }
 
-/* Staff Page Header */
+/* ── Mobile Overlay ───────────────────────────────────────── */
+.staff-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 140;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.staff-overlay.is-open { display: block; }
+
+/* Body lock when sidebar open on mobile */
+body.sidebar-lock { overflow: hidden; }
+
+/* ── Page Header ──────────────────────────────────────────── */
 .staff-page-header {
   display: flex;
   align-items: flex-start;
@@ -133,7 +185,7 @@
   color: var(--color-text-secondary);
 }
 
-/* Metric Cards */
+/* ── Metric Cards ─────────────────────────────────────────── */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -197,13 +249,16 @@
 .trend-up   { color: var(--color-success); }
 .trend-down { color: var(--color-danger); }
 
-/* Data Tables */
+/* ── Data Tables ──────────────────────────────────────────── */
 .data-table-wrapper {
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-1);
+  /* Allow horizontal scroll on mobile */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .data-table-header {
@@ -225,6 +280,8 @@
   border-radius: var(--radius-md);
   padding: 8px var(--space-md);
   transition: border-color var(--duration-btn);
+  flex: 1;
+  min-width: 200px;
 }
 
 .data-table-search:focus-within { border-color: var(--color-primary); }
@@ -235,7 +292,7 @@
   outline: none;
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
-  width: 220px;
+  width: 100%;
 }
 
 .data-table-search i { color: var(--color-text-muted); font-size: 14px; }
@@ -260,7 +317,7 @@
 }
 .filter-select:focus { border-color: var(--color-primary); }
 
-.data-table { width: 100%; border-collapse: collapse; }
+.data-table { width: 100%; border-collapse: collapse; min-width: 600px; }
 
 .data-table thead th {
   padding: var(--space-sm) var(--space-md);
@@ -291,9 +348,9 @@
 }
 
 .data-table .td-muted { color: var(--color-text-muted); }
-.data-table .td-mono { font-family: monospace; }
+.data-table .td-mono  { font-family: monospace; }
 
-/* Action Buttons in Tables */
+/* ── Action Buttons ───────────────────────────────────────── */
 .table-actions {
   display: flex;
   gap: var(--space-xs);
@@ -312,6 +369,7 @@
   cursor: pointer;
   border: none;
   transition: all var(--duration-btn);
+  white-space: nowrap;
 }
 
 .action-btn-primary { background: var(--color-primary-light); color: var(--color-primary); }
@@ -326,7 +384,7 @@
 .action-btn-ghost { background: var(--color-surface); color: var(--color-text-secondary); border: 1px solid var(--color-border); }
 .action-btn-ghost:hover { background: var(--color-border); }
 
-/* Staff Panel Containers */
+/* ── Staff Panels ─────────────────────────────────────────── */
 .staff-panel {
   background: #fff;
   border: 1px solid var(--color-border);
@@ -341,6 +399,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }
 
 .staff-panel-title {
@@ -351,7 +411,7 @@
 
 .staff-panel-body { padding: var(--space-lg); }
 
-/* Form layouts for staff forms */
+/* ── Staff Forms ──────────────────────────────────────────── */
 .staff-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -360,7 +420,7 @@
 
 .staff-form-full { grid-column: 1 / -1; }
 
-/* Stock indicator in product table */
+/* ── Stock Indicator ──────────────────────────────────────── */
 .stock-indicator {
   display: flex;
   align-items: center;
@@ -387,7 +447,7 @@
 .stock-bar-fill.low { background: var(--color-warning); }
 .stock-bar-fill.out { background: var(--color-danger); width: 0 !important; }
 
-/* Status Pills for Orders */
+/* ── Order Status Pills ───────────────────────────────────── */
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -399,27 +459,27 @@
   white-space: nowrap;
 }
 
-.status-pending         { background: var(--color-warning-light); color: #92400E; }
+.status-pending          { background: var(--color-warning-light); color: #92400E; }
 .status-awaiting_payment { background: var(--color-warning-light); color: #92400E; }
-.status-payment_verified { background: var(--color-info-light); color: var(--color-info); }
-.status-confirmed       { background: var(--color-primary-light); color: var(--color-primary); }
-.status-processing      { background: var(--color-primary-light); color: var(--color-primary); }
-.status-packed          { background: var(--color-info-light); color: var(--color-info); }
-.status-ready_dispatch  { background: var(--color-info-light); color: var(--color-info); }
-.status-dispatched      { background: var(--color-success-light); color: var(--color-success); }
-.status-in_transit      { background: var(--color-success-light); color: var(--color-success); }
-.status-delivered       { background: var(--color-success-light); color: var(--color-success); }
-.status-completed       { background: var(--color-success-light); color: var(--color-success); }
-.status-cancelled       { background: var(--color-danger-light); color: var(--color-danger); }
-.status-failed          { background: var(--color-danger-light); color: var(--color-danger); }
+.status-payment_verified { background: var(--color-info-light);    color: var(--color-info); }
+.status-confirmed        { background: var(--color-primary-light); color: var(--color-primary); }
+.status-processing       { background: var(--color-primary-light); color: var(--color-primary); }
+.status-packed           { background: var(--color-info-light);    color: var(--color-info); }
+.status-ready_dispatch   { background: var(--color-info-light);    color: var(--color-info); }
+.status-dispatched       { background: var(--color-success-light); color: var(--color-success); }
+.status-in_transit       { background: var(--color-success-light); color: var(--color-success); }
+.status-delivered        { background: var(--color-success-light); color: var(--color-success); }
+.status-completed        { background: var(--color-success-light); color: var(--color-success); }
+.status-cancelled        { background: var(--color-danger-light);  color: var(--color-danger); }
+.status-failed           { background: var(--color-danger-light);  color: var(--color-danger); }
 
-/* Chart container */
+/* ── Chart Container ──────────────────────────────────────── */
 .chart-container {
   position: relative;
   height: 280px;
 }
 
-/* Recent items list */
+/* ── Recent Lists ─────────────────────────────────────────── */
 .recent-list { }
 .recent-list-item {
   display: flex;
@@ -444,23 +504,89 @@
   font-weight: 600;
 }
 
-/* Responsive staff */
-@media (max-width: 1023px) {
-  .staff-sidebar { display: none; }
-  .staff-main { padding: var(--space-lg); }
-  .staff-form-grid { grid-template-columns: 1fr; }
-  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+/* Utility: hide on extra-small screens */
+@media (max-width: 479px) {
+  .hide-xs { display: none !important; }
 }
 
-@media (max-width: 767px) {
-  .data-table-header { flex-direction: column; align-items: stretch; }
-  .data-table-search input { width: 100%; }
-  .metrics-grid { grid-template-columns: 1fr 1fr; }
-  .staff-main { padding: var(--space-md); }
-  .data-table thead { display: none; }
-  .data-table td {
-    display: block;
-    padding: 4px var(--space-md);
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================ */
+
+/* ── Tablet / small desktop (< 1024px) ─────────────────────── */
+@media (max-width: 1023px) {
+  /* Sidebar becomes a fixed off-screen drawer */
+  .staff-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    height: 100vh;
+    z-index: 150;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-3, 0 8px 32px rgba(0,0,0,.18));
   }
-  .data-table tr { display: block; border-bottom: 1px solid var(--color-border); padding: var(--space-sm) 0; }
+
+  .staff-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  /* Show hamburger + close buttons on tablet/mobile */
+  .staff-hamburger     { display: inline-flex; }
+  .staff-sidebar-close { display: block; }
+
+  /* Main content fills full width */
+  .staff-main { padding: var(--space-lg); }
+
+  /* Forms collapse to single column */
+  .staff-form-grid { grid-template-columns: 1fr; }
+
+  /* Metrics: 2 columns on tablet */
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Overview panels: stack vertically */
+  .overview-grid-2-1,
+  .overview-grid-2-15 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Mobile (< 768px) ──────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Metrics: still 2 columns (they are small enough) */
+  .metrics-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Staff main: compact padding */
+  .staff-main { padding: var(--space-md); }
+
+  /* Page header: stack title + action button */
+  .staff-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .staff-page-header > a,
+  .staff-page-header > button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Table header: stack search + filters */
+  .data-table-header { flex-direction: column; align-items: stretch; }
+  .data-table-filters { flex-direction: column; }
+  .filter-select { width: 100%; }
+
+  /* Staff panel title: smaller font */
+  .staff-panel-title { font-size: var(--font-size-sm); }
+}
+
+/* ── Small mobile (< 480px) ────────────────────────────────── */
+@media (max-width: 479px) {
+  /* Metrics: full width single column */
+  .metrics-grid { grid-template-columns: 1fr; }
+
+  /* Metric value smaller on tiny screens */
+  .metric-card-value { font-size: 22px; }
+
+  /* Action buttons: icon only */
+  .action-btn span { display: none; }
 }

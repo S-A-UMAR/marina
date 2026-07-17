@@ -93,11 +93,11 @@
 
             <!-- 3 checkout triggers / buttons -->
             <div class="checkout-methods">
-                <form action="{% url 'store:add_to_cart' %}" method="POST" id="addToCartForm" style="margin:0;">
+                <form id="addToCartForm" style="margin:0;">
                     {% csrf_token %}
                     <input type="hidden" name="product_id" value="{{ product.id }}">
                     <input type="hidden" name="quantity" value="1" id="hiddenQuantity">
-                    <button type="submit" class="btn btn-primary btn-full btn-lg mb-sm">
+                    <button type="button" class="btn btn-primary btn-full btn-lg mb-sm" id="addToCartBtn">
                         <i class="fa-solid fa-cart-plus"></i> Add to Cart
                     </button>
                 </form>
@@ -110,17 +110,13 @@
                     
                     <!-- Wishlist toggle -->
                     {% if in_wishlist %}
-                        <a href="{% url 'store:wishlist' %}" class="btn btn-secondary btn-full" style="color: var(--color-danger); border-color: var(--color-danger);">
+                        <button type="button" class="btn btn-secondary btn-full" id="wishlistToggleBtn" data-in-wishlist="true" style="color: var(--color-danger); border-color: var(--color-danger);">
                             <i class="fa-solid fa-heart"></i> In Wishlist
-                        </a>
+                        </button>
                     {% else %}
-                        <form action="{% url 'store:add_to_wishlist' %}" method="POST" style="margin: 0;">
-                            {% csrf_token %}
-                            <input type="hidden" name="product_id" value="{{ product.id }}">
-                            <button type="submit" class="btn btn-secondary btn-full">
-                                <i class="fa-regular fa-heart"></i> Save Wishlist
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-secondary btn-full" id="wishlistToggleBtn" data-in-wishlist="false">
+                            <i class="fa-regular fa-heart"></i> Save Wishlist
+                        </button>
                     {% endif %}
                 </div>
             </div>

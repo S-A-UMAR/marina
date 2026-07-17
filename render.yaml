@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: marina-web
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    plan: free
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "*.onrender.com"
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: SECRET_KEY
+        generateValue: true
+      # TiDB Database Configuration (Provide these in Render dashboard)
+      - key: TIDB_HOST
+        sync: false
+      - key: TIDB_PORT
+        value: "4000"
+      - key: TIDB_DB_NAME
+        value: "marina"
+      - key: TIDB_USER
+        sync: false
+      - key: TIDB_PASSWORD
+        sync: false
+      # Cloudinary Configuration (Provide these in Render dashboard)
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # Paystack Configuration (Provide these in Render dashboard)
+      - key: PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      # Redis Cache Configuration (Linked automatically to Redis service below)
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: marina-redis
+          property: connectionString
+
+  - type: redis
+    name: marina-redis
+    plan: free
+    ipAllowList: [] # Secure: only accessible within the Render network

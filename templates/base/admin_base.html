@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Staff Portal | Marina{% endblock %}</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+    
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -20,8 +23,8 @@
     <header style="position: sticky; top: 0; z-index: 100;">
         <div class="container" style="max-width: 100%; padding: 0 var(--space-xl);">
             <div class="navbar-top" style="justify-content: space-between;">
-                <a href="{% url 'store:home' %}" class="logo" style="margin-right: 0;">
-                    <i class="fa-solid fa-mobile-screen-button text-primary"></i>
+                <a href="{% url 'store:home' %}" class="logo" style="margin-right: 0; display: flex; align-items: center; gap: 8px;">
+                    <img src="{% static 'img/favicon.png' %}" alt="Logo" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                     <div>
                         <span class="logo-text">Marina Staff</span>
                         <span class="logo-sub">Operations Hub</span>

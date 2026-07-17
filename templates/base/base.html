@@ -7,6 +7,9 @@
     <title>{% block title %}{{ site_settings.business_name }}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Premium gadgets and accessories at the best prices on {{ site_settings.business_name }}. Fast delivery in Kano and nationwide.{% endblock %}">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+    
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -22,8 +25,8 @@
     <!-- Sidebar Drawer -->
     <aside class="sidebar-drawer" id="sidebarDrawer" aria-label="Site navigation">
         <div class="sidebar-header">
-            <a href="{% url 'store:home' %}" class="sidebar-logo">
-                <i class="fa-solid fa-mobile-screen-button text-primary"></i>
+            <a href="{% url 'store:home' %}" class="sidebar-logo" style="display: flex; align-items: center; gap: 8px;">
+                <img src="{% static 'img/favicon.png' %}" alt="Logo" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                 <span>Marina</span>
             </a>
             <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
@@ -148,8 +151,8 @@
                     </button>
 
                     <!-- Logo -->
-                    <a href="{% url 'store:home' %}" class="logo">
-                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    <a href="{% url 'store:home' %}" class="logo" style="display: flex; align-items: center; gap: 8px;">
+                        <img src="{% static 'img/favicon.png' %}" alt="Logo" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                         <div>
                             <span class="logo-text">Marina</span>
                             <span class="logo-sub">Gadgets Kano</span>
@@ -284,8 +287,8 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-column">
-                    <a href="{% url 'store:home' %}" class="footer-logo">
-                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    <a href="{% url 'store:home' %}" class="footer-logo" style="display: flex; align-items: center; gap: 8px;">
+                        <img src="{% static 'img/favicon.png' %}" alt="Logo" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                         <span>Marina Gadgets</span>
                     </a>
                     <p>{{ site_settings.tagline }}</p>

@@ -1,0 +1,114 @@
+{% extends 'base/admin_base.html' %}
+{% load marina_filters %}
+
+{% block title %}Awaiting Dispatch | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Awaiting Dispatch</h1>
+        <p class="staff-page-subtitle">Packages sealed and ready for dispatch. Group them to send to the transport park or assign local riders.</p>
+    </div>
+    <div>
+        <a href="{% url 'store:dashboard_dispatch_batches' %}" class="btn btn-ghost">
+            <i class="fa-solid fa-list-check"></i> View Dispatch Batches
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Sealed Packages ({{ orders.count }})</div>
+    <div class="card-body" style="padding: 0;">
+        <form action="" method="POST" id="dispatchForm">
+            {% csrf_token %}
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px; text-align: center;">
+                            <input type="checkbox" id="selectAllCheckbox" style="width:16px; height:16px; cursor:pointer;">
+                        </th>
+                        <th>Order Number</th>
+                        <th>Customer</th>
+                        <th>State / Destination</th>
+                        <th>Delivery Type</th>
+                        <th style="text-align: right;">Total Amount</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td style="text-align: center;">
+                                <input type="checkbox" name="order_ids[]" value="{{ order.id }}" class="order-checkbox" style="width:16px; height:16px; cursor:pointer;">
+                            </td>
+                            <td><strong class="td-mono">#{{ order.order_number }}</strong></td>
+                            <td>{{ order.full_name }}</td>
+                            <td>{{ order.state }} ({{ order.city }})</td>
+                            <td>
+                                {% if order.state|lower == 'kano' or order.delivery_type == 'kano' %}
+                                    <span class="badge badge-success"><i class="fa-solid fa-motorcycle"></i> Kano Local</span>
+                                {% else %}
+                                    <span class="badge badge-primary"><i class="fa-solid fa-truck-fast"></i> Interstate</span>
+                                {% endif %}
+                            </td>
+                            <td class="font-semibold text-primary" style="text-align: right;">{{ order.total_amount|naira }}</td>
+                            <td style="text-align: center;">
+                                <a href="{% url 'store:dashboard_order_detail' order.order_number %}" class="btn btn-ghost btn-sm" style="padding: 4px 8px;">
+                                    <i class="fa-solid fa-eye"></i> Details
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" style="padding: var(--space-xl); text-align: center;">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-box text-muted" style="font-size: 48px; margin-bottom: var(--space-md);"></i>
+                                    <p class="font-semibold text-secondary">No packages awaiting dispatch right now.</p>
+                                    <p class="text-muted" style="font-size: var(--font-size-xs);">Sealed packages will automatically appear here once packaging checklist is completed.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if orders %}
+                <div style="padding: var(--space-lg); border-top: 1.5px solid var(--color-border); display: flex; justify-content: flex-end;">
+                    <button type="submit" class="btn btn-primary btn-lg" id="createBatchBtn" disabled>
+                        <i class="fa-solid fa-truck-ramp-box"></i> Send Selected Packages to Park (Create Batch)
+                    </button>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAllCheckbox');
+        const checkboxes = document.querySelectorAll('.order-checkbox');
+        const createBatchBtn = document.getElementById('createBatchBtn');
+
+        function updateBtnState() {
+            const checkedCount = Array.from(checkboxes).filter(chk => chk.checked).length;
+            if (createBatchBtn) {
+                createBatchBtn.disabled = checkedCount === 0;
+            }
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(chk => chk.checked = this.checked);
+                updateBtnState();
+            });
+        }
+
+        checkboxes.forEach(chk => {
+            chk.addEventListener('change', updateBtnState);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,4 +1,5 @@
 {% extends 'base/admin_base.html' %}
+{% load marina_filters %}
 
 {% block title %}{{ title }} | Marina Admin{% endblock %}
 
@@ -16,8 +17,12 @@
 <div class="card">
     <div class="card-header">{{ title }} Information</div>
     <div class="card-body">
-        <form action="" method="POST" enctype="multipart/form-data">
+        <form action="" method="POST" enctype="multipart/form-data" id="productForm">
             {% csrf_token %}
+            
+            {% if upload_session_token %}
+                <input type="hidden" name="upload_session_token" value="{{ upload_session_token }}">
+            {% endif %}
 
             <div class="staff-form-grid">
                 <div class="form-group staff-form-full">
@@ -43,9 +48,28 @@
                     {{ form.brand }}
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="id_category">Store Category</label>
+                <!-- Cascade Category & Subcategory Select -->
+                <div style="display:none;">
                     {{ form.category }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="category_parent_select">Primary Category</label>
+                    <select id="category_parent_select" class="form-input">
+                        <option value="">Select Category...</option>
+                        {% for cat in categories %}
+                            {% if not cat.parent %}
+                                <option value="{{ cat.id }}" {% if product.category.parent.id == cat.id or product.category.id == cat.id and not product.category.parent %}selected{% endif %}>{{ cat.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="subcategory_select">Subcategory</label>
+                    <select id="subcategory_select" class="form-input">
+                        <option value="">Select Subcategory...</option>
+                    </select>
                 </div>
 
                 <div class="form-group staff-form-full">
@@ -78,8 +102,8 @@
                     {{ form.low_stock_threshold }}
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="id_cover_image">Product Cover Image</label>
+                <!-- Hidden cover image input since it's automated via gallery -->
+                <div style="display:none;">
                     {{ form.cover_image }}
                 </div>
 
@@ -97,6 +121,47 @@
                     {{ form.is_new_arrival }}
                     <label class="form-label" for="id_is_new_arrival" style="margin-bottom:0;">Mark as New Arrival Tag</label>
                 </div>
+
+                <!-- Gallery Multi-media Upload Container -->
+                <div class="form-group staff-form-full">
+                    <label class="form-label">Product Gallery Media (Images & Videos)</label>
+                    <div class="media-upload-container">
+                        <div class="media-dropzone" id="mediaDropzone">
+                            <i class="fa-solid fa-cloud-arrow-up text-primary" style="font-size: 32px; margin-bottom: var(--space-sm);"></i>
+                            <p class="font-semibold text-secondary mb-xs">Drag & drop files here, or click to upload</p>
+                            <p class="text-muted" style="font-size: var(--font-size-xs);">Supports multiple JPEG, PNG, WEBP images and MP4 videos</p>
+                            <input type="file" id="mediaFileInput" multiple accept="image/*,video/mp4" style="display: none;">
+                        </div>
+                        
+                        <!-- Preview grid -->
+                        <div class="media-preview-grid" id="mediaPreviewGrid">
+                            <!-- Existing Gallery Images -->
+                            {% for img in gallery_images %}
+                                <div class="media-preview-card" data-id="{{ img.id }}" data-type="image">
+                                    {% if img.is_cover %}
+                                        <span class="cover-badge"><i class="fa-solid fa-star"></i> Cover</span>
+                                    {% endif %}
+                                    <img src="{{ img.image.url }}" alt="Gallery Image">
+                                    <div class="media-actions">
+                                        <button type="button" class="media-action-btn delete" onclick="deleteMedia({{ img.id }}, 'image', this)"><i class="fa-solid fa-trash"></i></button>
+                                        <button type="button" class="media-action-btn cover" onclick="setCoverImage({{ img.id }}, this)"><i class="fa-solid fa-star"></i> Cover</button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <!-- Existing Videos -->
+                            {% for vid in videos %}
+                                <div class="media-preview-card" data-id="{{ vid.id }}" data-type="video">
+                                    <span class="video-badge"><i class="fa-solid fa-video"></i> Video</span>
+                                    <video src="{{ vid.video.url }}" muted playsinline></video>
+                                    <div class="media-actions">
+                                        <button type="button" class="media-action-btn delete" onclick="deleteMedia({{ vid.id }}, 'video', this)"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary btn-lg mt-lg">
@@ -105,4 +170,365 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Sortable.js for Drag and Drop Reordering -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script>
+    // -------------------------------------------------------------
+    // CASCADE CATEGORY SELECT
+    // -------------------------------------------------------------
+    const categoryMap = {
+        {% for cat in categories %}
+            {% if not cat.parent %}
+                "{{ cat.id }}": [
+                    {% for sub in categories %}
+                        {% if sub.parent.id == cat.id %}
+                            { id: "{{ sub.id }}", name: "{{ sub.name }}" },
+                        {% endif %}
+                    {% endfor %}
+                ],
+            {% endif %}
+        {% endfor %}
+    };
+
+    const parentSelect = document.getElementById('category_parent_select');
+    const subSelect = document.getElementById('subcategory_select');
+    const originalSelect = document.getElementById('id_category');
+
+    function updateSubcategories(selectedParentId, selectSubId = null) {
+        // Clear subcategory options
+        subSelect.innerHTML = '<option value="">Select Subcategory...</option>';
+        
+        const subs = categoryMap[selectedParentId] || [];
+        
+        if (subs.length > 0) {
+            subSelect.disabled = false;
+            subSelect.required = true;
+            
+            subs.forEach(sub => {
+                const opt = document.createElement('option');
+                opt.value = sub.id;
+                opt.textContent = sub.name;
+                if (selectSubId && selectSubId == sub.id) {
+                    opt.selected = true;
+                }
+                subSelect.appendChild(opt);
+            });
+        } else {
+            subSelect.disabled = true;
+            subSelect.required = false;
+            // If no subcategories, top-level category is the category
+            originalSelect.value = selectedParentId;
+        }
+    }
+
+    parentSelect.addEventListener('change', function() {
+        const val = this.value;
+        updateSubcategories(val);
+        if (categoryMap[val] && categoryMap[val].length > 0) {
+            originalSelect.value = '';
+        } else {
+            originalSelect.value = val;
+        }
+    });
+
+    subSelect.addEventListener('change', function() {
+        originalSelect.value = this.value || parentSelect.value;
+    });
+
+    // Initialize category selections on Edit
+    {% if product.category %}
+        {% if product.category.parent %}
+            // It is a subcategory
+            parentSelect.value = "{{ product.category.parent.id }}";
+            updateSubcategories("{{ product.category.parent.id }}", "{{ product.category.id }}");
+            originalSelect.value = "{{ product.category.id }}";
+        {% else %}
+            // It is a top-level category
+            parentSelect.value = "{{ product.category.id }}";
+            updateSubcategories("{{ product.category.id }}");
+            originalSelect.value = "{{ product.category.id }}";
+        {% endif %}
+    {% endif %}
+
+
+    // -------------------------------------------------------------
+    // AJAX FILE UPLOADS & DRAG DROP
+    // -------------------------------------------------------------
+    const dropzone = document.getElementById('mediaDropzone');
+    const fileInput = document.getElementById('mediaFileInput');
+    const previewGrid = document.getElementById('mediaPreviewGrid');
+    
+    const productId = "{{ product.id|default:'' }}";
+    const sessionToken = "{{ upload_session_token|default:'' }}";
+    const csrfToken = "{{ csrf_token }}";
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    // Drag-over styling
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+        }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    });
+
+    fileInput.addEventListener('change', function() {
+        handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+        Array.from(files).forEach(file => {
+            uploadFile(file);
+        });
+    }
+
+    function uploadFile(file) {
+        const isVideo = file.type.startsWith('video/');
+        const url = isVideo ? "{% url 'store:product_video_upload' %}" : "{% url 'store:product_image_upload' %}";
+        
+        // Create preview placeholder with progress bar
+        const cardId = 'upload-' + Math.random().toString(36).substr(2, 9);
+        const card = document.createElement('div');
+        card.className = 'media-preview-card';
+        card.id = cardId;
+        
+        // Local preview if image
+        if (!isVideo) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            card.appendChild(img);
+        } else {
+            const icon = document.createElement('div');
+            icon.style.display = 'flex';
+            icon.style.alignItems = 'center';
+            icon.style.justifyContent = 'center';
+            icon.style.height = '100%';
+            icon.innerHTML = '<i class="fa-solid fa-video" style="font-size:32px;color:var(--color-text-muted);"></i>';
+            card.appendChild(icon);
+        }
+
+        // Progress bar Overlay
+        const progressDiv = document.createElement('div');
+        progressDiv.className = 'media-upload-progress';
+        progressDiv.innerHTML = `
+            <span style="font-size:10px;font-weight:600;">Uploading...</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="bar-${cardId}"></div>
+            </div>
+        `;
+        card.appendChild(progressDiv);
+        previewGrid.appendChild(card);
+
+        const formData = new FormData();
+        if (productId) formData.append('product_id', productId);
+        if (sessionToken) formData.append('session_token', sessionToken);
+        formData.append(isVideo ? 'video' : 'image', file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                document.getElementById(`bar-${cardId}`).style.width = percent + '%';
+            }
+        });
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                const res = JSON.parse(xhr.responseText);
+                if (res.success) {
+                    // Update preview with real media and action buttons
+                    progressDiv.remove();
+                    card.removeAttribute('id');
+                    card.setAttribute('data-id', res.id);
+                    card.setAttribute('data-type', isVideo ? 'video' : 'image');
+                    
+                    if (isVideo) {
+                        card.innerHTML = `
+                            <span class="video-badge"><i class="fa-solid fa-video"></i> Video</span>
+                            <video src="${res.url}" muted playsinline></video>
+                            <div class="media-actions">
+                                <button type="button" class="media-action-btn delete" onclick="deleteMedia(${res.id}, 'video', this)"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        `;
+                    } else {
+                        card.innerHTML = `
+                            ${res.is_cover ? '<span class="cover-badge"><i class="fa-solid fa-star"></i> Cover</span>' : ''}
+                            <img src="${res.url}" alt="Gallery Image">
+                            <div class="media-actions">
+                                <button type="button" class="media-action-btn delete" onclick="deleteMedia(${res.id}, 'image', this)"><i class="fa-solid fa-trash"></i></button>
+                                <button type="button" class="media-action-btn cover" onclick="setCoverImage(${res.id}, this)"><i class="fa-solid fa-star"></i> Cover</button>
+                            </div>
+                        `;
+                    }
+                    initReordering();
+                } else {
+                    card.remove();
+                    alert('Upload failed: ' + res.error);
+                }
+            } else {
+                card.remove();
+                alert('Upload failed: Server error ' + xhr.status);
+            }
+        };
+
+        xhr.onerror = function() {
+            card.remove();
+            alert('Upload error occurred.');
+        };
+
+        xhr.send(formData);
+    }
+
+    // -------------------------------------------------------------
+    // DELETE MEDIA
+    // -------------------------------------------------------------
+    window.deleteMedia = function(mediaId, mediaType, btn) {
+        if (!confirm('Are you sure you want to delete this file?')) return;
+        
+        const url = mediaType === 'video' ? "{% url 'store:product_video_delete' %}" : "{% url 'store:product_image_delete' %}";
+        const card = btn.closest('.media-preview-card');
+        
+        const formData = new FormData();
+        formData.append(mediaType === 'video' ? 'video_id' : 'image_id', mediaId);
+        if (sessionToken) formData.append('session_token', sessionToken);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                card.remove();
+                // Refresh to check if another cover got set automatically
+                if (mediaType === 'image') {
+                    refreshCoverBadge();
+                }
+            } else {
+                alert('Delete failed.');
+            }
+        });
+    };
+
+    // -------------------------------------------------------------
+    // SET COVER IMAGE
+    // -------------------------------------------------------------
+    window.setCoverImage = function(imageId, btn) {
+        const url = "{% url 'store:product_image_set_cover' %}";
+        
+        const formData = new FormData();
+        formData.append('image_id', imageId);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                refreshCoverBadge(imageId);
+            } else {
+                alert('Failed to set cover image.');
+            }
+        });
+    };
+
+    function refreshCoverBadge(coverId = null) {
+        // Remove cover badges from all image cards
+        document.querySelectorAll('.media-preview-grid .media-preview-card[data-type="image"]').forEach(card => {
+            const badge = card.querySelector('.cover-badge');
+            if (badge) badge.remove();
+            
+            const id = card.getAttribute('data-id');
+            // If explicit coverId, add it there, else we let the view's returned cover match
+            if (coverId && id == coverId) {
+                const newBadge = document.createElement('span');
+                newBadge.className = 'cover-badge';
+                newBadge.innerHTML = '<i class="fa-solid fa-star"></i> Cover';
+                card.appendChild(newBadge);
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // DRAG AND DROP REORDERING
+    // -------------------------------------------------------------
+    let sortableImages, sortableVideos;
+
+    function initReordering() {
+        if (typeof Sortable === 'undefined') return;
+
+        Sortable.create(previewGrid, {
+            animation: 150,
+            draggable: ".media-preview-card",
+            onEnd: function (evt) {
+                const imageIds = [];
+                const videoIds = [];
+                
+                document.querySelectorAll('.media-preview-grid .media-preview-card').forEach(card => {
+                    const id = card.getAttribute('data-id');
+                    const type = card.getAttribute('data-type');
+                    if (type === 'image') imageIds.push(id);
+                    if (type === 'video') videoIds.push(id);
+                });
+
+                // Send Image Reorder
+                if (imageIds.length > 0) {
+                    const imgFormData = new FormData();
+                    imageIds.forEach(id => imgFormData.append('image_ids[]', id));
+                    
+                    fetch("{% url 'store:product_image_reorder' %}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: imgFormData
+                    });
+                }
+
+                // Send Video Reorder
+                if (videoIds.length > 0) {
+                    const vidFormData = new FormData();
+                    videoIds.forEach(id => vidFormData.append('video_ids[]', id));
+                    
+                    fetch("{% url 'store:product_video_reorder' %}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: vidFormData
+                    });
+                }
+            }
+        });
+    }
+
+    // Initialize Sortable reordering on page load
+    initReordering();
+</script>
 {% endblock %}

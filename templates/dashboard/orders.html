@@ -1,4 +1,5 @@
 {% extends 'base/admin_base.html' %}
+{% load marina_filters %}
 
 {% block title %}Customer Orders | Marina Admin{% endblock %}
 
@@ -60,7 +61,7 @@
                     <td><strong>{{ order.full_name }}</strong></td>
                     <td class="td-muted" style="font-size:var(--font-size-xs);">{{ order.phone }}</td>
                     <td>{{ order.city }}, {{ order.state }}</td>
-                    <td class="font-semibold text-primary">₦{{ order.total_amount|floatformat:0 }}</td>
+                    <td class="font-semibold text-primary">{{ order.total_amount|naira }}</td>
                     <td>
                         <span class="badge {% if order.checkout_method == 'online' %}badge-primary{% elif order.checkout_method == 'whatsapp' %}badge-success{% else %}badge-warning{% endif %}" style="font-size:10px;">
                             {{ order.get_checkout_method_display }}

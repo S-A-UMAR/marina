@@ -71,8 +71,14 @@
                 </a>
 
                 <div class="staff-nav-section-label">Sales &amp; Orders</div>
-                <a href="{% url 'store:dashboard_orders' %}" class="staff-nav-item {% if 'order' in request.resolver_match.url_name %}active{% endif %}">
+                <a href="{% url 'store:dashboard_orders' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_orders' %}active{% endif %}">
                     <i class="fa-solid fa-receipt"></i> Customer Orders
+                </a>
+                <a href="{% url 'store:dashboard_awaiting_dispatch' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_awaiting_dispatch' or request.resolver_match.url_name == 'dashboard_dispatch_batch_detail' %}active{% endif %}">
+                    <i class="fa-solid fa-box-open"></i> Awaiting Dispatch
+                </a>
+                <a href="{% url 'store:dashboard_sent_orders' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_sent_orders' %}active{% endif %}">
+                    <i class="fa-solid fa-truck-fast"></i> Sent Out Orders
                 </a>
                 <a href="{% url 'store:dashboard_customers' %}" class="staff-nav-item {% if request.resolver_match.url_name == 'dashboard_customers' %}active{% endif %}">
                     <i class="fa-solid fa-users"></i> Customers

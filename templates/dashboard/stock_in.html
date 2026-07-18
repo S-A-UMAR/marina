@@ -1,4 +1,5 @@
 {% extends 'base/admin_base.html' %}
+{% load marina_filters %}
 
 {% block title %}Stock In | Marina Admin{% endblock %}
 
@@ -65,7 +66,7 @@
                         <tr>
                             <td><strong style="font-size:var(--font-size-sm);">{{ log.product.name }}</strong></td>
                             <td class="text-success font-bold">+{{ log.quantity }}</td>
-                            <td>{% if log.cost_price %}₦{{ log.cost_price|floatformat:0 }}{% else %}—{% endif %}</td>
+                            <td>{% if log.cost_price %}{{ log.cost_price|naira }}{% else %}—{% endif %}</td>
                             <td class="td-muted" style="font-size:var(--font-size-xs);">{{ log.recorded_by.username|default:'System' }}</td>
                             <td class="td-muted" style="font-size:var(--font-size-xs);">{{ log.created_at|date:"d M Y, H:i" }}</td>
                         </tr>

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import upload_views
 
 urlpatterns = [
     path('staff/', views.dashboard_overview, name='dashboard_overview'),
@@ -32,4 +33,28 @@ urlpatterns = [
     path('staff/suppliers/', views.dashboard_suppliers, name='dashboard_suppliers'),
     path('staff/suppliers/<int:pk>/edit/', views.dashboard_supplier_edit, name='dashboard_supplier_edit'),
     path('staff/suppliers/<int:pk>/delete/', views.dashboard_supplier_delete, name='dashboard_supplier_delete'),
+
+    # Media Upload AJAX endpoints
+    path('staff/media/image/upload/', upload_views.product_image_upload, name='product_image_upload'),
+    path('staff/media/image/delete/', upload_views.product_image_delete, name='product_image_delete'),
+    path('staff/media/image/reorder/', upload_views.product_image_reorder, name='product_image_reorder'),
+    path('staff/media/image/set-cover/', upload_views.product_image_set_cover, name='product_image_set_cover'),
+    path('staff/media/video/upload/', upload_views.product_video_upload, name='product_video_upload'),
+    path('staff/media/video/delete/', upload_views.product_video_delete, name='product_video_delete'),
+    path('staff/media/video/reorder/', upload_views.product_video_reorder, name='product_video_reorder'),
+
+    # Polling API
+    path('staff/api/new-orders/', views.dashboard_new_orders_poll, name='dashboard_new_orders_poll'),
+    
+    # Packaging photo upload API
+    path('staff/orders/<str:order_number>/package-photo/upload/', views.dashboard_upload_package_photo, name='dashboard_upload_package_photo'),
+
+    # Dispatch Batches Management
+    path('staff/dispatch/awaiting/', views.dashboard_awaiting_dispatch, name='dashboard_awaiting_dispatch'),
+    path('staff/dispatch/batches/', views.dashboard_dispatch_batches, name='dashboard_dispatch_batches'),
+    path('staff/dispatch/batches/<str:batch_number>/', views.dashboard_dispatch_batch_detail, name='dashboard_dispatch_batch_detail'),
+    
+    # Sent Orders & Confirmation Requests
+    path('staff/dispatch/sent/', views.dashboard_sent_orders, name='dashboard_sent_orders'),
+    path('staff/dispatch/sent/<str:order_number>/confirm-request/', views.dashboard_send_delivery_confirm_request, name='dashboard_send_delivery_confirm_request'),
 ]

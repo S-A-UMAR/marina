@@ -590,3 +590,273 @@ body.sidebar-lock { overflow: hidden; }
   /* Action buttons: icon only */
   .action-btn span { display: none; }
 }
+
+/* ============================================================
+   MARINA MULTI-MEDIA UPLOAD STYLING
+   ============================================================ */
+.media-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-xs);
+}
+
+.media-dropzone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl) var(--space-lg);
+  text-align: center;
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: all var(--duration-btn);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-dropzone:hover, .media-dropzone.dragover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.media-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.media-preview-card {
+  position: relative;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: #fff;
+  box-shadow: var(--shadow-1);
+  display: flex;
+  flex-direction: column;
+  cursor: grab;
+  user-select: none;
+}
+
+.media-preview-card:active {
+  cursor: grabbing;
+}
+
+.media-preview-card img, .media-preview-card video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  flex: 1;
+}
+
+.media-preview-card .cover-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  z-index: 2;
+}
+
+.media-preview-card .video-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  z-index: 2;
+}
+
+.media-preview-card .media-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px;
+  display: flex;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 3;
+}
+
+.media-preview-card:hover .media-actions {
+  opacity: 1;
+}
+
+.media-action-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.media-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.media-action-btn.delete {
+  color: var(--color-danger-light);
+}
+.media-action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fff;
+}
+
+/* Upload progress overlay */
+.media-upload-progress {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  z-index: 4;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-primary);
+  transition: width 0.1s;
+}
+
+/* ============================================================
+   PENDING ORDER CARDS STYLING
+   ============================================================ */
+.pending-orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.pending-order-card {
+  background: #fff;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--duration-btn);
+  position: relative;
+  box-shadow: var(--shadow-1);
+}
+
+.pending-order-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-2);
+}
+
+.pending-order-card.is-new {
+  border: 2px solid var(--color-danger);
+  background: var(--color-danger-light);
+  animation: cardPulse 2s infinite alternate;
+}
+
+@keyframes cardPulse {
+  0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.1); }
+  100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.4); }
+}
+
+.pending-order-card .new-badge {
+  position: absolute;
+  top: -10px;
+  right: var(--space-md);
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-1);
+  animation: badgeFlash 1s infinite alternate;
+}
+
+@keyframes badgeFlash {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+
+.pending-order-card .card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pending-order-card .order-no {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: var(--font-size-base);
+}
+
+.pending-order-card .order-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.pending-order-card .customer-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.pending-order-card .card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1.5px solid var(--color-border-light);
+  padding-top: var(--space-sm);
+}
+
+.pending-order-card .detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-xs);
+}
+
+.pending-order-card .detail-row .label {
+  color: var(--color-text-secondary);
+}
+
+.pending-order-card .detail-row .value {
+  color: var(--color-text-primary);
+}
+
+.pending-order-card .detail-row .total-price {
+  color: var(--color-danger);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+}

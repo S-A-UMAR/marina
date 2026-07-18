@@ -1,4 +1,5 @@
 {% extends 'base/admin_base.html' %}
+{% load marina_filters %}
 
 {% block title %}Order {{ order.order_number }} | Marina Admin{% endblock %}
 
@@ -38,20 +39,20 @@
                                     <strong style="font-size:var(--font-size-sm);">{{ item.product_name }}</strong>
                                 </td>
                                 <td><span class="badge badge-info" style="font-size:10px;">{{ item.condition_at_sale|default:'N/A' }}</span></td>
-                                <td>₦{{ item.price|floatformat:0 }}</td>
+                                <td>{{ item.price|naira }}</td>
                                 <td>{{ item.quantity }}</td>
-                                <td class="font-semibold text-primary" style="text-align:right;">₦{{ item.subtotal|floatformat:0 }}</td>
+                                <td class="font-semibold text-primary" style="text-align:right;">{{ item.subtotal|naira }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 <div class="flex-between" style="padding:var(--space-md) var(--space-md); font-size:var(--font-size-sm); border-top:1px solid var(--color-border);">
                     <span class="text-secondary">Shipping</span>
-                    <span class="font-semibold">{% if order.shipping_cost == 0 %}FREE{% else %}₦{{ order.shipping_cost|floatformat:0 }}{% endif %}</span>
+                    <span class="font-semibold">{% if order.shipping_cost == 0 %}FREE{% else %}{{ order.shipping_cost|naira }}{% endif %}</span>
                 </div>
                 <div class="flex-between" style="padding:var(--space-md); font-size:var(--font-size-base); border-top:1px solid var(--color-border); font-weight:700;">
                     <span>Grand Total</span>
-                    <span class="text-primary">₦{{ order.total_amount|floatformat:0 }}</span>
+                    <span class="text-primary">{{ order.total_amount|naira }}</span>
                 </div>
             </div>
         </div>
@@ -64,11 +65,67 @@
         </div>
         {% endif %}
 
+        <!-- Packaging Workflow Section -->
+        {% if order.status == 'confirmed' or order.status == 'pending_packaging' or order.status == 'packaging' %}
+        <div class="card" id="packagingWorkflowCard">
+            <div class="card-header"><i class="fa-solid fa-box-open text-primary"></i> Packaging Workflow Checklist</div>
+            <div class="card-body">
+                <p class="text-secondary mb-md" style="font-size: var(--font-size-sm);">
+                    Check off all items as you pack them, then upload a live photo of the sealed package to validate packaging and move the order to the delivery dispatch stage.
+                </p>
+                
+                <!-- Checklist -->
+                <div class="packaging-checklist mb-lg" style="display:flex; flex-direction:column; gap:var(--space-sm); border-bottom:1.5px solid var(--color-border-light); padding-bottom:var(--space-md); margin-bottom:var(--space-md);">
+                    {% for item in order.items.all %}
+                        <div class="flex items-center gap-md" style="font-size: var(--font-size-sm); margin-bottom: 6px;">
+                            <input type="checkbox" class="pack-item-checkbox" id="chk-item-{{ item.id }}" style="width:18px; height:18px; cursor:pointer;">
+                            <label for="chk-item-{{ item.id }}" style="cursor:pointer; display:flex; flex-direction:column;">
+                                <strong class="text-primary">{{ item.product_name }}</strong>
+                                <span class="text-secondary" style="font-size: var(--font-size-xs);">Quantity: {{ item.quantity }}</span>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Live package photo upload -->
+                <div class="form-group mb-lg">
+                    <label class="form-label" style="font-weight:600;">Upload Sealed Package Photo</label>
+                    <div style="display:flex; gap:var(--space-md); align-items:center; margin-top: 6px;">
+                        <input type="file" id="packagePhotoInput" accept="image/*" style="display:none;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('packagePhotoInput').click()">
+                            <i class="fa-solid fa-camera"></i> Take / Choose Photo
+                        </button>
+                        <span id="packagePhotoStatus" class="text-secondary" style="font-size: var(--font-size-xs);">No photo uploaded</span>
+                    </div>
+                    <div id="packagePhotoPreviewContainer" style="margin-top:var(--space-md); display:none; max-width: 240px; border-radius: var(--radius-md); overflow:hidden; border: 1.5px solid var(--color-border);">
+                        <img id="packagePhotoPreview" src="" alt="Sealed Package Preview" style="width:100%; height:auto; display:block;">
+                    </div>
+                </div>
+
+                <!-- Confirm Action button -->
+                <button type="button" class="btn btn-success btn-full" id="confirmPackBtn" style="margin-top: 12px;" disabled>
+                    <i class="fa-solid fa-box-archive"></i> Seal Package &amp; Send Photo
+                </button>
+            </div>
+        </div>
+        {% elif order.package_photo %}
+        <!-- Display uploaded package photo if it already exists -->
+        <div class="card">
+            <div class="card-header"><i class="fa-solid fa-box-archive text-success"></i> Sealed Package Photo</div>
+            <div class="card-body">
+                <div style="max-width: 240px; border-radius: var(--radius-md); overflow:hidden; border: 1.5px solid var(--color-border); margin-bottom:var(--space-sm);">
+                    <img src="{{ order.package_photo.photo.url }}" alt="Sealed Package" style="width:100%; height:auto; display:block;">
+                </div>
+                <span class="text-secondary" style="font-size: var(--font-size-xs);">Uploaded at {{ order.package_photo.uploaded_at|date:"d M Y, H:i" }}</span>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Status Update Form -->
         <div class="card">
             <div class="card-header">Update Order Status</div>
             <div class="card-body">
-                <form action="{% url 'store:dashboard_order_update_status' order.order_number %}" method="POST">
+                <form action="{% url 'store:dashboard_order_detail' order.order_number %}" method="POST">
                     {% csrf_token %}
                     <div style="display:grid; grid-template-columns:1fr auto; gap:var(--space-sm); align-items:end;">
                         <div class="form-group" style="margin-bottom:0;">
@@ -141,4 +198,83 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.pack-item-checkbox');
+        const photoInput = document.getElementById('packagePhotoInput');
+        const previewContainer = document.getElementById('packagePhotoPreviewContainer');
+        const previewImg = document.getElementById('packagePhotoPreview');
+        const statusSpan = document.getElementById('packagePhotoStatus');
+        const confirmBtn = document.getElementById('confirmPackBtn');
+        
+        let packagePhotoFile = null;
+
+        function checkFormValidity() {
+            const allChecked = Array.from(checkboxes).every(chk => chk.checked);
+            const hasPhoto = packagePhotoFile !== null;
+            if (confirmBtn) {
+                confirmBtn.disabled = !(allChecked && hasPhoto);
+            }
+        }
+
+        checkboxes.forEach(chk => {
+            chk.addEventListener('change', checkFormValidity);
+        });
+
+        if (photoInput) {
+            photoInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    packagePhotoFile = file;
+                    previewImg.src = URL.createObjectURL(file);
+                    previewContainer.style.display = 'block';
+                    statusSpan.textContent = file.name;
+                    checkFormValidity();
+                }
+            });
+        }
+
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                if (confirmBtn.disabled) return;
+                
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+                
+                const formData = new FormData();
+                formData.append('package_photo', packagePhotoFile);
+                
+                const uploadUrl = "{% url 'store:dashboard_upload_package_photo' order.order_number %}";
+                
+                fetch(uploadUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Order packaging completed successfully!');
+                        location.reload();
+                    } else {
+                        alert('Upload failed: ' + (data.error || 'Unknown error'));
+                        confirmBtn.disabled = false;
+                        confirmBtn.innerHTML = '<i class="fa-solid fa-box-archive"></i> Seal Package &amp; Send Photo';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('An error occurred during submission.');
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = '<i class="fa-solid fa-box-archive"></i> Seal Package &amp; Send Photo';
+                });
+            });
+        }
+    });
+</script>
 {% endblock %}

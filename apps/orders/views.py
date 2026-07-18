@@ -61,3 +61,43 @@ def my_orders(request):
 def order_list(request):
     return redirect('store:dashboard_orders')
 
+@login_required
+def my_order_detail(request, order_number):
+    """Customer order tracking detail page with visual timeline stepper and notification logs."""
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
+    timeline_data = order.get_timeline_data()
+    notifications = Notification.objects.filter(order=order, user=request.user).order_by('-created_at')
+    
+    # Check if a package photo exists
+    package_photo = getattr(order, 'package_photo', None)
+    
+    # Get any active interstate dispatch driver phone
+    interstate_dispatch = None
+    if order.delivery_type == Order.DELIVERY_INTERSTATE:
+        from apps.orders.models import InterstateDispatch
+        # Look up by state of this order on any dispatch batch it belongs to
+        batch_item = order.dispatch_batches.first()
+        if batch_item:
+            interstate_dispatch = InterstateDispatch.objects.filter(batch=batch_item.batch, state=order.state).first()
+            
+    # Get local Kano dispatch details if in_transit
+    local_dispatch = None
+    if order.delivery_type == Order.DELIVERY_KANO:
+        batch_item = order.dispatch_batches.first()
+        if batch_item and batch_item.batch.rider_phone:
+            local_dispatch = {
+                'rider_name': batch_item.batch.rider_name,
+                'rider_phone': batch_item.batch.rider_phone
+            }
+
+    context = {
+        'order': order,
+        'timeline_data': timeline_data,
+        'notifications': notifications,
+        'package_photo': package_photo,
+        'interstate_dispatch': interstate_dispatch,
+        'local_dispatch': local_dispatch,
+    }
+    return render(request, 'my_marina/order_detail.html', context)
+
+

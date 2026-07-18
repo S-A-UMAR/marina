@@ -1,4 +1,5 @@
 {% extends 'base/admin_base.html' %}
+{% load marina_filters %}
 
 {% block title %}Manage Products | Marina Admin{% endblock %}
 
@@ -94,7 +95,7 @@
                             {{ prod.get_condition_display }}
                         </span>
                     </td>
-                    <td class="font-semibold text-primary">₦{{ prod.selling_price|floatformat:0 }}</td>
+                    <td class="font-semibold text-primary">{{ prod.selling_price|naira }}</td>
                     <td>
                         <div class="stock-indicator">
                             <span class="{% if prod.out_of_stock %}text-danger{% elif prod.is_low_stock %}text-warning{% else %}text-success{% endif %} font-bold">

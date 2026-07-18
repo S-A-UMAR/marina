@@ -1,0 +1,31 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Delivery Confirmed | Marina{% endblock %}
+
+{% block content %}
+<div class="container py-xl" style="max-width: 600px; margin: 0 auto; text-align: center; padding: 0 var(--space-md);">
+    <div class="card" style="padding: var(--space-xl); box-shadow: var(--shadow-3); border-radius: var(--radius-lg); border-top: 5px solid var(--color-success);">
+        <i class="fa-solid fa-circle-check text-success" style="font-size: 64px; margin-bottom: var(--space-md); animation: bounce 1.5s infinite alternate;"></i>
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--color-text-primary); margin-bottom: var(--space-sm);">Delivery Confirmed!</h1>
+        <p class="text-secondary" style="font-size: var(--font-size-base); line-height: 1.6; margin-bottom: var(--space-lg);">
+            Thank you, <strong>{{ order.full_name }}</strong>! We have updated order <strong>#{{ order.order_number }}</strong> status to Delivered. 
+            We are glad your package arrived safely and you are satisfied with your purchase.
+        </p>
+
+        <div style="background: var(--color-success-light); padding: var(--space-md); border-radius: var(--radius-md); font-size: var(--font-size-sm); color: var(--color-success); font-weight: 600; margin-bottom: var(--space-lg);">
+            🎉 Thank you for your trust in Marina Gadgets!
+        </div>
+
+        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'store:home' %}" class="btn btn-primary">
+                <i class="fa-solid fa-store"></i> Continue Shopping
+            </a>
+            <a href="{% url 'store:my_marina' %}" class="btn btn-secondary">
+                <i class="fa-solid fa-user"></i> My Account
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

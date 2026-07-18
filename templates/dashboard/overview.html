@@ -1,5 +1,6 @@
 {% extends 'base/admin_base.html' %}
 {% load static %}
+{% load marina_filters %}
 
 {% block title %}Marina Operations Dashboard{% endblock %}
 
@@ -12,39 +13,152 @@
 </div>
 
 <!-- Metric boxes -->
-<div class="metrics-grid">
-    <div class="metric-card">
+<div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-xl);">
+    
+    <!-- 1. Revenue Today -->
+    <div class="metric-card" style="padding: var(--space-md);">
         <div class="metric-card-header">
-            <span class="metric-card-label">SALES TODAY</span>
+            <span class="metric-card-label" style="font-size: 10px;">REVENUE TODAY</span>
             <div class="metric-card-icon metric-icon-green"><i class="fa-solid fa-naira-sign"></i></div>
         </div>
-        <span class="metric-card-value">₦{{ sales_today|floatformat:0 }}</span>
+        <span class="metric-card-value" style="font-size: 20px;">{{ sales_today|naira }}</span>
     </div>
 
-    <div class="metric-card">
+    <!-- 2. Today's Orders -->
+    <a href="{% url 'store:dashboard_orders' %}" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
         <div class="metric-card-header">
-            <span class="metric-card-label">TOTAL REVENUE</span>
-            <div class="metric-card-icon metric-icon-blue"><i class="fa-solid fa-wallet"></i></div>
+            <span class="metric-card-label" style="font-size: 10px;">TODAY'S ORDERS</span>
+            <div class="metric-card-icon metric-icon-blue"><i class="fa-solid fa-cart-shopping"></i></div>
         </div>
-        <span class="metric-card-value">₦{{ total_sales|floatformat:0 }}</span>
-    </div>
+        <span class="metric-card-value" style="font-size: 20px;">{{ orders_today_count }}</span>
+    </a>
 
-    <div class="metric-card">
+    <!-- 3. Pending Payment -->
+    <a href="{% url 'store:dashboard_orders' %}?status=awaiting_payment" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
         <div class="metric-card-header">
-            <span class="metric-card-label">AWAITING ACTION</span>
-            <div class="metric-card-icon metric-icon-orange"><i class="fa-solid fa-clock"></i></div>
+            <span class="metric-card-label" style="font-size: 10px;">PENDING PAYMENT</span>
+            <div class="metric-card-icon metric-icon-orange"><i class="fa-solid fa-wallet"></i></div>
         </div>
-        <span class="metric-card-value">{{ orders_awaiting }}</span>
-    </div>
+        <span class="metric-card-value" style="font-size: 20px;">{{ pending_payment_count }}</span>
+    </a>
 
-    <div class="metric-card">
+    <!-- 4. Pending Packaging -->
+    <a href="{% url 'store:dashboard_orders' %}?status=confirmed" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
         <div class="metric-card-header">
-            <span class="metric-card-label">ACTIVE PRODUCTS</span>
-            <div class="metric-card-icon metric-icon-blue"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <span class="metric-card-label" style="font-size: 10px;">PENDING PACKAGING</span>
+            <div class="metric-card-icon metric-icon-orange"><i class="fa-solid fa-box-open"></i></div>
         </div>
-        <span class="metric-card-value">{{ total_products }}</span>
-    </div>
+        <span class="metric-card-value" style="font-size: 20px;">{{ pending_packaging_count }}</span>
+    </a>
+
+    <!-- 5. Awaiting Dispatch -->
+    <a href="{% url 'store:dashboard_awaiting_dispatch' %}" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
+        <div class="metric-card-header">
+            <span class="metric-card-label" style="font-size: 10px;">AWAITING DISPATCH</span>
+            <div class="metric-card-icon metric-icon-blue"><i class="fa-solid fa-dolly"></i></div>
+        </div>
+        <span class="metric-card-value" style="font-size: 20px;">{{ awaiting_dispatch_count }}</span>
+    </a>
+
+    <!-- 6. Kano Deliveries -->
+    <a href="{% url 'store:dashboard_sent_orders' %}" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
+        <div class="metric-card-header">
+            <span class="metric-card-label" style="font-size: 10px;">KANO DELIVERIES</span>
+            <div class="metric-card-icon metric-icon-green"><i class="fa-solid fa-motorcycle"></i></div>
+        </div>
+        <span class="metric-card-value" style="font-size: 20px;">{{ kano_deliveries_count }}</span>
+    </a>
+
+    <!-- 7. Interstate Deliveries -->
+    <a href="{% url 'store:dashboard_sent_orders' %}" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
+        <div class="metric-card-header">
+            <span class="metric-card-label" style="font-size: 10px;">INTERSTATE DELIVERIES</span>
+            <div class="metric-card-icon metric-icon-blue"><i class="fa-solid fa-truck"></i></div>
+        </div>
+        <span class="metric-card-value" style="font-size: 20px;">{{ interstate_deliveries_count }}</span>
+    </a>
+
+    <!-- 8. Delivered Today -->
+    <a href="{% url 'store:dashboard_orders' %}?status=delivered" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
+        <div class="metric-card-header">
+            <span class="metric-card-label" style="font-size: 10px;">DELIVERED TODAY</span>
+            <div class="metric-card-icon metric-icon-green"><i class="fa-solid fa-house-circle-check"></i></div>
+        </div>
+        <span class="metric-card-value" style="font-size: 20px;">{{ delivered_today_count }}</span>
+    </a>
+
+    <!-- 9. Completed Orders -->
+    <a href="{% url 'store:dashboard_orders' %}?status=completed" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
+        <div class="metric-card-header">
+            <span class="metric-card-label" style="font-size: 10px;">COMPLETED ORDERS</span>
+            <div class="metric-card-icon metric-icon-blue"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+        <span class="metric-card-value" style="font-size: 20px;">{{ completed_orders_count }}</span>
+    </a>
+
+    <!-- 10. Low Stock Alerts -->
+    <a href="{% url 'store:dashboard_products' %}?stock=low" class="metric-card" style="padding: var(--space-md); text-decoration: none; color: inherit;">
+        <div class="metric-card-header">
+            <span class="metric-card-label" style="font-size: 10px;">LOW STOCK ALERTS</span>
+            <div class="metric-card-icon metric-icon-red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        </div>
+        <span class="metric-card-value" style="font-size: 20px; color: var(--color-danger);">{{ low_stock_count }}</span>
+    </a>
+
 </div>
+
+<!-- Pending Orders Section -->
+<section class="staff-panel mb-xl" id="pendingOrdersPanel" style="margin-bottom: var(--space-xl);">
+    <div class="staff-panel-header" style="background: var(--color-surface); display: flex; align-items: center; justify-content: space-between;">
+        <h2 class="staff-panel-title">
+            <i class="fa-solid fa-bell text-danger" style="animation: badgeFlash 1s infinite alternate;"></i> 
+            Pending Orders Operational Dashboard 
+            <span class="badge badge-danger" id="pendingCountBadge" style="margin-left: 8px; {% if pending_count == 0 %}display:none;{% endif %}">{{ pending_count }}</span>
+        </h2>
+        <div style="display: flex; align-items: center; gap: var(--space-md);">
+            <button id="toggleAlertSoundBtn" class="btn btn-ghost btn-sm" title="Toggle Sound Notification Alerts">
+                <i class="fa-solid fa-volume-high"></i> Alerts: On
+            </button>
+            <span class="text-muted" style="font-size: var(--font-size-xs); font-style: italic;">Auto-checking every {{ site_settings.dashboard_poll_interval|default:30 }}s</span>
+        </div>
+    </div>
+    <div class="staff-panel-body" style="padding: var(--space-lg);">
+        <div class="pending-orders-grid" id="pendingOrdersGrid">
+            {% for order in pending_orders %}
+                <a href="{% url 'store:dashboard_order_detail' order.order_number %}" class="pending-order-card {% if order.is_new %}is-new{% endif %}" data-order-number="{{ order.order_number }}">
+                    {% if order.is_new %}
+                        <span class="new-badge">NEW ORDER</span>
+                    {% endif %}
+                    <div class="card-header-flex">
+                        <span class="order-no">#{{ order.order_number }}</span>
+                        <span class="order-time">{{ order.created_at|date:"d M, H:i" }}</span>
+                    </div>
+                    <div class="customer-name" style="margin-top: 4px; margin-bottom: 8px;">{{ order.full_name }}</div>
+                    
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="label">Items count:</span>
+                            <span class="value font-semibold">{{ order.items.count }} items</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Total amount:</span>
+                            <span class="value total-price">{{ order.total_amount|naira }}</span>
+                        </div>
+                        <div class="detail-row" style="margin-top: 6px;">
+                            <span class="label">Status:</span>
+                            <span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span>
+                        </div>
+                    </div>
+                </a>
+            {% empty %}
+                <div class="empty-state" style="grid-column: 1/-1; padding: var(--space-xl) 0; text-align: center; width: 100%;">
+                    <i class="fa-solid fa-circle-check text-success" style="font-size: 48px; margin-bottom: var(--space-md); display: block;"></i>
+                    <p class="font-semibold text-secondary">All caught up! No pending orders.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
 <div class="overview-grid-2-1" style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-xl); align-items: start; margin-bottom: var(--space-xl);">
     <!-- Sales chart -->
@@ -116,7 +230,7 @@
                         <tr>
                             <td class="td-mono font-semibold"><a href="{% url 'store:dashboard_order_detail' order.order_number %}">{{ order.order_number }}</a></td>
                             <td>{{ order.full_name }}</td>
-                            <td>₦{{ order.total_amount|floatformat:0 }}</td>
+                            <td>{{ order.total_amount|naira }}</td>
                             <td><span style="font-size: 11px; font-weight:600;">{{ order.get_checkout_method_display }}</span></td>
                             <td>
                                 <span class="status-pill status-{{ order.status }}">
@@ -162,6 +276,89 @@
                 </div>
             {% endif %}
         </div>
-    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Polling interval from site settings (default 30s)
+    const pollInterval = parseInt("{{ site_settings.dashboard_poll_interval|default:30 }}") * 1000;
+    const pollUrl = "{% url 'store:dashboard_new_orders_poll' %}";
+    
+    let isSoundEnabled = localStorage.getItem('marina_alert_sound') !== 'disabled';
+    const toggleBtn = document.getElementById('toggleAlertSoundBtn');
+    
+    // Configurable sound notification fallback
+    const alertAudio = new Audio("{% if site_settings.notification_sound %}{{ site_settings.notification_sound.url }}{% else %}https://assets.mixkit.co/active_storage/sfx/2869/2869-84.wav{% endif %}");
+
+    function updateSoundBtnUI() {
+        if (isSoundEnabled) {
+            toggleBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Alerts: On';
+            toggleBtn.classList.remove('btn-danger');
+            toggleBtn.classList.add('btn-ghost');
+        } else {
+            toggleBtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Alerts: Off';
+            toggleBtn.classList.remove('btn-ghost');
+            toggleBtn.classList.add('btn-danger');
+        }
+    }
+    
+    if (toggleBtn) {
+        updateSoundBtnUI();
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            isSoundEnabled = !isSoundEnabled;
+            localStorage.setItem('marina_alert_sound', isSoundEnabled ? 'enabled' : 'disabled');
+            updateSoundBtnUI();
+        });
+    }
+
+    // Keep track of order numbers we already show on the page
+    const existingOrders = new Set();
+    document.querySelectorAll('.pending-order-card').forEach(card => {
+        existingOrders.add(card.getAttribute('data-order-number'));
+    });
+
+    function checkNewOrders() {
+        fetch(pollUrl)
+            .then(res => res.json())
+            .then(data => {
+                const countBadge = document.getElementById('pendingCountBadge');
+                if (countBadge) {
+                    countBadge.textContent = data.count;
+                    if (data.count > 0) {
+                        countBadge.style.display = 'inline-block';
+                    } else {
+                        countBadge.style.display = 'none';
+                    }
+                }
+                
+                // Check if any polled order number is not already shown
+                let hasNew = false;
+                if (data.orders) {
+                    data.orders.forEach(o => {
+                        if (!existingOrders.has(o.order_number)) {
+                            hasNew = true;
+                        }
+                    });
+                }
+
+                if (hasNew) {
+                    if (isSoundEnabled) {
+                        alertAudio.play().catch(err => console.log('Audio playback blocked: ', err));
+                    }
+                    // Automatically reload to refresh dashboard stats and list newly received orders
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
+            })
+            .catch(err => console.error('Error polling new orders:', err));
+    }
+
+    // Start polling loop
+    if (pollInterval > 0) {
+        setInterval(checkNewOrders, pollInterval);
+    }
+</script>
 {% endblock %}

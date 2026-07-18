@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load marina_filters %}
 
 {% block title %}My Orders | Marina Gadgets{% endblock %}
 
@@ -61,7 +62,7 @@
                                     {% for item in order.items.all %}
                                         <li style="font-size: var(--font-size-sm); color: var(--color-text-primary); display: flex; justify-content: space-between;">
                                             <span>{{ item.quantity }}x {{ item.product_name }}</span>
-                                            <span class="font-semibold">₦{{ item.subtotal|floatformat:0 }}</span>
+                                            <span class="font-semibold">{{ item.subtotal|naira }}</span>
                                         </li>
                                     {% endfor %}
                                 </ul>
@@ -78,7 +79,7 @@
                                 </div>
                                 <div class="text-right">
                                     <span class="text-secondary" style="font-size: var(--font-size-xs); display: block;">TOTAL PAID</span>
-                                    <strong class="text-primary" style="font-size: var(--font-size-lg);">₦{{ order.total_amount|floatformat:0 }}</strong>
+                                    <strong class="text-primary" style="font-size: var(--font-size-lg);">{{ order.total_amount|naira }}</strong>
                                 </div>
                             </div>
                             

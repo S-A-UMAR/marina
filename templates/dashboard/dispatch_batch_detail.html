@@ -1,0 +1,187 @@
+{% extends 'base/admin_base.html' %}
+{% load marina_filters %}
+
+{% block title %}Manage Batch {{ batch.batch_number }} | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Manage Dispatch Batch <span class="td-mono text-primary">#{{ batch.batch_number }}</span></h1>
+        <p class="staff-page-subtitle">Assign Kano local delivery riders or register park driver waybill info for interstate packages.</p>
+    </div>
+    <a href="{% url 'store:dashboard_dispatch_batches' %}" class="btn btn-ghost">
+        <i class="fa-solid fa-arrow-left"></i> All Batches
+    </a>
+</div>
+
+<!-- Grid Layout: Kano local vs Interstate states -->
+<div style="display: flex; flex-direction: column; gap: var(--space-xl);">
+    
+    <!-- Kano Deliveries Section -->
+    <div class="card">
+        <div class="card-header" style="background: var(--color-surface); display: flex; align-items: center; justify-content: space-between;">
+            <h2 class="staff-panel-title">
+                <i class="fa-solid fa-motorcycle text-success"></i> Kano Local Deliveries 
+                <span class="badge badge-success" style="margin-left: 8px;">{{ kano_items|length }}</span>
+            </h2>
+        </div>
+        <div class="card-body">
+            {% if kano_items %}
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-lg); align-items: start;">
+                    <!-- Orders List -->
+                    <div style="border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden;">
+                        <table class="data-table" style="margin-bottom:0;">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Customer</th>
+                                    <th>City / Address</th>
+                                    <th style="text-align: right;">Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in kano_items %}
+                                    <tr>
+                                        <td><a href="{% url 'store:dashboard_order_detail' item.order.order_number %}" class="font-bold text-primary">#{{ item.order.order_number }}</a></td>
+                                        <td>{{ item.order.full_name }}</td>
+                                        <td>{{ item.order.city }} ({{ item.order.address|truncatechars:30 }})</td>
+                                        <td class="font-semibold" style="text-align: right;">{{ item.order.total_amount|naira }}</td>
+                                        <td><span class="status-pill status-{{ item.order.status }}">{{ item.order.get_status_display }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Rider Assignment Panel -->
+                    <div class="card" style="margin-bottom:0;">
+                        <div class="card-header" style="font-size: var(--font-size-sm);">Assign Kano Rider</div>
+                        <div class="card-body">
+                            <form action="" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="kano_dispatch">
+                                
+                                <div class="form-group mb-md">
+                                    <label class="form-label" for="rider_id">Choose Saved Rider</label>
+                                    <select name="rider_id" id="rider_id" class="form-input">
+                                        <option value="">-- Select Saved Rider --</option>
+                                        {% for rider in riders %}
+                                            <option value="{{ rider.id }}" {% if batch.rider.id == rider.id %}selected{% endif %}>{{ rider.name }} ({{ rider.phone }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div style="text-align: center; margin: var(--space-sm) 0; font-size: var(--font-size-xs); font-weight:600; color: var(--color-text-secondary);">- OR ENTER MANUALLY -</div>
+
+                                <div class="form-group mb-md">
+                                    <label class="form-label" for="rider_name">Rider Name</label>
+                                    <input type="text" name="rider_name" id="rider_name" class="form-input" value="{{ batch.rider_name }}" placeholder="e.g. Musa Ibrahim">
+                                </div>
+
+                                <div class="form-group mb-md">
+                                    <label class="form-label" for="rider_phone">Rider Phone</label>
+                                    <input type="text" name="rider_phone" id="rider_phone" class="form-input" value="{{ batch.rider_phone }}" placeholder="e.g. 08068860972">
+                                </div>
+
+                                <button type="submit" class="btn btn-success btn-full" style="margin-top:var(--space-md);">
+                                    <i class="fa-solid fa-paper-plane"></i> Dispatch Kano Orders (Off for Delivery)
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-secondary text-center py-md">No Kano local delivery packages in this dispatch batch.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Interstate Deliveries Section -->
+    <div class="card">
+        <div class="card-header" style="background: var(--color-surface);">
+            <h2 class="staff-panel-title"><i class="fa-solid fa-truck-fast text-primary"></i> Interstate Drivers Network (Grouped by State)</h2>
+        </div>
+        <div class="card-body">
+            {% if state_groups %}
+                <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+                    {% for state, state_items in state_groups.items %}
+                        <div style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden;">
+                            <!-- State Header -->
+                            <div style="background: var(--color-surface); padding: var(--space-md) var(--space-lg); border-bottom: 1.5px solid var(--color-border); display: flex; align-items: center; justify-content: space-between;">
+                                <strong style="font-size: var(--font-size-base); color: var(--color-text-primary);">{{ state|upper }} State Dispatch</strong>
+                                <span class="badge badge-primary">{{ state_items|length }} package(s)</span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 0; border-top:0;">
+                                <!-- Left side: packages -->
+                                <div style="border-right: 1px solid var(--color-border); padding: var(--space-md);">
+                                    <table class="data-table" style="margin-bottom:0; box-shadow: none; border:0;">
+                                        <thead>
+                                            <tr>
+                                                <th>Order</th>
+                                                <th>Customer</th>
+                                                <th>City</th>
+                                                <th style="text-align: right;">Total</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in state_items %}
+                                                <tr>
+                                                    <td><a href="{% url 'store:dashboard_order_detail' item.order.order_number %}" class="font-bold text-primary">#{{ item.order.order_number }}</a></td>
+                                                    <td>{{ item.order.full_name }}</td>
+                                                    <td>{{ item.order.city }}</td>
+                                                    <td class="font-semibold" style="text-align: right;">{{ item.order.total_amount|naira }}</td>
+                                                    <td><span class="status-pill status-{{ item.order.status }}">{{ item.order.get_status_display }}</span></td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Right side: Driver Assignment Form -->
+                                <div style="padding: var(--space-lg); background: var(--color-surface);">
+                                    {% with disp=interstate_dispatches|get_item:state %}
+                                        <form action="" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="interstate_dispatch">
+                                            <input type="hidden" name="state" value="{{ state }}">
+
+                                            <div class="form-group mb-sm">
+                                                <label class="form-label" style="font-size: var(--font-size-xs);">Driver Phone (Required)</label>
+                                                <input type="text" name="driver_phone" class="form-input" value="{{ disp.driver_phone }}" placeholder="e.g. 080XXXXXXXX" required>
+                                            </div>
+
+                                            <div class="form-group mb-sm">
+                                                <label class="form-label" style="font-size: var(--font-size-xs);">Driver Name (Optional)</label>
+                                                <input type="text" name="driver_name" class="form-input" value="{{ disp.driver_name }}" placeholder="e.g. Driver Adamu">
+                                            </div>
+
+                                            <div class="form-group mb-sm">
+                                                <label class="form-label" style="font-size: var(--font-size-xs);">Transport Company (Optional)</label>
+                                                <input type="text" name="transport_company" class="form-input" value="{{ disp.transport_company }}" placeholder="e.g. Kano Line">
+                                            </div>
+
+                                            <div class="form-group mb-md">
+                                                <label class="form-label" style="font-size: var(--font-size-xs);">Vehicle Plate Number (Optional)</label>
+                                                <input type="text" name="plate_number" class="form-input" value="{{ disp.plate_number }}" placeholder="e.g. KBL-420-AA">
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary btn-full">
+                                                <i class="fa-solid fa-floppy-disk"></i> Save Driver &amp; Notify Customers
+                                            </button>
+                                        </form>
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-secondary text-center py-md">No interstate packages in this dispatch batch.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

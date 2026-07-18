@@ -1,4 +1,5 @@
 {% extends 'base/admin_base.html' %}
+{% load marina_filters %}
 
 {% block title %}Reports & Analytics | Marina Admin{% endblock %}
 
@@ -17,7 +18,7 @@
             <span class="metric-card-label">TOTAL REVENUE (ALL TIME)</span>
             <div class="metric-card-icon metric-icon-green"><i class="fa-solid fa-naira-sign"></i></div>
         </div>
-        <span class="metric-card-value">₦{{ total_revenue|floatformat:0 }}</span>
+        <span class="metric-card-value">{{ total_revenue|naira }}</span>
     </div>
     <div class="metric-card">
         <div class="metric-card-header">
@@ -31,7 +32,7 @@
             <span class="metric-card-label">AVG ORDER VALUE</span>
             <div class="metric-card-icon metric-icon-orange"><i class="fa-solid fa-chart-bar"></i></div>
         </div>
-        <span class="metric-card-value">₦{{ avg_order_value|floatformat:0 }}</span>
+        <span class="metric-card-value">{{ avg_order_value|naira }}</span>
     </div>
     <div class="metric-card">
         <div class="metric-card-header">
@@ -79,7 +80,7 @@
                             {{ method.checkout_method|capfirst }}
                         </span>
                     </div>
-                    <strong class="text-primary">₦{{ method.total|floatformat:0 }}</strong>
+                    <strong class="text-primary">{{ method.total|naira }}</strong>
                 </div>
             {% empty %}
                 <p class="text-secondary text-center">No revenue data yet.</p>

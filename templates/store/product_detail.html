@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load marina_filters %}
 
 {% block title %}{{ product.name }} | Marina Gadgets{% endblock %}
 
@@ -69,9 +70,9 @@
         </div>
 
         <div class="product-price-block">
-            <span class="product-price-current">₦{{ product.selling_price|floatformat:0 }}</span>
+            <span class="product-price-current">{{ product.selling_price|naira }}</span>
             {% if product.is_discounted %}
-                <span class="product-price-previous">₦{{ product.previous_price|floatformat:0 }}</span>
+                <span class="product-price-previous">{{ product.previous_price|naira }}</span>
                 <span class="product-price-discount">-{{ product.discount_percent }}% OFF</span>
             {% endif %}
         </div>
@@ -104,7 +105,7 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm);">
                     <!-- Instant WhatsApp Checkout -->
-                    <a href="https://wa.me/{{ site_settings.whatsapp_number }}?text=Hello%20Marina%2C%20I'm%20interested%20in%20buying%3A%20{{ product.name }}%20(₦{{ product.selling_price|floatformat:0 }})" target="_blank" class="btn btn-whatsapp btn-full">
+                    <a href="https://wa.me/{{ site_settings.whatsapp_number }}?text=Hello%20Marina%2C%20I'm%20interested%20in%20buying%3A%20{{ product.name }}%20({{ product.selling_price|naira }})" target="_blank" class="btn btn-whatsapp btn-full">
                         <i class="fa-brands fa-whatsapp"></i> Buy on WhatsApp
                     </a>
                     
@@ -250,7 +251,7 @@
                     <span class="product-card-brand">{{ prod.brand.name|default:'Generic' }}</span>
                     <a href="{% url 'store:product_detail' prod.slug %}" class="product-card-name">{{ prod.name }}</a>
                     <div class="product-card-price">
-                        <span class="price-current">₦{{ prod.selling_price|floatformat:0 }}</span>
+                        <span class="price-current">{{ prod.selling_price|naira }}</span>
                     </div>
                 </div>
             </div>

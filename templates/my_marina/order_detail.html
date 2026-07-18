@@ -1,0 +1,199 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load marina_filters %}
+
+{% block title %}Order #{{ order.order_number }} Status | Marina{% endblock %}
+
+{% block content %}
+<div class="container py-xl" style="max-width: 900px; margin: 0 auto; padding: 0 var(--space-md);">
+    
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 800; color: var(--color-text-primary); display: flex; align-items: center; gap: 8px;">
+                Order <span class="td-mono text-primary">#{{ order.order_number }}</span>
+            </h1>
+            <p class="text-secondary" style="font-size: var(--font-size-sm); margin-top: 4px;">Placed on {{ order.created_at|date:"d F Y, H:i" }}</p>
+        </div>
+        <a href="{% url 'store:my_orders' %}" class="btn btn-secondary">
+            <i class="fa-solid fa-chevron-left"></i> Back to My Orders
+        </a>
+    </div>
+
+    <!-- Layout Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: var(--space-xl); align-items: start;">
+        
+        <!-- Left: Status Timeline -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-xl);">
+            
+            <!-- Order Timeline Card -->
+            <div class="card" style="box-shadow: var(--shadow-2); border-radius: var(--radius-lg);">
+                <div class="card-header" style="font-weight: 700; background: var(--color-surface);"><i class="fa-solid fa-timeline text-primary"></i> Delivery Tracker Timeline</div>
+                <div class="card-body" style="padding: var(--space-xl) var(--space-lg);">
+                    
+                    <div style="position: relative; padding-left: 36px; display: flex; flex-direction: column; gap: var(--space-lg);">
+                        <!-- Central Vertical Line -->
+                        <div style="position: absolute; left: 13px; top: 8px; bottom: 8px; width: 3px; background: var(--color-border); z-index: 1;"></div>
+                        
+                        {% for step in timeline_data %}
+                            <div style="position: relative; display: flex; flex-direction: column;">
+                                <!-- Timeline Node Dot -->
+                                <div style="position: absolute; left: -36px; top: 0; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 2; transition: all 0.3s;
+                                    {% if step.is_done %}
+                                        background: var(--color-success); color: #fff; box-shadow: 0 0 0 4px var(--color-success-light);
+                                    {% else %}
+                                        background: #fff; border: 2.5px solid var(--color-border); color: var(--color-text-muted);
+                                    {% endif %}">
+                                    <i class="fa-solid {{ step.icon }}" style="font-size: 11px;"></i>
+                                </div>
+                                
+                                <!-- Label & Description -->
+                                <div style="margin-left: 8px;">
+                                    <span style="font-size: var(--font-size-sm); font-weight: 700; 
+                                        {% if step.is_done %}color: var(--color-text-primary);{% else %}color: var(--color-text-muted);{% endif %}">
+                                        {{ step.label }}
+                                    </span>
+                                    
+                                    {% if step.is_current %}
+                                        <div style="margin-top: 4px;"><span class="badge badge-success animate-pulse" style="font-size: 9px; padding: 2px 6px;">CURRENT STAGE</span></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package Details & Courier Info -->
+            {% if package_photo or interstate_dispatch or local_dispatch %}
+                <div class="card" style="box-shadow: var(--shadow-2); border-radius: var(--radius-lg);">
+                    <div class="card-header" style="font-weight: 700; background: var(--color-surface);"><i class="fa-solid fa-truck-ramp-box text-primary"></i> Dispatch &amp; Package Info</div>
+                    <div class="card-body" style="display: flex; flex-direction: column; gap: var(--space-md);">
+                        
+                        <!-- Interstate Driver details -->
+                        {% if interstate_dispatch %}
+                            <div style="background: var(--color-primary-light); padding: var(--space-lg); border-radius: var(--radius-md); border-left: 4px solid var(--color-primary);">
+                                <h3 style="font-size: var(--font-size-sm); font-weight: 700; color: var(--color-primary); margin-bottom: var(--space-xs);"><i class="fa-solid fa-truck"></i> Transport Driver Handover Details</h3>
+                                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6;">
+                                    Your package has been handed over to the driver at the park.
+                                    <br><strong>Driver Phone Number:</strong> <span class="text-primary font-bold">{{ interstate_dispatch.driver_phone }}</span>
+                                    {% if interstate_dispatch.transport_company %}
+                                        <br><strong>Transport Company:</strong> {{ interstate_dispatch.transport_company }}
+                                    {% endif %}
+                                    {% if interstate_dispatch.plate_number %}
+                                        <br><strong>Plate Number:</strong> {{ interstate_dispatch.plate_number }}
+                                    {% endif %}
+                                    <br><span style="font-size: var(--font-size-xs); font-style: italic;" class="text-muted">The driver will contact you regarding waybill pickup and parking terminal fees.</span>
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Kano Local Dispatcher Details -->
+                        {% if local_dispatch %}
+                            <div style="background: var(--color-success-light); padding: var(--space-lg); border-radius: var(--radius-md); border-left: 4px solid var(--color-success);">
+                                <h3 style="font-size: var(--font-size-sm); font-weight: 700; color: var(--color-success); margin-bottom: var(--space-xs);"><i class="fa-solid fa-motorcycle"></i> Local Rider Details</h3>
+                                <p style="font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6;">
+                                    Your order is out for delivery with our local Kano dispatcher.
+                                    <br><strong>Rider Name:</strong> {{ local_dispatch.rider_name|default:"Marina Delivery Rider" }}
+                                    <br><strong>Rider Contact:</strong> <span class="text-success font-bold">{{ local_dispatch.rider_phone }}</span>
+                                    <br><span style="font-size: var(--font-size-xs); font-style: italic;" class="text-muted">The rider will call you once they reach your neighborhood.</span>
+                                </p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Sealed Photo -->
+                        {% if package_photo %}
+                            <div>
+                                <h3 style="font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text-primary); margin-bottom: var(--space-sm);"><i class="fa-solid fa-camera"></i> Live Photo of Your Sealed Package</h3>
+                                <div style="max-width: 320px; border-radius: var(--radius-md); overflow: hidden; border: 1.5px solid var(--color-border);">
+                                    <img src="{{ package_photo.photo.url }}" alt="Sealed Package" style="width: 100%; height: auto; display: block;">
+                                </div>
+                                <p class="text-muted" style="font-size: 11px; margin-top: 4px;">Photo captured by packaging staff at {{ package_photo.uploaded_at|date:"d M Y, H:i" }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Notification History Logs -->
+            <div class="card" style="box-shadow: var(--shadow-2); border-radius: var(--radius-lg);">
+                <div class="card-header" style="font-weight: 700; background: var(--color-surface);"><i class="fa-solid fa-clock-rotate-left text-primary"></i> Notification History Log</div>
+                <div class="card-body" style="padding: 0;">
+                    <ul class="recent-list" style="margin: 0; padding: 0; list-style: none;">
+                        {% for notif in notifications %}
+                            <li style="padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--color-border-light); display: flex; flex-direction: column; gap: var(--space-xs);">
+                                <div class="flex-between">
+                                    <span style="font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text-primary);">
+                                        {{ notif.get_event_type_display }}
+                                    </span>
+                                    <span style="font-size: 11px; color: var(--color-text-muted);">{{ notif.created_at|date:"d M H:i" }}</span>
+                                </div>
+                                <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); line-height: 1.5; white-space: pre-line; margin: 0;">{{ notif.message }}</p>
+                                <div style="display: flex; gap: var(--space-sm); margin-top: 2px;">
+                                    <span class="badge badge-secondary" style="font-size: 9px;">Channel: {{ notif.get_channel_display }}</span>
+                                    <span class="badge badge-success" style="font-size: 9px;">Status: {{ notif.get_status_display }}</span>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li style="padding: var(--space-xl); text-align: center; color: var(--color-text-muted);">
+                                No notifications dispatched for this order yet.
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Right: Order items summary card -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
+            <div class="card" style="box-shadow: var(--shadow-2); border-radius: var(--radius-lg); overflow: hidden;">
+                <div class="card-header" style="font-weight: 700; background: var(--color-surface);"><i class="fa-solid fa-receipt text-primary"></i> Order Summary</div>
+                <div class="card-body" style="padding: 0;">
+                    <ul style="margin: 0; padding: 0; list-style: none;">
+                        {% for item in order.items.all %}
+                            <li style="padding: var(--space-md); border-bottom: 1px solid var(--color-border-light); display: flex; gap: var(--space-md); align-items: center;">
+                                <div style="flex: 1;">
+                                    <strong style="font-size: var(--font-size-sm); color: var(--color-text-primary);">{{ item.product_name }}</strong>
+                                    <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top: 2px;">
+                                        {{ item.quantity }} × {{ item.price|naira }}
+                                    </div>
+                                </div>
+                                <span class="font-semibold text-primary" style="font-size: var(--font-size-sm);">{{ item.subtotal|naira }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <div style="padding: var(--space-md); border-top: 2px solid var(--color-border); font-size: var(--font-size-sm); display: flex; flex-direction: column; gap: var(--space-xs);">
+                        <div class="flex-between">
+                            <span class="text-secondary">Subtotal</span>
+                            <span class="font-semibold">{{ order.subtotal|naira }}</span>
+                        </div>
+                        <div class="flex-between">
+                            <span class="text-secondary">Shipping</span>
+                            <span class="font-semibold">{% if order.shipping_fee == 0 %}FREE{% else %}{{ order.shipping_fee|naira }}{% endif %}</span>
+                        </div>
+                        <div class="flex-between" style="font-size: var(--font-size-base); font-weight: 800; border-top: 1.5px solid var(--color-border-light); padding-top: var(--space-sm); margin-top: var(--space-xs);">
+                            <span>Total</span>
+                            <span class="text-primary">{{ order.total_amount|naira }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Shipping Info -->
+            <div class="card" style="box-shadow: var(--shadow-2); border-radius: var(--radius-lg);">
+                <div class="card-header" style="font-weight: 700; background: var(--color-surface);"><i class="fa-solid fa-location-dot text-primary"></i> Shipping Address</div>
+                <div class="card-body" style="font-size: var(--font-size-sm); color: var(--color-text-secondary); line-height: 1.6;">
+                    <p><strong>Name:</strong> {{ order.full_name }}</p>
+                    <p><strong>Phone:</strong> {{ order.phone }}</p>
+                    <p><strong>Email:</strong> {{ order.email }}</p>
+                    <p style="margin-top: 6px;"><strong>Address:</strong><br>{{ order.address }}</p>
+                    <p><strong>City/State:</strong> {{ order.city }}, {{ order.state }}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

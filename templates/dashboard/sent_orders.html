@@ -1,0 +1,75 @@
+{% extends 'base/admin_base.html' %}
+{% load marina_filters %}
+
+{% block title %}Sent Out Orders | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Sent Out Orders</h1>
+        <p class="staff-page-subtitle">Dispatched packages in transit. Send delivery confirmation requests to prompt customers for feedback.</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Packages In Transit ({{ orders.count }})</div>
+    <div class="card-body" style="padding: 0;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Order Number</th>
+                    <th>Customer</th>
+                    <th>Destination</th>
+                    <th>Delivery Type</th>
+                    <th>Dispatch Date</th>
+                    <th style="text-align: right;">Total Amount</th>
+                    <th>Current Status</th>
+                    <th style="text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td><strong class="td-mono">#{{ order.order_number }}</strong></td>
+                        <td>{{ order.full_name }}<br><span class="text-secondary" style="font-size: 11px;">{{ order.phone }}</span></td>
+                        <td>{{ order.state }} ({{ order.city }})</td>
+                        <td>
+                            {% if order.state|lower == 'kano' or order.delivery_type == 'kano' %}
+                                <span class="badge badge-success"><i class="fa-solid fa-motorcycle"></i> Kano Local</span>
+                            {% else %}
+                                <span class="badge badge-primary"><i class="fa-solid fa-truck-fast"></i> Interstate</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ order.updated_at|date:"d M Y, H:i" }}</td>
+                        <td class="font-semibold text-primary" style="text-align: right;">{{ order.total_amount|naira }}</td>
+                        <td><span class="status-pill status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                        <td style="text-align: center;">
+                            <div style="display: flex; gap: var(--space-xs); justify-content: center;">
+                                <a href="{% url 'store:dashboard_order_detail' order.order_number %}" class="btn btn-ghost btn-sm" title="View details">
+                                    <i class="fa-solid fa-eye"></i> Details
+                                </a>
+                                <form action="{% url 'store:dashboard_send_delivery_confirm_request' order.order_number %}" method="POST" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-secondary btn-sm" title="Ask if received via WhatsApp">
+                                        <i class="fa-solid fa-paper-plane"></i> Ask if Received
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" style="padding: var(--space-xl); text-align: center;">
+                            <div class="empty-state">
+                                <i class="fa-solid fa-truck text-muted" style="font-size: 48px; margin-bottom: var(--space-md);"></i>
+                                <p class="font-semibold text-secondary">No sent packages currently in transit.</p>
+                                <p class="text-muted" style="font-size: var(--font-size-xs);">Active shipments in transit will automatically appear here once dispatched from the park or rider handoff.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

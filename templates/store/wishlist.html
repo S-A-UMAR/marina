@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load marina_filters %}
 
 {% block title %}My Wishlist | Marina Gadgets{% endblock %}
 
@@ -34,7 +35,7 @@
                 <a href="{% url 'store:product_detail' item.product.slug %}" class="product-card-name">{{ item.product.name }}</a>
 
                 <div class="product-card-price">
-                    <span class="price-current">₦{{ item.product.selling_price|floatformat:0 }}</span>
+                    <span class="price-current">{{ item.product.selling_price|naira }}</span>
                 </div>
             </div>
 

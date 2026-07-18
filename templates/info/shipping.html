@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load marina_filters %}
 
 {% block title %}Shipping & Delivery | Marina Gadgets Kano{% endblock %}
 
@@ -20,7 +21,7 @@
                 <li>Orders placed after 3:00 PM are delivered the next morning.</li>
                 <li>You can opt to pick up your order directly from our store by choosing "Request a Call" at checkout.</li>
             </ul>
-            <p><strong>Cost:</strong> Standard Kano delivery is ₦{{ site_settings.default_shipping_fee|floatformat:0 }} (Free for orders over ₦{{ site_settings.free_shipping_threshold|floatformat:0 }}).</p>
+            <p><strong>Cost:</strong> Standard Kano delivery is {{ site_settings.default_shipping_fee|naira }} (Free for orders over {{ site_settings.free_shipping_threshold|naira }}).</p>
         </div>
     </div>
 

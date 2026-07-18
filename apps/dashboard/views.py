@@ -82,10 +82,27 @@ def dashboard_overview(request):
     ).count()
 
     orders_today = Order.objects.filter(created_at__date=today)
-    total_orders = Order.objects.count()
-    orders_awaiting = Order.objects.filter(
-        status__in=[Order.STATUS_PENDING, Order.STATUS_CONFIRMED, Order.STATUS_PROCESSING]
+    orders_today_count = orders_today.count()
+    
+    pending_payment_count = Order.objects.filter(status=Order.STATUS_AWAITING_PAYMENT).count()
+    pending_packaging_count = Order.objects.filter(
+        status__in=[Order.STATUS_CONFIRMED, Order.STATUS_PENDING_PACKAGING, Order.STATUS_PACKAGING]
     ).count()
+    awaiting_dispatch_count = Order.objects.filter(status=Order.STATUS_AWAITING_DISPATCH).count()
+    
+    interstate_deliveries_count = Order.objects.filter(
+        status__in=[Order.STATUS_DISPATCHED, Order.STATUS_IN_TRANSIT]
+    ).exclude(Q(state__iexact='kano') | Q(delivery_type=Order.DELIVERY_KANO)).count()
+    
+    kano_deliveries_count = Order.objects.filter(
+        status__in=[Order.STATUS_DISPATCHED, Order.STATUS_IN_TRANSIT]
+    ).filter(Q(state__iexact='kano') | Q(delivery_type=Order.DELIVERY_KANO)).count()
+    
+    delivered_today_count = Order.objects.filter(
+        status=Order.STATUS_DELIVERED, updated_at__date=today
+    ).count()
+    
+    completed_orders_count = Order.objects.filter(status=Order.STATUS_COMPLETED).count()
 
     total_sales = Order.objects.filter(
         status__in=[Order.STATUS_PAYMENT_VERIFIED, Order.STATUS_CONFIRMED,
@@ -96,6 +113,19 @@ def dashboard_overview(request):
         status__in=[Order.STATUS_PAYMENT_VERIFIED, Order.STATUS_CONFIRMED,
                     Order.STATUS_PROCESSING, Order.STATUS_DELIVERED, Order.STATUS_COMPLETED]
     ).aggregate(total=Sum('total_amount'))['total'] or 0
+
+    # Main dashboard top section: Pending Orders
+    pending_orders = Order.objects.filter(
+        status__in=[
+            Order.STATUS_PENDING,
+            Order.STATUS_AWAITING_PAYMENT,
+            Order.STATUS_PAYMENT_VERIFIED,
+            Order.STATUS_CONFIRMED,
+            Order.STATUS_PENDING_PACKAGING,
+            Order.STATUS_PACKAGING
+        ]
+    ).select_related('user').order_by('-created_at')
+    pending_count = pending_orders.count()
 
     recent_orders = Order.objects.select_related('user').order_by('-created_at')[:8]
     recent_feedback = Feedback.objects.filter(status=Feedback.STATUS_RECEIVED).order_by('-created_at')[:5]
@@ -120,20 +150,32 @@ def dashboard_overview(request):
         sales_data.append(float(day_sales))
         orders_data.append(day_orders)
 
+    # Site settings sound info
+    site_settings_obj = SiteSettings.get()
+
     context = {
         'total_products': total_products,
         'low_stock_count': low_stock_count,
         'out_of_stock_count': out_of_stock_count,
-        'total_orders': total_orders,
-        'orders_awaiting': orders_awaiting,
+        'orders_today_count': orders_today_count,
+        'pending_payment_count': pending_payment_count,
+        'pending_packaging_count': pending_packaging_count,
+        'awaiting_dispatch_count': awaiting_dispatch_count,
+        'interstate_deliveries_count': interstate_deliveries_count,
+        'kano_deliveries_count': kano_deliveries_count,
+        'delivered_today_count': delivered_today_count,
+        'completed_orders_count': completed_orders_count,
         'total_sales': total_sales,
         'sales_today': sales_today,
+        'pending_orders': pending_orders,
+        'pending_count': pending_count,
         'recent_orders': recent_orders,
         'recent_feedback': recent_feedback,
         'low_stock_products': low_stock_products,
         'chart_labels': labels,
         'chart_sales': sales_data,
         'chart_orders': orders_data,
+        'site_settings': site_settings_obj,
     }
     return render(request, 'dashboard/overview.html', context)
 
@@ -145,10 +187,8 @@ def dashboard_products(request):
     status_filter = request.GET.get('status', '')
     stock_filter = request.GET.get('stock', '')
 
-    products_qs = Product.objects.select_related('brand', 'category').all()
+    products_qs = Product.objects.select_related('category', 'brand').order_by('-created_at')
 
-    if query:
-        products_qs = products_qs.filter(Q(name__icontains=query) | Q(sku__icontains=query))
     if category_filter:
         products_qs = products_qs.filter(category_id=category_filter)
     if brand_filter:
@@ -160,13 +200,22 @@ def dashboard_products(request):
     elif stock_filter == 'out':
         products_qs = products_qs.filter(current_stock=0)
 
+    if query:
+        products_qs = products_qs.filter(
+            Q(name__icontains=query) |
+            Q(sku__icontains=query)
+        )
+
     paginator = Paginator(products_qs, 20)
     products = paginator.get_page(request.GET.get('page'))
 
+    categories = Category.objects.all()
+    brands = Brand.objects.all()
+
     context = {
         'products': products,
-        'categories': Category.objects.all(),
-        'brands': Brand.objects.all(),
+        'categories': categories,
+        'brands': brands,
         'query': query,
         'category_filter': category_filter,
         'brand_filter': brand_filter,
@@ -179,10 +228,22 @@ def dashboard_products(request):
 @user_passes_test(is_staff_member, login_url='/auth/login/')
 def dashboard_product_create(request):
     form = ProductForm()
+    upload_session_token = request.GET.get('session_token') or request.POST.get('upload_session_token') or str(uuid.uuid4())
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             product = form.save()
+            # Associate any temp uploaded images/videos with this new product
+            session_token = request.POST.get('upload_session_token')
+            if session_token:
+                ProductImage.objects.filter(session_token=session_token).update(product=product, session_token='')
+                ProductVideo.objects.filter(session_token=session_token).update(product=product, session_token='')
+                # Sync the cover image
+                cover_img = ProductImage.objects.filter(product=product, is_cover=True).first()
+                if cover_img:
+                    product.cover_image = cover_img.image
+                    product.save(update_fields=['cover_image'])
+            
             if product.current_stock > 0:
                 StockMovement.objects.create(
                     product=product,
@@ -193,7 +254,13 @@ def dashboard_product_create(request):
                 )
             messages.success(request, f'"{product.name}" has been created.')
             return redirect('store:dashboard_products')
-    return render(request, 'dashboard/product_form.html', {'form': form, 'title': 'Add Product'})
+    categories = Category.objects.filter(is_active=True)
+    return render(request, 'dashboard/product_form.html', {
+        'form': form,
+        'title': 'Add Product',
+        'upload_session_token': upload_session_token,
+        'categories': categories,
+    })
 
 @user_passes_test(is_staff_member, login_url='/auth/login/')
 def dashboard_product_edit(request, pk):
@@ -205,8 +272,18 @@ def dashboard_product_edit(request, pk):
             form.save()
             messages.success(request, f'"{product.name}" has been updated.')
             return redirect('store:dashboard_products')
+    
+    gallery_images = product.gallery_images.all().order_by('order')
+    videos = product.videos.all().order_by('order')
+    categories = Category.objects.filter(is_active=True)
+    
     return render(request, 'dashboard/product_form.html', {
-        'form': form, 'product': product, 'title': 'Edit Product'
+        'form': form,
+        'product': product,
+        'title': 'Edit Product',
+        'gallery_images': gallery_images,
+        'videos': videos,
+        'categories': categories,
     })
 
 @user_passes_test(is_staff_member, login_url='/auth/login/')
@@ -605,4 +682,264 @@ def dashboard_supplier_delete(request, pk):
     supplier.delete()
     messages.success(request, 'Supplier deleted.')
     return redirect('store:dashboard_suppliers')
+
+@user_passes_test(is_staff_member, login_url='/auth/login/')
+def dashboard_new_orders_poll(request):
+    """AJAX endpoint returning the count and details of unread/new orders."""
+    new_orders_qs = Order.objects.filter(is_new=True)
+    new_count = new_orders_qs.count()
+    new_orders = list(new_orders_qs.values('order_number', 'full_name', 'total_amount'))
+    
+    # Cast total_amount to float for JSON compatibility
+    for o in new_orders:
+        o['total_amount'] = float(o['total_amount'])
+        
+    return JsonResponse({
+        'count': new_count,
+        'orders': new_orders
+    })
+
+@user_passes_test(is_staff_member, login_url='/auth/login/')
+@require_POST
+def dashboard_upload_package_photo(request, order_number):
+    """AJAX upload of package photo, update status, and notify customer."""
+    from apps.orders.models import PackagePhoto
+    from apps.notifications.services import notify
+    
+    order = get_object_or_404(Order, order_number=order_number)
+    photo_file = request.FILES.get('package_photo')
+    
+    if not photo_file:
+        return JsonResponse({'success': False, 'error': 'No photo file provided.'}, status=400)
+        
+    # Save PackagePhoto
+    photo, created = PackagePhoto.objects.get_or_create(
+        order=order,
+        defaults={'photo': photo_file, 'uploaded_by': request.user}
+    )
+    if not created:
+        photo.photo = photo_file
+        photo.uploaded_by = request.user
+        photo.save()
+
+    # Update order status to Awaiting Dispatch
+    order.log_status_change(
+        Order.STATUS_AWAITING_DISPATCH,
+        changed_by=request.user,
+        note='Package sealed and photo uploaded.'
+    )
+
+    # Trigger customer notification
+    photo_url = request.build_absolute_uri(photo.photo.url)
+    notify(order, Notification.EVENT_PACKAGE_PHOTO, extra={'photo_url': photo_url})
+
+    return JsonResponse({'success': True, 'url': photo.photo.url})
+
+@user_passes_test(is_staff_member, login_url='/auth/login/')
+def dashboard_awaiting_dispatch(request):
+    """List orders sealed and awaiting dispatch, allow grouping into batches."""
+    if request.method == 'POST':
+        order_ids = request.POST.getlist('order_ids[]')
+        if not order_ids:
+            messages.error(request, 'Please select at least one package to dispatch.')
+            return redirect('store:dashboard_awaiting_dispatch')
+            
+        # Create a new dispatch batch
+        batch = DispatchBatch.objects.create(created_by=request.user)
+        orders = Order.objects.filter(pk__in=order_ids)
+        for order in orders:
+            DispatchBatchItem.objects.create(batch=batch, order=order)
+            # Update status to Dispatched
+            order.log_status_change(
+                Order.STATUS_DISPATCHED,
+                changed_by=request.user,
+                note=f'Added to dispatch batch {batch.batch_number}'
+            )
+            
+        messages.success(request, f'Dispatch batch {batch.batch_number} created with {orders.count()} packages.')
+        return redirect('store:dashboard_dispatch_batch_detail', batch_number=batch.batch_number)
+
+    orders = Order.objects.filter(status=Order.STATUS_AWAITING_DISPATCH).order_by('-updated_at')
+    return render(request, 'dashboard/awaiting_dispatch.html', {'orders': orders})
+
+@user_passes_test(is_staff_member, login_url='/auth/login/')
+def dashboard_dispatch_batches(request):
+    """List all dispatch batches."""
+    batches = DispatchBatch.objects.all().order_by('-created_at')
+    return render(request, 'dashboard/dispatch_batches.html', {'batches': batches})
+
+@user_passes_test(is_staff_member, login_url='/auth/login/')
+def dashboard_dispatch_batch_detail(request, batch_number):
+    """Manage Kano local dispatch and Interstate transport drivers for a batch."""
+    batch = get_object_or_404(DispatchBatch, batch_number=batch_number)
+    items = batch.batch_items.select_related('order')
+    
+    # Separate local Kano vs Interstate orders
+    kano_items = []
+    interstate_items = []
+    
+    for item in items:
+        state_lower = (item.order.state or '').strip().lower()
+        if state_lower == 'kano' or item.order.delivery_type == Order.DELIVERY_KANO:
+            kano_items.append(item)
+        else:
+            interstate_items.append(item)
+            
+    # Group interstate items by state
+    state_groups = {}
+    for item in interstate_items:
+        state = item.order.state or 'Unknown'
+        if state not in state_groups:
+            state_groups[state] = []
+        state_groups[state].append(item)
+        
+    # Get saved riders
+    riders = DispatchRider.objects.filter(is_active=True)
+    
+    # Query existing interstate dispatches saved for this batch
+    interstate_dispatches = {
+        d.state: d for d in InterstateDispatch.objects.filter(batch=batch)
+    }
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'kano_dispatch':
+            # Kano deliveries: assign rider
+            rider_id = request.POST.get('rider_id')
+            rider_name = request.POST.get('rider_name', '').strip()
+            rider_phone = request.POST.get('rider_phone', '').strip()
+            
+            if rider_id:
+                rider_obj = get_object_or_404(DispatchRider, pk=rider_id)
+                batch.rider = rider_obj
+                batch.rider_name = rider_obj.name
+                batch.rider_phone = rider_obj.phone
+            else:
+                batch.rider_name = rider_name
+                batch.rider_phone = rider_phone
+                
+            batch.status = DispatchBatch.STATUS_SENT
+            batch.save()
+            
+            # Update kano orders to IN_TRANSIT and notify customers
+            from apps.notifications.services import notify
+            for item in kano_items:
+                order = item.order
+                order.log_status_change(
+                    Order.STATUS_IN_TRANSIT,
+                    changed_by=request.user,
+                    note=f'Dispatched locally in Kano. Rider: {batch.rider_name} ({batch.rider_phone})'
+                )
+                notify(
+                    order, Notification.EVENT_KANO_DISPATCH,
+                    extra={'rider_name': batch.rider_name, 'rider_phone': batch.rider_phone}
+                )
+                
+            messages.success(request, f'Kano local orders dispatched. Rider assigned.')
+            return redirect('store:dashboard_dispatch_batch_detail', batch_number=batch.batch_number)
+            
+        elif action == 'interstate_dispatch':
+            # Interstate deliveries: assign driver details per state
+            state = request.POST.get('state')
+            driver_name = request.POST.get('driver_name', '').strip()
+            driver_phone = request.POST.get('driver_phone', '').strip()
+            transport_co = request.POST.get('transport_company', '').strip()
+            plate_no = request.POST.get('plate_number', '').strip()
+            
+            if not driver_phone:
+                messages.error(request, 'Driver phone number is required.')
+                return redirect('store:dashboard_dispatch_batch_detail', batch_number=batch.batch_number)
+                
+            disp, created = InterstateDispatch.objects.get_or_create(
+                batch=batch, state=state,
+                defaults={
+                    'driver_name': driver_name,
+                    'driver_phone': driver_phone,
+                    'transport_company': transport_co,
+                    'plate_number': plate_no,
+                    'customer_notified': True,
+                    'notified_at': timezone.now()
+                }
+            )
+            if not created:
+                disp.driver_name = driver_name
+                disp.driver_phone = driver_phone
+                disp.transport_company = transport_co
+                disp.plate_number = plate_no
+                disp.customer_notified = True
+                disp.notified_at = timezone.now()
+                disp.save()
+                
+            # Update status of all orders in this state to IN_TRANSIT and notify
+            from apps.notifications.services import notify
+            state_orders = state_groups.get(state, [])
+            for item in state_orders:
+                order = item.order
+                order.log_status_change(
+                    Order.STATUS_IN_TRANSIT,
+                    changed_by=request.user,
+                    note=f'Interstate transit to {state}. Driver phone: {driver_phone}'
+                )
+                notify(
+                    order, Notification.EVENT_INTERSTATE_HANDOVER,
+                    extra={'driver_phone': driver_phone, 'transport_company': transport_co}
+                )
+                
+            messages.success(request, f'Interstate transport details saved and notifications dispatched for {state}.')
+            return redirect('store:dashboard_dispatch_batch_detail', batch_number=batch.batch_number)
+            
+    context = {
+        'batch': batch,
+        'kano_items': kano_items,
+        'state_groups': state_groups,
+        'riders': riders,
+        'interstate_dispatches': interstate_dispatches,
+    }
+    return render(request, 'dashboard/dispatch_batch_detail.html', context)
+
+@user_passes_test(is_staff_member, login_url='/auth/login/')
+def dashboard_sent_orders(request):
+    """View orders dispatched and in transit, allow sending delivery confirmation requests."""
+    orders = Order.objects.filter(status__in=[Order.STATUS_DISPATCHED, Order.STATUS_IN_TRANSIT]).order_by('-updated_at')
+    return render(request, 'dashboard/sent_orders.html', {'orders': orders})
+
+@user_passes_test(is_staff_member, login_url='/auth/login/')
+@require_POST
+def dashboard_send_delivery_confirm_request(request, order_number):
+    """Trigger WhatsApp request asking customer if they received their order."""
+    order = get_object_or_404(Order, order_number=order_number)
+    from apps.notifications.services import notify
+    notify(order, Notification.EVENT_DELIVERY_CONFIRM_REQ)
+    messages.success(request, f'Delivery confirmation request notification generated for #{order.order_number}.')
+    return redirect('store:dashboard_sent_orders')
+
+def customer_confirm_delivery_yes(request, order_number):
+    """Webhook/Link clicked by customer confirming they received the order and are satisfied."""
+    order = get_object_or_404(Order, order_number=order_number)
+    
+    if order.status != Order.STATUS_COMPLETED and order.status != Order.STATUS_DELIVERED:
+        order.log_status_change(Order.STATUS_DELIVERED, note='Delivery confirmed by customer (Yes).')
+        from apps.notifications.services import notify
+        notify(order, Notification.EVENT_DELIVERY_CONFIRMED)
+        
+    return render(request, 'orders/delivery_feedback_success.html', {'order': order})
+
+def customer_confirm_delivery_no(request, order_number):
+    """Webhook/Link clicked by customer indicating they did NOT receive the order or have an issue."""
+    order = get_object_or_404(Order, order_number=order_number)
+    
+    order.log_status_change(Order.STATUS_DELIVERY_FAILED, note='Delivery issue reported by customer (No).')
+    from apps.notifications.services import notify
+    notify(order, Notification.EVENT_DELIVERY_ISSUE)
+    
+    site_settings_obj = SiteSettings.get()
+    return render(request, 'orders/delivery_feedback_issue.html', {
+        'order': order,
+        'support_phone': site_settings_obj.support_phone or '0806 886 0972'
+    })
+
+
+
+
 

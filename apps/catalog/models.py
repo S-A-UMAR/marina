@@ -3,21 +3,32 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 import uuid
 
+
 class Category(models.Model):
     name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     description = models.TextField(blank=True)
-    icon = models.CharField(max_length=100, blank=True, default='fa-solid fa-microchip',
-                            help_text='FontAwesome class e.g. fa-solid fa-laptop')
+    icon = models.CharField(
+        max_length=100, blank=True, default='fa-solid fa-microchip',
+        help_text='FontAwesome class e.g. fa-solid fa-laptop'
+    )
     image = models.ImageField(upload_to='categories/', blank=True, null=True)
+    parent = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='subcategories',
+        help_text='Leave blank for top-level category. Select parent to make this a subcategory.'
+    )
+    sort_order = models.PositiveIntegerField(default=0, help_text='Lower = appears first')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = 'Categories'
-        ordering = ['name']
+        ordering = ['sort_order', 'name']
 
     def __str__(self):
+        if self.parent:
+            return f'{self.parent.name} → {self.name}'
         return self.name
 
     def save(self, *args, **kwargs):
@@ -28,6 +39,14 @@ class Category(models.Model):
     def product_count(self):
         return self.products.filter(status=Product.STATUS_PUBLISHED).count()
 
+    @property
+    def is_subcategory(self):
+        return self.parent is not None
+
+    @property
+    def top_level(self):
+        return self.parent if self.parent else self
+
 
 # ---------------------------------------------------------------------------
 # Product
@@ -35,7 +54,6 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    # Status choices per Marina spec
     STATUS_DRAFT = 'draft'
     STATUS_PUBLISHED = 'published'
     STATUS_HIDDEN = 'hidden'
@@ -59,8 +77,15 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     sku = models.CharField(max_length=100, blank=True)
-    brand = models.ForeignKey('brands.Brand', on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
-    category = models.ForeignKey('catalog.Category', on_delete=models.SET_NULL, null=True, related_name='products')
+    brand = models.ForeignKey(
+        'brands.Brand', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='products'
+    )
+    category = models.ForeignKey(
+        'catalog.Category', on_delete=models.SET_NULL, null=True,
+        related_name='products',
+        help_text='Select a subcategory if available'
+    )
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default=CONDITION_NEW)
     short_description = models.CharField(max_length=300, blank=True)
     description = models.TextField(blank=True)
@@ -118,32 +143,56 @@ class Product(models.Model):
     def out_of_stock(self):
         return self.current_stock == 0
 
-    # Legacy compatibility for old templates using is_active
     @property
     def is_active(self):
         return self.status == self.STATUS_PUBLISHED
 
 
-
-
 class ProductImage(models.Model):
-    product = models.ForeignKey('catalog.Product', on_delete=models.CASCADE, related_name='gallery_images')
+    product = models.ForeignKey(
+        'catalog.Product', on_delete=models.CASCADE, related_name='gallery_images',
+        null=True, blank=True
+    )
     image = models.ImageField(upload_to='products/gallery/')
     alt_text = models.CharField(max_length=200, blank=True)
     order = models.PositiveIntegerField(default=0)
+    is_cover = models.BooleanField(default=False, help_text='Use as cover/primary image')
+    session_token = models.CharField(max_length=100, blank=True, db_index=True)
 
     class Meta:
         ordering = ['order']
 
     def __str__(self):
-        return f'Image for {self.product.name}'
+        if self.product:
+            return f'Image for {self.product.name}'
+        return f'Temp Image ({self.session_token})'
 
 
+class ProductVideo(models.Model):
+    """Short product demo/unboxing videos."""
+    product = models.ForeignKey(
+        'catalog.Product', on_delete=models.CASCADE, related_name='videos',
+        null=True, blank=True
+    )
+    video = models.FileField(upload_to='products/videos/')
+    title = models.CharField(max_length=200, blank=True)
+    order = models.PositiveIntegerField(default=0)
+    session_token = models.CharField(max_length=100, blank=True, db_index=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        if self.product:
+            return f'Video for {self.product.name}'
+        return f'Temp Video ({self.session_token})'
 
 
 class ProductSpecification(models.Model):
-    """Flexible key-value specifications per Marina spec."""
-    product = models.ForeignKey('catalog.Product', on_delete=models.CASCADE, related_name='specifications')
+    product = models.ForeignKey(
+        'catalog.Product', on_delete=models.CASCADE, related_name='specifications'
+    )
     key = models.CharField(max_length=100)
     value = models.CharField(max_length=300)
     order = models.PositiveIntegerField(default=0)
@@ -155,10 +204,10 @@ class ProductSpecification(models.Model):
         return f'{self.product.name}: {self.key} = {self.value}'
 
 
-
-
 class ProductReview(models.Model):
-    product = models.ForeignKey('catalog.Product', on_delete=models.CASCADE, related_name='reviews')
+    product = models.ForeignKey(
+        'catalog.Product', on_delete=models.CASCADE, related_name='reviews'
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
     comment = models.TextField(blank=True)
@@ -169,10 +218,3 @@ class ProductReview(models.Model):
 
     def __str__(self):
         return f'{self.user.username} – {self.product.name} ({self.rating}/5)'
-
-
-# ---------------------------------------------------------------------------
-# Cart
-# ---------------------------------------------------------------------------
-
-

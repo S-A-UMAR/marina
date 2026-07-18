@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load marina_filters %}
 
 {% block title %}Order Confirmed | Marina Gadgets{% endblock %}
 
@@ -20,7 +21,7 @@
             <p><strong>Phone:</strong> {{ order.phone }}</p>
             <p><strong>Address:</strong> {{ order.address }}</p>
             <p><strong>City/State:</strong> {{ order.city }}, {{ order.state }}</p>
-            <p><strong>Total Amount Paid:</strong> <strong class="text-primary">₦{{ order.total_amount|floatformat:0 }}</strong></p>
+            <p><strong>Total Amount Paid:</strong> <strong class="text-primary">{{ order.total_amount|naira }}</strong></p>
         </div>
     </div>
 

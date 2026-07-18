@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load marina_filters %}
 
 {% block title %}WhatsApp Checkout Redirect | Marina Gadgets{% endblock %}
 
@@ -25,9 +26,9 @@ Phone: {{ order.phone }}
 Delivery: {{ order.city }}, {{ order.state }}
 
 Items:
-{% for item in order.items.all %}• {{ item.quantity }}x {{ item.product_name }} - ₦{{ item.price|floatformat:0 }}
+{% for item in order.items.all %}• {{ item.quantity }}x {{ item.product_name }} - {{ item.price|naira }}
 {% endfor %}
-Total: ₦{{ order.total_amount|floatformat:0 }}
+Total: {{ order.total_amount|naira }}
             </pre>
         </div>
     </div>

@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load marina_filters %}
 
 {% block title %}Marina Gadgets Kano | Premium Electronics & Gadgets{% endblock %}
 
@@ -182,9 +183,9 @@
                     <a href="{% url 'store:product_detail' prod.slug %}" class="product-card-name">{{ prod.name }}</a>
                     
                     <div class="product-card-price">
-                        <span class="price-current">₦{{ prod.selling_price|floatformat:0 }}</span>
+                        <span class="price-current">{{ prod.selling_price|naira }}</span>
                         {% if prod.is_discounted %}
-                            <span class="price-previous">₦{{ prod.previous_price|floatformat:0 }}</span>
+                            <span class="price-previous">{{ prod.previous_price|naira }}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -258,9 +259,9 @@
                     <a href="{% url 'store:product_detail' prod.slug %}" class="product-card-name">{{ prod.name }}</a>
 
                     <div class="product-card-price">
-                        <span class="price-current">₦{{ prod.selling_price|floatformat:0 }}</span>
+                        <span class="price-current">{{ prod.selling_price|naira }}</span>
                         {% if prod.is_discounted %}
-                            <span class="price-previous">₦{{ prod.previous_price|floatformat:0 }}</span>
+                            <span class="price-previous">{{ prod.previous_price|naira }}</span>
                         {% endif %}
                     </div>
                 </div>

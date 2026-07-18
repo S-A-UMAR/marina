@@ -1,0 +1,35 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Delivery Issue Logged | Marina{% endblock %}
+
+{% block content %}
+<div class="container py-xl" style="max-width: 600px; margin: 0 auto; text-align: center; padding: 0 var(--space-md);">
+    <div class="card" style="padding: var(--space-xl); box-shadow: var(--shadow-3); border-radius: var(--radius-lg); border-top: 5px solid var(--color-danger);">
+        <i class="fa-solid fa-triangle-exclamation text-danger" style="font-size: 64px; margin-bottom: var(--space-md); animation: pulse 1s infinite alternate;"></i>
+        
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--color-text-primary); margin-bottom: var(--space-sm);">Issue Logged</h1>
+        <p class="text-secondary" style="font-size: var(--font-size-base); line-height: 1.6; margin-bottom: var(--space-lg);">
+            We are sorry to hear that you have not received order <strong>#{{ order.order_number }}</strong> or that there is an issue. 
+            We have flagged this order for immediate customer support follow-up.
+        </p>
+
+        <div style="background: var(--color-danger-light); padding: var(--space-md); border-radius: var(--radius-md); font-size: var(--font-size-sm); color: var(--color-danger); font-weight: 600; margin-bottom: var(--space-lg); line-height: 1.5;">
+            ⚠️ Please contact our customer support team immediately so we can resolve this waybill or delivery issue right away!
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: var(--space-sm); align-items: center; margin-bottom: var(--space-lg);">
+            <a href="tel:{{ support_phone }}" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;">
+                <i class="fa-solid fa-phone"></i> Call Support: {{ support_phone }}
+            </a>
+            <a href="https://wa.me/234{{ support_phone|slice:'1:' }}?text=Hello! I am having issues receiving my order %23{{ order.order_number }}." target="_blank" class="btn btn-whatsapp" style="width: 100%; justify-content: center;">
+                <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+            </a>
+        </div>
+
+        <a href="{% url 'store:my_marina' %}" class="btn btn-ghost">
+            <i class="fa-solid fa-arrow-left"></i> Return to Account Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

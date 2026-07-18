@@ -1,0 +1,76 @@
+{% extends 'base/admin_base.html' %}
+{% load marina_filters %}
+
+{% block title %}Dispatch Batches | Marina Admin{% endblock %}
+
+{% block content %}
+<div class="staff-page-header">
+    <div>
+        <h1 class="staff-page-title">Dispatch Batches</h1>
+        <p class="staff-page-subtitle">Track batches of packages handed over to dispatch riders and interstate driver networks.</p>
+    </div>
+    <div>
+        <a href="{% url 'store:dashboard_awaiting_dispatch' %}" class="btn btn-primary">
+            <i class="fa-solid fa-box-open"></i> Awaiting Dispatch List
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">All Batches ({{ batches.count }})</div>
+    <div class="card-body" style="padding: 0;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Batch ID</th>
+                    <th>Created At</th>
+                    <th>Created By</th>
+                    <th style="text-align: center;">Packages</th>
+                    <th>States Included</th>
+                    <th>Dispatch Rider / Status</th>
+                    <th style="text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for batch in batches %}
+                    <tr>
+                        <td><strong class="td-mono text-primary">{{ batch.batch_number }}</strong></td>
+                        <td>{{ batch.created_at|date:"d M Y, H:i" }}</td>
+                        <td>{{ batch.created_by.username|default:"System" }}</td>
+                        <td style="text-align: center;"><span class="badge badge-info">{{ batch.order_count }}</span></td>
+                        <td>
+                            {% for state in batch.states_included %}
+                                <span class="badge badge-secondary" style="font-size: 10px;">{{ state }}</span>
+                            {% empty %}
+                                <span class="text-muted" style="font-size: var(--font-size-xs);">None</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if batch.status == 'prepared' %}
+                                <span class="badge badge-warning">Prepared (Pending Handover)</span>
+                            {% else %}
+                                <span class="badge badge-success">Dispatched ({{ batch.rider_name|default:'Driver Network' }})</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="{% url 'store:dashboard_dispatch_batch_detail' batch.batch_number %}" class="btn btn-ghost btn-sm" style="padding: 4px 8px;">
+                                <i class="fa-solid fa-gear"></i> Manage Handover
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" style="padding: var(--space-xl); text-align: center;">
+                            <div class="empty-state">
+                                <i class="fa-solid fa-truck-ramp-box text-muted" style="font-size: 48px; margin-bottom: var(--space-md);"></i>
+                                <p class="font-semibold text-secondary">No dispatch batches created yet.</p>
+                                <p class="text-muted" style="font-size: var(--font-size-xs);">Select packages in the Awaiting Dispatch view to group them into a batch.</p>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

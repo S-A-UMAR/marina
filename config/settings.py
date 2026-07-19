@@ -219,61 +219,23 @@ MESSAGE_TAGS = {
 # ---------------------------------------------------------------------------
 JAZZMIN_SETTINGS = {
     "site_title": "Marina Admin",
-    "site_header": "Marina",
+    "site_header": "Marina Gadgets",
     "site_brand": "Marina Gadgets",
-    "welcome_sign": "Welcome to Marina Admin",
-    "copyright": "Marina Gadgets Kano",
+    "site_logo": None,
+    "site_logo_classes": None,
+    "site_icon": None,
+    "welcome_sign": "Welcome to Marina Admin Panel",
+    "copyright": "Marina Gadgets Kano © 2026",
+    "search_model": ["apps.catalog.Product", "apps.orders.Order", "auth.User"],
 
     "topmenu_links": [
         {"name": "View Store", "url": "/", "new_window": True, "icon": "fas fa-store"},
-        {"name": "Orders", "model": "store.order"},
-        {"name": "Products", "model": "store.product"},
+        {"name": "Staff Portal", "url": "/staff/", "new_window": True, "icon": "fas fa-chart-line"},
     ],
 
-    "order_with_respect_to": [
-        "store",
-        "store.product",
-        "store.brand",
-        "store.category",
-        "store.order",
-        "store.orderitem",
-        "store.payment",
-        "store.wishlist",
-        "store.feedback",
-        "store.reward",
-        "store.notification",
-        "store.banner",
-        "store.stockmovement",
-        "store.sitesettings",
-        "store.userprofile",
-        "auth",
+    "usermenu_links": [
+        {"name": "View Store", "url": "/", "new_window": True},
     ],
-
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.group": "fas fa-users",
-        "store.product": "fas fa-box-open",
-        "store.brand": "fas fa-tag",
-        "store.category": "fas fa-tags",
-        "store.order": "fas fa-shopping-bag",
-        "store.orderitem": "fas fa-list",
-        "store.payment": "fas fa-credit-card",
-        "store.cart": "fas fa-shopping-cart",
-        "store.cartitem": "fas fa-cart-plus",
-        "store.wishlist": "fas fa-heart",
-        "store.feedback": "fas fa-comments",
-        "store.reward": "fas fa-gift",
-        "store.notification": "fas fa-bell",
-        "store.banner": "fas fa-image",
-        "store.stockmovement": "fas fa-warehouse",
-        "store.sitesettings": "fas fa-cog",
-        "store.userprofile": "fas fa-id-card",
-        "store.productreview": "fas fa-star",
-        "store.productimage": "fas fa-images",
-    },
-    "default_icon_parents": "fas fa-chevron-circle-right",
-    "default_icon_children": "fas fa-circle",
 
     "show_sidebar": True,
     "navigation_expanded": True,
@@ -281,18 +243,88 @@ JAZZMIN_SETTINGS = {
     "hide_models": [],
     "related_modal_active": True,
 
-    "custom_css": None,
+    "order_with_respect_to": [
+        "apps.catalog",
+        "apps.catalog.Product",
+        "apps.brands",
+        "apps.catalog.Category",
+        "apps.orders",
+        "apps.orders.Order",
+        "apps.orders.OrderItem",
+        "apps.payments",
+        "apps.cart",
+        "apps.wishlist",
+        "apps.feedback",
+        "apps.rewards",
+        "apps.notifications",
+        "apps.homepage",
+        "apps.inventory",
+        "apps.core",
+        "apps.accounts",
+        "auth",
+    ],
+
+    "icons": {
+        # Auth
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.group": "fas fa-users",
+        # Catalog
+        "apps.catalog.product": "fas fa-box-open",
+        "apps.catalog.productimage": "fas fa-images",
+        "apps.catalog.productspecification": "fas fa-list-check",
+        "apps.catalog.productreview": "fas fa-star",
+        "apps.catalog.category": "fas fa-tags",
+        # Brands
+        "apps.brands.brand": "fas fa-tag",
+        # Orders
+        "apps.orders.order": "fas fa-shopping-bag",
+        "apps.orders.orderitem": "fas fa-list",
+        # Payments
+        "apps.payments.payment": "fas fa-credit-card",
+        # Cart
+        "apps.cart.cart": "fas fa-shopping-cart",
+        "apps.cart.cartitem": "fas fa-cart-plus",
+        # Wishlist
+        "apps.wishlist.wishlist": "fas fa-heart",
+        "apps.wishlist.wishlistitem": "fas fa-heart-circle-plus",
+        # Feedback
+        "apps.feedback.feedback": "fas fa-comments",
+        # Rewards
+        "apps.rewards.reward": "fas fa-gift",
+        # Notifications
+        "apps.notifications.notification": "fas fa-bell",
+        # Homepage
+        "apps.homepage.banner": "fas fa-image",
+        # Inventory
+        "apps.inventory.stockmovement": "fas fa-warehouse",
+        "apps.inventory.supplier": "fas fa-truck-field",
+        # Core
+        "apps.core.sitesettings": "fas fa-cog",
+        # Accounts
+        "apps.accounts.userprofile": "fas fa-id-card",
+    },
+
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+
+    "custom_css": "css/admin_custom.css",
     "custom_js": None,
     "use_google_fonts_cdn": True,
     "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
 }
 
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
-    "footer_small_text": False,
+    "footer_small_text": True,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-primary",
+    "brand_colour": "navbar-dark",
     "accent": "accent-primary",
     "navbar": "navbar-white navbar-light",
     "no_navbar_border": False,
@@ -300,11 +332,11 @@ JAZZMIN_UI_TWEAKS = {
     "layout_boxed": False,
     "footer_fixed": False,
     "sidebar_fixed": True,
-    "sidebar": "sidebar-light-primary",
+    "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": True,
-    "sidebar_nav_compact_style": False,
+    "sidebar_nav_compact_style": True,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
     "theme": "default",
@@ -318,3 +350,4 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success",
     },
 }
+

@@ -633,7 +633,8 @@ header .container:hover {
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  padding: 10px var(--space-lg);
+  padding: 12px var(--space-lg);
+  min-height: 44px;
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -708,8 +709,8 @@ header .container:hover {
 .btn-whatsapp:hover { background: #1DA851; border-color: #1DA851; color: #fff; }
 
 /* Sizes */
-.btn-sm { padding: 6px var(--space-md); font-size: var(--font-size-xs); }
-.btn-lg { padding: 14px var(--space-xl); font-size: var(--font-size-base); }
+.btn-sm { padding: 8px var(--space-md); font-size: var(--font-size-xs); min-height: 36px; }
+.btn-lg { padding: 16px var(--space-xl); font-size: var(--font-size-base); min-height: 52px; }
 .btn-full { width: 100%; }
 
 /* Loading state */

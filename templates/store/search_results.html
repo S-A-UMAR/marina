@@ -74,7 +74,7 @@
                 <div class="product-card">
                     <a href="{% url 'store:product_detail' prod.slug %}" class="product-card-img">
                         {% if prod.cover_image %}
-                            <img src="{{ prod.cover_image.url }}" alt="{{ prod.name }}">
+                            <img src="{{ prod.cover_image.url }}" alt="{{ prod.name }}" loading="lazy">
                         {% else %}
                             <div class="no-image"><i class="fa-solid fa-image"></i></div>
                         {% endif %}

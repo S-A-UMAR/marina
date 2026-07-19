@@ -1,0 +1,43 @@
+{
+  "name": "Marina Gadgets Kano",
+  "short_name": "Marina",
+  "description": "Premium gadgets and accessories. Fast delivery in Kano and nationwide.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#185ABD",
+  "lang": "en-NG",
+  "categories": ["shopping", "business"],
+  "icons": [
+    {
+      "src": "/static/img/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Products",
+      "short_name": "Shop",
+      "description": "Browse all products",
+      "url": "/products/",
+      "icons": [{ "src": "/static/img/favicon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "My Orders",
+      "short_name": "Orders",
+      "description": "View my order history",
+      "url": "/my-marina/orders/",
+      "icons": [{ "src": "/static/img/favicon.png", "sizes": "96x96" }]
+    }
+  ]
+}

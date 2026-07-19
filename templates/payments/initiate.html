@@ -5,9 +5,9 @@
 
 {% block content %}
 <div class="text-center" style="max-width: 500px; margin: 80px auto; padding: 40px; background: #FFF; border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-2);">
-    <i class="fa-solid fa-spinner fa-spin text-primary" style="font-size: 64px; margin-bottom: 20px;"></i>
-    <h2 class="font-bold">Connecting to Paystack</h2>
-    <p class="text-secondary mt-xs">We are launching secure checkout portals. Please do not close or reload this tab.</p>
+    <i class="fa-solid fa-lock text-primary" style="font-size: 64px; margin-bottom: 20px;"></i>
+    <h2 class="font-bold">Secure Checkout</h2>
+    <p class="text-secondary mt-xs">Complete your payment securely via Paystack. Do not close or reload this tab.</p>
     
     <div style="background: var(--color-surface); padding: 20px; border-radius: var(--radius-md); margin: 25px 0; text-align: left; font-size: var(--font-size-sm); border: 1px solid var(--color-border-light);">
         <p style="margin-bottom: 8px;"><strong>Order ID:</strong> <span class="td-mono font-semibold">{{ order.order_number }}</span></p>
@@ -15,9 +15,15 @@
         <p><strong>Amount:</strong> <span class="text-primary font-bold">{{ order.total_amount|naira }}</span></p>
     </div>
 
-    <button id="paystack-btn" class="btn btn-primary btn-lg btn-full">
-        Pay Securely Now <i class="fa-solid fa-credit-card"></i>
+    <button id="paystack-btn" class="btn btn-primary btn-lg btn-full" style="margin-bottom: var(--space-md);">
+        <i class="fa-solid fa-credit-card"></i> Pay Securely Now
     </button>
+    <a href="{% url 'store:payment_cancel' reference %}" class="btn btn-ghost btn-full" id="cancel-btn">
+        <i class="fa-solid fa-xmark"></i> Cancel Payment
+    </a>
+    <p style="font-size: 11px; color: var(--color-text-muted); margin-top: var(--space-md);">
+        <i class="fa-solid fa-shield-halved"></i> 256-bit SSL encrypted · Powered by Paystack
+    </p>
 </div>
 {% endblock %}
 
@@ -27,19 +33,29 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const paystackBtn = document.getElementById('paystack-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
         
         function payWithPaystack() {
+            paystackBtn.disabled = true;
+            paystackBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening Paystack...';
+            
             let handler = PaystackPop.setup({
                 key: '{{ paystack_public_key }}',
                 email: '{{ email }}',
                 amount: {{ amount_kobo }},
                 currency: 'NGN',
                 ref: '{{ reference }}',
+                metadata: {
+                    order_number: '{{ order.order_number }}',
+                    customer_name: '{{ order.full_name }}',
+                },
                 callback: function(response) {
+                    paystackBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying payment...';
                     window.location.href = "{% url 'store:verify_payment' reference %}";
                 },
                 onClose: function() {
-                    alert('Transaction cancelled. You can retry paying by clicking the Pay button.');
+                    // User closed the modal — redirect to cancel endpoint to mark order as cancelled
+                    window.location.href = "{% url 'store:payment_cancel' reference %}";
                 }
             });
             handler.openIframe();
@@ -50,3 +66,4 @@
     });
 </script>
 {% endblock %}
+

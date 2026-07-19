@@ -1,0 +1,171 @@
+/*
+ * Marina Gadgets Kano — Custom Django /admin CSS
+ * Overrides Jazzmin/AdminLTE with Marina brand colors (#185ABD)
+ * Loaded via JAZZMIN_SETTINGS["custom_css"]
+ */
+
+/* ── Brand primary color overrides ────────────────────────── */
+:root {
+  --marina-blue: #185ABD;
+  --marina-blue-dark: #144A99;
+  --marina-blue-light: #EAF3FF;
+  --marina-sidebar-bg: #0f2c5c;
+  --marina-sidebar-text: rgba(255,255,255,0.85);
+  --marina-sidebar-active: #185ABD;
+}
+
+/* Sidebar background */
+.main-sidebar,
+.main-sidebar .sidebar {
+  background-color: var(--marina-sidebar-bg) !important;
+}
+
+/* Sidebar brand/logo area */
+.brand-link,
+.brand-link:hover {
+  background-color: #0a1f42 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+}
+
+.brand-text {
+  color: #fff !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.3px;
+}
+
+/* Sidebar nav items */
+.nav-sidebar .nav-item .nav-link {
+  color: var(--marina-sidebar-text) !important;
+  font-size: 13.5px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  margin: 1px 8px;
+  transition: all 0.15s ease;
+}
+
+.nav-sidebar .nav-item .nav-link:hover {
+  background: rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+}
+
+.nav-sidebar .nav-item .nav-link.active {
+  background: var(--marina-sidebar-active) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(24,90,189,0.4);
+}
+
+/* Sidebar section headers */
+.nav-sidebar .nav-header {
+  color: rgba(255,255,255,0.45) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  padding: 16px 16px 4px !important;
+}
+
+/* Top navbar */
+.main-header.navbar {
+  background: #fff !important;
+  border-bottom: 1px solid #E5E7EB !important;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important;
+}
+
+.navbar-light .navbar-nav .nav-link,
+.main-header .navbar-nav .nav-link {
+  color: #374151 !important;
+}
+
+/* Breadcrumb */
+.content-header {
+  background: #F8FAFC;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 12px 20px !important;
+}
+
+.content-header h1 {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #1F2937 !important;
+}
+
+/* Buttons — primary */
+.btn-primary,
+.btn-info {
+  background-color: var(--marina-blue) !important;
+  border-color: var(--marina-blue) !important;
+  color: #fff !important;
+}
+
+.btn-primary:hover,
+.btn-info:hover {
+  background-color: var(--marina-blue-dark) !important;
+  border-color: var(--marina-blue-dark) !important;
+}
+
+/* Cards */
+.card {
+  border-radius: 12px !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+}
+
+.card-header {
+  background: #F8FAFC !important;
+  border-bottom: 1px solid #E5E7EB !important;
+  font-weight: 600 !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+/* Tables */
+.table thead th {
+  background: #F8FAFC;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6B7280 !important;
+  border-bottom: 2px solid #E5E7EB !important;
+}
+
+/* Links */
+a { color: var(--marina-blue); }
+a:hover { color: var(--marina-blue-dark); }
+
+/* Form inputs */
+.form-control:focus,
+.select2-container--default .select2-selection--single:focus {
+  border-color: var(--marina-blue) !important;
+  box-shadow: 0 0 0 3px rgba(24,90,189,0.12) !important;
+}
+
+/* Pagination */
+.page-link {
+  color: var(--marina-blue) !important;
+}
+.page-item.active .page-link {
+  background-color: var(--marina-blue) !important;
+  border-color: var(--marina-blue) !important;
+  color: #fff !important;
+}
+
+/* Save buttons */
+input[type=submit],
+button[type=submit] {
+  background-color: var(--marina-blue) !important;
+  border-color: var(--marina-blue) !important;
+}
+
+/* Footer */
+.main-footer {
+  font-size: 12px;
+  color: #9CA3AF;
+  border-top: 1px solid #E5E7EB;
+}
+
+/* Responsive sidebar fix for tablets */
+@media (max-width: 991px) {
+  .main-sidebar {
+    box-shadow: 4px 0 20px rgba(0,0,0,0.25) !important;
+  }
+}

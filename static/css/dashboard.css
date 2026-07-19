@@ -361,7 +361,8 @@ body.sidebar-lock { overflow: hidden; }
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 5px 10px;
+  padding: 7px 12px;
+  min-height: 34px;
   border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: 600;
@@ -589,7 +590,26 @@ body.sidebar-lock { overflow: hidden; }
 
   /* Action buttons: icon only */
   .action-btn span { display: none; }
+
+  /* Staff main: tightest padding */
+  .staff-main { padding: var(--space-sm); }
+
+  /* Page header title: smaller */
+  .staff-page-title { font-size: var(--font-size-xl); }
+
+  /* Pending order cards: single column */
+  .pending-orders-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Ensure tables are always scrollable ───────────────────── */
+.table-responsive-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-lg);
+}
+
+/* ── Force min-width on wide tables (e.g. sent orders, 8 cols) ── */
+.data-table.table-wide { min-width: 800px; }
 
 /* ============================================================
    MARINA MULTI-MEDIA UPLOAD STYLING

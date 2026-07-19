@@ -74,8 +74,8 @@ class Order(models.Model):
 
     user             = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     session_key      = models.CharField(max_length=40, blank=True, null=True)
-    order_number     = models.CharField(max_length=20, unique=True, blank=True)
-    status           = models.CharField(max_length=25, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    order_number     = models.CharField(max_length=20, unique=True, blank=True, db_index=True)
+    status           = models.CharField(max_length=25, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
     checkout_method  = models.CharField(max_length=20, choices=METHOD_CHOICES, default=METHOD_ONLINE)
     delivery_type    = models.CharField(max_length=20, choices=DELIVERY_CHOICES, default=DELIVERY_KANO, blank=True)
     full_name        = models.CharField(max_length=200)

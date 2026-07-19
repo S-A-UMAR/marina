@@ -8,12 +8,14 @@ class Payment(models.Model):
     STATUS_PROCESSING = 'processing'
     STATUS_SUCCESS = 'success'
     STATUS_FAILED = 'failed'
+    STATUS_CANCELLED = 'cancelled'
     STATUS_REFUNDED = 'refunded'
     STATUS_CHOICES = [
         (STATUS_PENDING, 'Pending'),
         (STATUS_PROCESSING, 'Processing'),
         (STATUS_SUCCESS, 'Successful'),
         (STATUS_FAILED, 'Failed'),
+        (STATUS_CANCELLED, 'Cancelled by User'),
         (STATUS_REFUNDED, 'Refunded'),
     ]
 

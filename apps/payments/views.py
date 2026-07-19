@@ -119,3 +119,93 @@ def verify_payment(request, reference):
             messages.error(request, 'Payment was not successful on Paystack.')
             return redirect('store:home')
 
+
+def payment_cancel(request, reference):
+    """Called when a user closes/cancels the Paystack payment modal.
+    Marks the payment and order as cancelled so it shows correctly in order history.
+    """
+    try:
+        payment = Payment.objects.get(reference=reference)
+        if payment.status == Payment.STATUS_PENDING:
+            payment.status = Payment.STATUS_CANCELLED
+            payment.save()
+            order = payment.order
+            if order.status not in [Order.STATUS_PAYMENT_VERIFIED, Order.STATUS_DELIVERED, Order.STATUS_COMPLETED]:
+                order.log_status_change(Order.STATUS_CANCELLED, note='Payment cancelled by customer on Paystack modal.')
+    except Payment.DoesNotExist:
+        pass
+    messages.warning(request, 'Payment was cancelled. Your order has been marked as cancelled. You can place a new order anytime.')
+    return redirect('store:my_orders')
+
+
+import hashlib
+import hmac
+import json
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def paystack_webhook(request):
+    """Receive and process Paystack webhook events (charge.success, charge.failed, etc.)
+    This is the server-side payment confirmation — more reliable than browser redirect alone.
+    """
+    if request.method != 'POST':
+        from django.http import HttpResponseNotAllowed
+        return HttpResponseNotAllowed(['POST'])
+
+    # Verify webhook signature
+    paystack_secret = getattr(settings, 'PAYSTACK_SECRET_KEY', '')
+    signature = request.headers.get('X-Paystack-Signature', '')
+    computed = hmac.new(
+        paystack_secret.encode('utf-8'),
+        request.body,
+        hashlib.sha512
+    ).hexdigest()
+
+    if not hmac.compare_digest(computed, signature):
+        return JsonResponse({'error': 'Invalid signature'}, status=400)
+
+    try:
+        event = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    event_type = event.get('event', '')
+    data = event.get('data', {})
+    reference = data.get('reference', '')
+
+    if event_type == 'charge.success':
+        try:
+            payment = Payment.objects.get(reference=reference)
+            if payment.status != Payment.STATUS_SUCCESS:
+                payment.status = Payment.STATUS_SUCCESS
+                payment.gateway_response = event
+                payment.save()
+                order = payment.order
+                if order.status != Order.STATUS_PAYMENT_VERIFIED:
+                    order.status = Order.STATUS_PAYMENT_VERIFIED
+                    order.save()
+                    # Deduct stock if not already done
+                    for item in order.items.all():
+                        if item.product:
+                            item.product.current_stock = max(0, item.product.current_stock - item.quantity)
+                            item.product.save()
+        except Payment.DoesNotExist:
+            pass
+
+    elif event_type in ('charge.failed', 'transfer.failed'):
+        try:
+            payment = Payment.objects.get(reference=reference)
+            if payment.status == Payment.STATUS_PENDING:
+                payment.status = Payment.STATUS_FAILED
+                payment.gateway_response = event
+                payment.save()
+                order = payment.order
+                if order.status not in [Order.STATUS_PAYMENT_VERIFIED, Order.STATUS_COMPLETED]:
+                    order.status = Order.STATUS_CANCELLED
+                    order.save()
+        except Payment.DoesNotExist:
+            pass
+
+    return JsonResponse({'status': 'ok'})
+
+

@@ -105,13 +105,23 @@ def dashboard_overview(request):
     completed_orders_count = Order.objects.filter(status=Order.STATUS_COMPLETED).count()
 
     total_sales = Order.objects.filter(
-        status__in=[Order.STATUS_PAYMENT_VERIFIED, Order.STATUS_CONFIRMED,
-                    Order.STATUS_PROCESSING, Order.STATUS_DELIVERED, Order.STATUS_COMPLETED]
+        status__in=[
+            Order.STATUS_PAYMENT_VERIFIED, Order.STATUS_CONFIRMED,
+            Order.STATUS_PENDING_PACKAGING, Order.STATUS_PACKAGING,
+            Order.STATUS_PACKED, Order.STATUS_AWAITING_DISPATCH,
+            Order.STATUS_DISPATCHED, Order.STATUS_IN_TRANSIT,
+            Order.STATUS_DELIVERED, Order.STATUS_COMPLETED
+        ]
     ).aggregate(total=Sum('total_amount'))['total'] or 0
 
     sales_today = orders_today.filter(
-        status__in=[Order.STATUS_PAYMENT_VERIFIED, Order.STATUS_CONFIRMED,
-                    Order.STATUS_PROCESSING, Order.STATUS_DELIVERED, Order.STATUS_COMPLETED]
+        status__in=[
+            Order.STATUS_PAYMENT_VERIFIED, Order.STATUS_CONFIRMED,
+            Order.STATUS_PENDING_PACKAGING, Order.STATUS_PACKAGING,
+            Order.STATUS_PACKED, Order.STATUS_AWAITING_DISPATCH,
+            Order.STATUS_DISPATCHED, Order.STATUS_IN_TRANSIT,
+            Order.STATUS_DELIVERED, Order.STATUS_COMPLETED
+        ]
     ).aggregate(total=Sum('total_amount'))['total'] or 0
 
     # Main dashboard top section: Pending Orders

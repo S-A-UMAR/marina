@@ -47,8 +47,10 @@ def my_marina(request):
     """Customer personal dashboard."""
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     active_orders = orders.filter(status__in=[
-        Order.STATUS_PENDING, Order.STATUS_CONFIRMED,
-        Order.STATUS_PROCESSING, Order.STATUS_DISPATCHED, Order.STATUS_IN_TRANSIT
+        Order.STATUS_PENDING, Order.STATUS_AWAITING_PAYMENT, Order.STATUS_PAYMENT_VERIFIED,
+        Order.STATUS_CONFIRMED, Order.STATUS_PENDING_PACKAGING, Order.STATUS_PACKAGING,
+        Order.STATUS_PACKED, Order.STATUS_AWAITING_DISPATCH, Order.STATUS_DISPATCHED,
+        Order.STATUS_IN_TRANSIT, Order.STATUS_DELIVERED
     ])
     recent_orders = orders[:5]
     

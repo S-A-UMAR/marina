@@ -130,4 +130,182 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+
+    // -----------------------------------------------
+    // Product Detail Page - Add to Cart / Wishlist AJAX
+    // -----------------------------------------------
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const addToCartForm = document.getElementById('addToCartForm');
+    
+    if (addToCartBtn && addToCartForm) {
+        addToCartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const formData = new FormData(addToCartForm);
+            
+            // Get the current quantity from selector if it exists
+            const qtyDisplay = document.querySelector('.qty-display');
+            if (qtyDisplay) {
+                formData.set('quantity', qtyDisplay.textContent.trim());
+            }
+
+            addToCartBtn.disabled = true;
+            addToCartBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+
+            fetch('/cart/add/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                addToCartBtn.disabled = false;
+                addToCartBtn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+                
+                if (data.ok) {
+                    showGlobalMessage(data.message, 'success');
+                    updateBadgeCount('cart', data.cart_count);
+                } else {
+                    showGlobalMessage(data.message || 'Failed to add item to cart', 'error');
+                }
+            })
+            .catch(err => {
+                addToCartBtn.disabled = false;
+                addToCartBtn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+                showGlobalMessage('Network error occurred. Please try again.', 'error');
+            });
+        });
+    }
+
+    const wishlistToggleBtn = document.getElementById('wishlistToggleBtn');
+    if (wishlistToggleBtn) {
+        wishlistToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Find CSRF token from cart form
+            const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (!csrfInput) {
+                showGlobalMessage('Session error, please refresh the page.', 'error');
+                return;
+            }
+
+            const productIdInput = document.querySelector('[name=product_id]');
+            if (!productIdInput) return;
+
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', csrfInput.value);
+            formData.append('product_id', productIdInput.value);
+
+            wishlistToggleBtn.disabled = true;
+            wishlistToggleBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+            fetch('/wishlist/add/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => {
+                if (res.status === 403 || res.redirected) {
+                    // Not authenticated
+                    window.location.href = '/auth/login/';
+                    return;
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (!data) return;
+                wishlistToggleBtn.disabled = false;
+                
+                if (data.ok) {
+                    showGlobalMessage(data.message, 'success');
+                    updateBadgeCount('wishlist', data.wishlist_count);
+                    
+                    // Update button styling
+                    if (data.in_wishlist) {
+                        wishlistToggleBtn.setAttribute('data-in-wishlist', 'true');
+                        wishlistToggleBtn.style.color = 'var(--color-danger)';
+                        wishlistToggleBtn.style.borderColor = 'var(--color-danger)';
+                        wishlistToggleBtn.innerHTML = '<i class="fa-solid fa-heart"></i> In Wishlist';
+                    } else {
+                        wishlistToggleBtn.setAttribute('data-in-wishlist', 'false');
+                        wishlistToggleBtn.style.color = '';
+                        wishlistToggleBtn.style.borderColor = '';
+                        wishlistToggleBtn.innerHTML = '<i class="fa-regular fa-heart"></i> Save Wishlist';
+                    }
+                } else {
+                    showGlobalMessage(data.message || 'Failed to update wishlist', 'error');
+                }
+            })
+            .catch(err => {
+                wishlistToggleBtn.disabled = false;
+                showGlobalMessage('Network error occurred. Please try again.', 'error');
+            });
+        });
+    }
+
+    // Helpers
+    function showGlobalMessage(text, type) {
+        const container = document.querySelector('.messages-container');
+        if (!container) return;
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.innerHTML = `
+            <span>${text}</span>
+            <i class="fa-solid fa-xmark close-btn" onclick="this.parentElement.remove()"></i>
+        `;
+        container.appendChild(alertDiv);
+        
+        // Auto remove
+        setTimeout(() => {
+            alertDiv.style.transition = 'opacity 0.5s ease';
+            alertDiv.style.opacity = '0';
+            setTimeout(() => alertDiv.remove(), 500);
+        }, 5000);
+    }
+
+    function updateBadgeCount(type, count) {
+        // Find badge in desktop nav
+        const navItems = document.querySelectorAll('.nav-actions .nav-item');
+        navItems.forEach(item => {
+            const isCart = item.querySelector('.fa-cart-shopping') && type === 'cart';
+            const isWishlist = item.querySelector('.fa-regular.fa-heart, .fa-solid.fa-heart') && type === 'wishlist';
+            
+            if (isCart || isWishlist) {
+                let badge = item.querySelector('.badge');
+                if (count > 0) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'badge';
+                        item.appendChild(badge);
+                    }
+                    badge.textContent = count;
+                } else if (badge) {
+                    badge.remove();
+                }
+            }
+        });
+        
+        // Also update mobile bottom nav badges if present
+        const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+        bottomNavItems.forEach(item => {
+            const isWishlist = item.querySelector('.fa-regular.fa-heart, .fa-solid.fa-heart') && type === 'wishlist';
+            if (isWishlist) {
+                let badge = item.querySelector('.badge');
+                if (count > 0) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'badge';
+                        item.appendChild(badge);
+                    }
+                    badge.textContent = count;
+                } else if (badge) {
+                    badge.remove();
+                }
+            }
+        });
+    }
 });

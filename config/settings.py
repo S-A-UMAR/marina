@@ -226,7 +226,7 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
     "welcome_sign": "Welcome to Marina Admin Panel",
     "copyright": "Marina Gadgets Kano © 2026",
-    "search_model": ["apps.catalog.Product", "apps.orders.Order", "auth.User"],
+    "search_model": "catalog.Product",
 
     "topmenu_links": [
         {"name": "View Store", "url": "/", "new_window": True, "icon": "fas fa-store"},
@@ -244,23 +244,23 @@ JAZZMIN_SETTINGS = {
     "related_modal_active": True,
 
     "order_with_respect_to": [
-        "apps.catalog",
-        "apps.catalog.Product",
-        "apps.brands",
-        "apps.catalog.Category",
-        "apps.orders",
-        "apps.orders.Order",
-        "apps.orders.OrderItem",
-        "apps.payments",
-        "apps.cart",
-        "apps.wishlist",
-        "apps.feedback",
-        "apps.rewards",
-        "apps.notifications",
-        "apps.homepage",
-        "apps.inventory",
-        "apps.core",
-        "apps.accounts",
+        "catalog",
+        "catalog.Product",
+        "brands",
+        "catalog.Category",
+        "orders",
+        "orders.Order",
+        "orders.OrderItem",
+        "payments",
+        "cart",
+        "wishlist",
+        "feedback",
+        "rewards",
+        "notifications",
+        "homepage",
+        "inventory",
+        "core",
+        "accounts",
         "auth",
     ],
 
@@ -270,39 +270,39 @@ JAZZMIN_SETTINGS = {
         "auth.user": "fas fa-user",
         "auth.group": "fas fa-users",
         # Catalog
-        "apps.catalog.product": "fas fa-box-open",
-        "apps.catalog.productimage": "fas fa-images",
-        "apps.catalog.productspecification": "fas fa-list-check",
-        "apps.catalog.productreview": "fas fa-star",
-        "apps.catalog.category": "fas fa-tags",
+        "catalog.product": "fas fa-box-open",
+        "catalog.productimage": "fas fa-images",
+        "catalog.productspecification": "fas fa-list-check",
+        "catalog.productreview": "fas fa-star",
+        "catalog.category": "fas fa-tags",
         # Brands
-        "apps.brands.brand": "fas fa-tag",
+        "brands.brand": "fas fa-tag",
         # Orders
-        "apps.orders.order": "fas fa-shopping-bag",
-        "apps.orders.orderitem": "fas fa-list",
+        "orders.order": "fas fa-shopping-bag",
+        "orders.orderitem": "fas fa-list",
         # Payments
-        "apps.payments.payment": "fas fa-credit-card",
+        "payments.payment": "fas fa-credit-card",
         # Cart
-        "apps.cart.cart": "fas fa-shopping-cart",
-        "apps.cart.cartitem": "fas fa-cart-plus",
+        "cart.cart": "fas fa-shopping-cart",
+        "cart.cartitem": "fas fa-cart-plus",
         # Wishlist
-        "apps.wishlist.wishlist": "fas fa-heart",
-        "apps.wishlist.wishlistitem": "fas fa-heart-circle-plus",
+        "wishlist.wishlist": "fas fa-heart",
+        "wishlist.wishlistitem": "fas fa-heart-circle-plus",
         # Feedback
-        "apps.feedback.feedback": "fas fa-comments",
+        "feedback.feedback": "fas fa-comments",
         # Rewards
-        "apps.rewards.reward": "fas fa-gift",
+        "rewards.reward": "fas fa-gift",
         # Notifications
-        "apps.notifications.notification": "fas fa-bell",
+        "notifications.notification": "fas fa-bell",
         # Homepage
-        "apps.homepage.banner": "fas fa-image",
+        "homepage.banner": "fas fa-image",
         # Inventory
-        "apps.inventory.stockmovement": "fas fa-warehouse",
-        "apps.inventory.supplier": "fas fa-truck-field",
+        "inventory.stockmovement": "fas fa-warehouse",
+        "inventory.supplier": "fas fa-truck-field",
         # Core
-        "apps.core.sitesettings": "fas fa-cog",
+        "core.sitesettings": "fas fa-cog",
         # Accounts
-        "apps.accounts.userprofile": "fas fa-id-card",
+        "accounts.userprofile": "fas fa-id-card",
     },
 
     "default_icon_parents": "fas fa-chevron-circle-right",

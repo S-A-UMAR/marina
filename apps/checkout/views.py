@@ -80,9 +80,7 @@ def checkout(request):
         if errors:
             for e in errors:
                 messages.error(request, e)
-            # Re-render with entered data
-            context = _checkout_context(settings_obj, cart, subtotal, total, initial_data)
-            context.update({'posted': request.POST})
+            context = _checkout_context(settings_obj, cart, subtotal, total, initial_data, posted=request.POST)
             return render(request, 'orders/checkout.html', context)
 
         # Recompute total server-side (security: don't trust client-side values)
@@ -159,17 +157,19 @@ def checkout(request):
     return render(request, 'orders/checkout.html', context)
 
 
-def _checkout_context(settings_obj, cart, subtotal, total, initial_data):
+def _checkout_context(settings_obj, cart, subtotal, total, initial_data, posted=None):
     return {
         'cart': cart,
         'subtotal': subtotal,
         'total': total,
         'states': NIGERIAN_STATES,
         'initial': initial_data,
+        'posted': posted or {},
         'site_settings': settings_obj,
         'delivery_estimate_kano': settings_obj.delivery_estimate_kano,
         'delivery_estimate_interstate': settings_obj.delivery_estimate_interstate,
     }
+
 
 
 def whatsapp_checkout(request, order_number):

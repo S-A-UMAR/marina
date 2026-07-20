@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from django.http import FileResponse
 import os
 
@@ -49,6 +49,8 @@ def serve_sw(request):
     return response
 
 urlpatterns = [
+    # Redirect /admin/login/ to the OTP phone login flow (staff login via WhatsApp OTP)
+    path('admin/login/', RedirectView.as_view(url='/auth/login/', permanent=False)),
     path('admin/', admin.site.urls),
     path('', include((combined_urlpatterns, 'store'))),
     # PWA
@@ -56,5 +58,6 @@ urlpatterns = [
     path('sw.js', serve_sw, name='pwa_sw'),
     path('offline/', TemplateView.as_view(template_name='offline.html'), name='offline'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT if hasattr(settings, 'MEDIA_ROOT') else '')
+
 
 

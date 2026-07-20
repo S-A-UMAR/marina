@@ -59,6 +59,22 @@ class UserProfile(models.Model):
         return self.is_staff_member()
 
 
+class OTPCode(models.Model):
+    phone = models.CharField(max_length=30, db_index=True)
+    otp_hash = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    attempts = models.IntegerField(default=0)
+    is_verified = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"OTP for {self.phone} (Verified: {self.is_verified})"
+
+
+
 # ---------------------------------------------------------------------------
 # Brand
 # ---------------------------------------------------------------------------

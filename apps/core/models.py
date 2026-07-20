@@ -76,6 +76,16 @@ class SiteSettings(models.Model):
         help_text='Name of the receipt/order printer connected to the shop PC'
     )
 
+    # Delivery Estimates (display text only)
+    delivery_estimate_kano = models.CharField(
+        max_length=200, default='₦1,500 – ₦2,000',
+        help_text='Display estimate for home delivery in Kano'
+    )
+    delivery_estimate_interstate = models.CharField(
+        max_length=500, default='Outside Kano, delivery is paid directly to the transport company on collection — typically ₦3,000 – ₦8,000 depending on your location and package size',
+        help_text='Display estimate for interstate pickup'
+    )
+
     class Meta:
         verbose_name = 'Site Settings'
         verbose_name_plural = 'Site Settings'
@@ -91,3 +101,32 @@ class SiteSettings(models.Model):
     def get(cls):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
+
+
+class DeliverableCity(models.Model):
+    state = models.CharField(max_length=100, db_index=True)
+    name = models.CharField(max_length=100, db_index=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = 'Deliverable City'
+        verbose_name_plural = 'Deliverable Cities'
+        unique_together = ('state', 'name')
+
+    def __str__(self):
+        return f"{self.name}, {self.state}"
+
+
+class PickupLocation(models.Model):
+    name = models.CharField(max_length=200)
+    address = models.TextField()
+    city = models.ForeignKey(DeliverableCity, on_delete=models.CASCADE, related_name='pickup_locations')
+    phone = models.CharField(max_length=30, blank=True)
+
+    class Meta:
+        verbose_name = 'Pickup Location'
+        verbose_name_plural = 'Pickup Locations'
+
+    def __str__(self):
+        return f"{self.name} ({self.city.name})"
+

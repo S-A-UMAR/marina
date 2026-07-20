@@ -1,0 +1,163 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Enter Verification Code | Marina Gadgets{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-card-header">
+            <a href="{% url 'store:home' %}" class="auth-logo">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <span>Marina Gadgets</span>
+            </a>
+            <h2 class="auth-title">Verify Your Number</h2>
+            <p class="auth-subtitle">
+                We sent a 6-digit code to
+                <strong>{{ phone }}</strong>.
+                Check your WhatsApp.
+            </p>
+        </div>
+
+        <form action="" method="POST" id="otpForm">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="id_otp" style="text-align: center; display: block;">
+                    Enter 6-Digit Code
+                </label>
+                <input
+                    type="text"
+                    name="otp"
+                    id="id_otp"
+                    class="form-input"
+                    placeholder="______"
+                    maxlength="6"
+                    pattern="[0-9]{6}"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    style="text-align: center; font-size: 28px; font-weight: 700; letter-spacing: 12px; padding: 14px; font-family: monospace;"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <!-- Countdown Timer -->
+            <div style="text-align: center; margin: var(--space-sm) 0 var(--space-md);">
+                <span id="timerDisplay" style="font-size: var(--font-size-sm); color: var(--color-text-muted);">
+                    Code expires in <strong id="countdown">5:00</strong>
+                </span>
+                <div id="expiredMsg" style="display:none; color: var(--color-danger); font-size: var(--font-size-sm);">
+                    <i class="fa-solid fa-circle-exclamation"></i> Your code has expired.
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg" id="verifyBtn">
+                <i class="fa-solid fa-check-circle"></i> Verify & Sign In
+            </button>
+        </form>
+
+        <!-- Resend -->
+        <div style="text-align: center; margin-top: var(--space-lg);">
+            <button id="resendBtn" class="btn btn-secondary btn-sm" style="opacity: 0.5;" disabled>
+                <i class="fa-solid fa-rotate-right"></i> Resend Code
+                <span id="resendCountdown"> (60s)</span>
+            </button>
+        </div>
+
+        <p class="text-center mt-md" style="font-size: var(--font-size-sm);">
+            Wrong number?
+            <a href="{% url 'store:login' %}" style="color: var(--color-primary); font-weight: 600;">Change number</a>
+        </p>
+    </div>
+</div>
+
+<script>
+// --- OTP Countdown (5 minutes) ---
+let timeLeft = 5 * 60;
+const countdownEl = document.getElementById('countdown');
+const timerDisplay = document.getElementById('timerDisplay');
+const expiredMsg = document.getElementById('expiredMsg');
+const verifyBtn = document.getElementById('verifyBtn');
+
+const otpTimer = setInterval(() => {
+    timeLeft--;
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    countdownEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    if (timeLeft <= 0) {
+        clearInterval(otpTimer);
+        timerDisplay.style.display = 'none';
+        expiredMsg.style.display = 'block';
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<i class="fa-solid fa-ban"></i> Code Expired';
+    }
+}, 1000);
+
+// --- Resend Countdown (60s) ---
+let resendLeft = 60;
+const resendBtn = document.getElementById('resendBtn');
+const resendCd = document.getElementById('resendCountdown');
+const resendTimer = setInterval(() => {
+    resendLeft--;
+    resendCd.textContent = ` (${resendLeft}s)`;
+    if (resendLeft <= 0) {
+        clearInterval(resendTimer);
+        resendBtn.disabled = false;
+        resendBtn.style.opacity = '1';
+        resendCd.textContent = '';
+    }
+}, 1000);
+
+resendBtn.addEventListener('click', function() {
+    this.disabled = true;
+    this.style.opacity = '0.5';
+    this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+
+    fetch('{% url "store:resend_otp" %}', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value, 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.ok) {
+            // Reset OTP timer
+            timeLeft = 5 * 60;
+            timerDisplay.style.display = 'block';
+            expiredMsg.style.display = 'none';
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Verify & Sign In';
+
+            // Restart resend countdown
+            resendLeft = 60;
+            resendCd.textContent = ` (60s)`;
+            this.disabled = true;
+            this.style.opacity = '0.5';
+            this.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Code <span id="resendCountdown"> (60s)</span>';
+
+            if (data.debug_otp) {
+                alert(`[DEV MODE] New OTP: ${data.debug_otp}`);
+            }
+        } else {
+            alert(data.message);
+            this.disabled = false;
+            this.style.opacity = '1';
+            this.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Resend Code';
+        }
+    });
+});
+
+// Auto-submit on 6 digits
+document.getElementById('id_otp').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    if (this.value.length === 6) {
+        document.getElementById('otpForm').submit();
+    }
+});
+
+document.getElementById('otpForm').addEventListener('submit', function() {
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+});
+</script>
+{% endblock %}

@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
+{% load static %}
 
-{% block title %}Log In | Marina Gadgets{% endblock %}
+{% block title %}Sign In | Marina Gadgets{% endblock %}
 
 {% block content %}
 <div class="auth-page">
@@ -11,30 +12,73 @@
                 <span>Marina Gadgets</span>
             </a>
             <h2 class="auth-title">Welcome Back</h2>
-            <p class="auth-subtitle">Sign in to access your orders, rewards, and notifications.</p>
+            <p class="auth-subtitle">Enter your phone number to receive a verification code.</p>
         </div>
 
-        <form action="" method="POST">
+        <form action="" method="POST" id="phoneForm">
             {% csrf_token %}
-
             <div class="form-group">
-                <label class="form-label" for="id_username">Username or Email</label>
-                {{ form.username }}
+                <label class="form-label" for="id_phone">
+                    <i class="fa-solid fa-phone" style="color: var(--color-primary); margin-right: 6px;"></i>
+                    Phone Number
+                </label>
+                <div style="position: relative;">
+                    <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 600; color: var(--color-text-secondary); font-size: var(--font-size-sm); pointer-events: none;">+234</span>
+                    <input
+                        type="tel"
+                        name="phone"
+                        id="id_phone"
+                        class="form-input"
+                        placeholder="080X XXX XXXX"
+                        pattern="[0-9\s\-\+]+"
+                        style="padding-left: 58px;"
+                        required
+                        autofocus
+                    >
+                </div>
+                <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 6px;">
+                    <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+                    We'll send a 6-digit code via WhatsApp.
+                </p>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="id_password">Password</label>
-                {{ form.password }}
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-full btn-lg mt-md">
-                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            <button type="submit" class="btn btn-primary btn-full btn-lg mt-md" id="sendOtpBtn">
+                <i class="fa-solid fa-paper-plane"></i> Send Verification Code
             </button>
         </form>
 
-        <p class="text-center text-secondary mt-lg" style="font-size: var(--font-size-sm);">
-            Don't have an account? <a href="{% url 'store:register' %}" class="font-semibold">Register now</a>
+        <div class="auth-divider" style="margin: var(--space-lg) 0; display: flex; align-items: center; gap: var(--space-md);">
+            <div style="flex: 1; height: 1px; background: var(--color-border);"></div>
+            <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">First time here?</span>
+            <div style="flex: 1; height: 1px; background: var(--color-border);"></div>
+        </div>
+
+        <p class="text-center text-secondary" style="font-size: var(--font-size-sm);">
+            Just enter your number and we'll create your account automatically.
         </p>
+
+        <div style="margin-top: var(--space-xl); padding: var(--space-md); background: var(--color-surface); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+            <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); text-align: center; margin: 0;">
+                <i class="fa-solid fa-shield-halved" style="color: var(--color-primary);"></i>
+                Your number is only used to verify your identity. We never share it.
+            </p>
+        </div>
     </div>
 </div>
+
+<script>
+document.getElementById('phoneForm').addEventListener('submit', function(e) {
+    const btn = document.getElementById('sendOtpBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+});
+
+// Auto-format phone input
+document.getElementById('id_phone').addEventListener('input', function(e) {
+    let val = this.value.replace(/\D/g, '');
+    // If they type with country code 234, strip it
+    if (val.startsWith('234')) val = '0' + val.slice(3);
+    this.value = val;
+});
+</script>
 {% endblock %}

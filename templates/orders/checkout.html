@@ -1,165 +1,381 @@
 {% extends 'base/base.html' %}
+{% load static %}
 {% load marina_filters %}
 
 {% block title %}Checkout | Marina Gadgets{% endblock %}
 
 {% block content %}
-<nav class="breadcrumb">
-    <a href="{% url 'store:home' %}">Home</a>
-    <span class="sep">/</span>
-    <a href="{% url 'store:cart' %}">Cart</a>
-    <span class="sep">/</span>
-    <span class="current">Checkout</span>
-</nav>
+<div class="section">
+    <h1 class="section-title mb-xl" style="font-size: var(--font-size-xl);">
+        <i class="fa-solid fa-bag-shopping" style="color: var(--color-primary);"></i>
+        Complete Your Order
+    </h1>
 
-<h1 class="font-bold mb-xl" style="font-size: var(--font-size-xl);">Complete Your Order</h1>
+    <div style="display: grid; grid-template-columns: 1fr 380px; gap: var(--space-xl); align-items: start;">
 
-<div class="checkout-grid">
-    <!-- Billing & Shipping details form -->
-    <div class="card">
-        <div class="card-header">Billing &amp; Delivery Details</div>
-        <div class="card-body">
-            <form action="" method="POST" id="checkoutForm">
+        <!-- LEFT: Order form -->
+        <div>
+            <form method="POST" id="checkoutForm">
                 {% csrf_token %}
 
-                <div class="form-group">
-                    <label class="form-label" for="id_full_name">Full Name <span class="required">*</span></label>
-                    {{ form.full_name }}
-                    {% if form.full_name.errors %}
-                        <span class="form-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.full_name.errors.as_text }}</span>
-                    {% endif %}
-                </div>
+                <!-- ===== Section 1: Contact Info ===== -->
+                <div class="card mb-lg" style="border-radius: var(--radius-lg); padding: var(--space-xl);">
+                    <h2 style="font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--space-lg); display: flex; align-items: center; gap: var(--space-sm);">
+                        <i class="fa-solid fa-user-circle" style="color: var(--color-primary);"></i>
+                        Your Details
+                    </h2>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
-                    <div class="form-group">
-                        <label class="form-label" for="id_phone">Phone Number <span class="required">*</span></label>
-                        {{ form.phone }}
-                        {% if form.phone.errors %}
-                            <span class="form-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.phone.errors.as_text }}</span>
-                        {% endif %}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                        <div class="form-group">
+                            <label class="form-label" for="id_full_name">Full Name</label>
+                            <input type="text" name="full_name" id="id_full_name" class="form-input"
+                                placeholder="Fatima Musa" value="{{ initial.full_name|default:posted.full_name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="id_phone">Phone Number</label>
+                            <input type="tel" name="phone" id="id_phone" class="form-input"
+                                placeholder="080X XXX XXXX" value="{{ initial.phone|default:posted.phone }}" required>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="id_email">Email Address <span class="required">*</span></label>
-                        {{ form.email }}
-                        {% if form.email.errors %}
-                            <span class="form-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.email.errors.as_text }}</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="id_address">Delivery Address <span class="required">*</span></label>
-                    {{ form.address }}
-                    {% if form.address.errors %}
-                        <span class="form-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.address.errors.as_text }}</span>
-                    {% endif %}
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
-                    <div class="form-group">
-                        <label class="form-label" for="id_city">City <span class="required">*</span></label>
-                        {{ form.city }}
-                        {% if form.city.errors %}
-                            <span class="form-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.city.errors.as_text }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="id_state">State <span class="required">*</span></label>
-                        {{ form.state }}
-                        {% if form.state.errors %}
-                            <span class="form-error"><i class="fa-solid fa-circle-exclamation"></i> {{ form.state.errors.as_text }}</span>
-                        {% endif %}
+                        <label class="form-label" for="id_email">Email Address <span style="color: var(--color-text-muted); font-weight: 400;">(optional, for receipt)</span></label>
+                        <input type="email" name="email" id="id_email" class="form-input"
+                            placeholder="you@example.com" value="{{ initial.email|default:posted.email }}">
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="id_notes">Order Notes (optional)</label>
-                    {{ form.notes }}
+                <!-- ===== Section 2: Delivery Location ===== -->
+                <div class="card mb-lg" style="border-radius: var(--radius-lg); padding: var(--space-xl);">
+                    <h2 style="font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--space-lg); display: flex; align-items: center; gap: var(--space-sm);">
+                        <i class="fa-solid fa-location-dot" style="color: var(--color-primary);"></i>
+                        Delivery Location
+                    </h2>
+
+                    <!-- State Dropdown -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_state">State</label>
+                        <select name="state" id="id_state" class="form-input" required>
+                            <option value="">— Select your state —</option>
+                            {% for state in states %}
+                                <option value="{{ state }}" {% if initial.state == state or posted.state == state %}selected{% endif %}>{{ state }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- City Dropdown (populated via AJAX) -->
+                    <div class="form-group">
+                        <label class="form-label" for="id_city">City / Area</label>
+                        <select name="city" id="id_city" class="form-input" required disabled>
+                            <option value="">— Select state first —</option>
+                        </select>
+                    </div>
+
+                    <!-- Delivery estimate badge -->
+                    <div id="deliveryEstimateBlock" style="display:none; margin-bottom: var(--space-md);">
+                        <div id="kanoEstimate" style="display:none; background: #e8f5e9; border: 1px solid #66bb6a; border-radius: var(--radius-md); padding: var(--space-md);">
+                            <p style="font-size: var(--font-size-sm); color: #2e7d32; margin: 0;">
+                                <i class="fa-solid fa-truck" style="color: #43a047;"></i>
+                                <strong>Kano Home Delivery</strong> — Delivery fee paid to rider on arrival. Estimate: <strong>{{ delivery_estimate_kano }}</strong>
+                            </p>
+                        </div>
+                        <div id="interstateEstimate" style="display:none; background: #fff8e1; border: 1px solid #ffc107; border-radius: var(--radius-md); padding: var(--space-md);">
+                            <p style="font-size: var(--font-size-sm); color: #7a5800; margin: 0;">
+                                <i class="fa-solid fa-bus" style="color: #f59e0b;"></i>
+                                <strong>Interstate Pickup</strong> — {{ delivery_estimate_interstate }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Delivery mode: Kano = home delivery, outside = pickup -->
+                    <input type="hidden" name="delivery_mode" id="id_delivery_mode" value="{{ posted.delivery_mode|default:'home_delivery' }}">
+
+                    <!-- Address block (shown for Kano) -->
+                    <div id="homeDeliveryBlock" style="display:none;">
+                        <div class="form-group">
+                            <label class="form-label" for="id_address">
+                                <i class="fa-solid fa-house"></i> Delivery Address
+                            </label>
+                            <textarea name="address" id="id_address" class="form-input" rows="2"
+                                placeholder="House number, street name, nearest landmark">{{ initial.address|default:posted.address }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Pickup location block (shown outside Kano) -->
+                    <div id="pickupBlock" style="display:none;">
+                        <div class="form-group">
+                            <label class="form-label" for="id_pickup_location">
+                                <i class="fa-solid fa-warehouse"></i> Select Pickup Point
+                            </label>
+                            <select name="pickup_location" id="id_pickup_location" class="form-input">
+                                <option value="">— Select a pickup location —</option>
+                            </select>
+                            <div id="pickupDetails" style="margin-top: var(--space-sm); font-size: var(--font-size-sm); color: var(--color-text-secondary);"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 3 Checkout Methods Selector Section -->
-                <div class="mt-xl">
-                    <h3 class="font-bold mb-lg" style="font-size: var(--font-size-md);">Choose Checkout Method</h3>
-                    
-                    <div class="checkout-method-options">
-                        <!-- Method 1: Online -->
-                        <label class="checkout-method-option" for="method_online">
-                            <input type="radio" name="checkout_method" id="method_online" value="online" checked style="margin-top: 4px;">
-                            <div class="checkout-method-icon" style="background: var(--color-primary-light); color: var(--color-primary);">
-                                <i class="fa-solid fa-credit-card"></i>
-                            </div>
-                            <div style="flex: 1;">
-                                <strong style="font-size: var(--font-size-sm); color: var(--color-text-primary); display: block;">Instant Online Payment</strong>
-                                <span style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">Pay securely using OPay or Paystack. Your stock is reserved instantly.</span>
+                <!-- ===== Section 3: Payment Method ===== -->
+                <div class="card mb-lg" style="border-radius: var(--radius-lg); padding: var(--space-xl);">
+                    <h2 style="font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--space-lg); display: flex; align-items: center; gap: var(--space-sm);">
+                        <i class="fa-solid fa-credit-card" style="color: var(--color-primary);"></i>
+                        How Would You Like to Pay?
+                    </h2>
+
+                    <div style="display: grid; gap: var(--space-md);">
+
+                        <!-- Online -->
+                        <label class="checkout-method-card" for="method_online">
+                            <input type="radio" name="checkout_method" id="method_online" value="online" class="checkout-method-radio" checked>
+                            <div class="checkout-method-body">
+                                <i class="fa-solid fa-credit-card" style="color: var(--color-primary); font-size: 22px;"></i>
+                                <div>
+                                    <p class="font-semibold" style="margin:0;">Pay Online Now</p>
+                                    <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin:0;">Instant. Powered by Paystack. Card, bank transfer & more.</p>
+                                </div>
+                                <span class="badge badge-success" style="margin-left: auto; white-space: nowrap;">Recommended</span>
                             </div>
                         </label>
 
-                        <!-- Method 2: WhatsApp -->
-                        <label class="checkout-method-option" for="method_whatsapp">
-                            <input type="radio" name="checkout_method" id="method_whatsapp" value="whatsapp" style="margin-top: 4px;">
-                            <div class="checkout-method-icon" style="background: #E8F8EF; color: #25D366;">
-                                <i class="fa-brands fa-whatsapp"></i>
-                            </div>
-                            <div style="flex: 1;">
-                                <strong style="font-size: var(--font-size-sm); color: var(--color-text-primary); display: block;">WhatsApp Assisted Checkout</strong>
-                                <span style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">Generate a pre-filled cart invoice list and finish order with Marina staff on WhatsApp.</span>
+                        <!-- WhatsApp -->
+                        <label class="checkout-method-card" for="method_whatsapp">
+                            <input type="radio" name="checkout_method" id="method_whatsapp" value="whatsapp" class="checkout-method-radio">
+                            <div class="checkout-method-body">
+                                <i class="fa-brands fa-whatsapp" style="color: #25D366; font-size: 22px;"></i>
+                                <div>
+                                    <p class="font-semibold" style="margin:0;">Pay via WhatsApp</p>
+                                    <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin:0;">Chat with our team to arrange bank transfer or pay on delivery.</p>
+                                </div>
                             </div>
                         </label>
 
-                        <!-- Method 3: Request Call -->
-                        <label class="checkout-method-option" for="method_call">
-                            <input type="radio" name="checkout_method" id="method_call" value="call" style="margin-top: 4px;">
-                            <div class="checkout-method-icon" style="background: var(--color-warning-light); color: var(--color-warning);">
-                                <i class="fa-solid fa-phone-volume"></i>
-                            </div>
-                            <div style="flex: 1;">
-                                <strong style="font-size: var(--font-size-sm); color: var(--color-text-primary); display: block;">Request a Phone Call</strong>
-                                <span style="font-size: var(--font-size-xs); color: var(--color-text-secondary);">Skip the form details and online verification. Our team will call you to organize details.</span>
+                        <!-- Call -->
+                        <label class="checkout-method-card" for="method_call">
+                            <input type="radio" name="checkout_method" id="method_call" value="call" class="checkout-method-radio">
+                            <div class="checkout-method-body">
+                                <i class="fa-solid fa-phone-volume" style="color: var(--color-warning); font-size: 22px;"></i>
+                                <div>
+                                    <p class="font-semibold" style="margin:0;">Request a Call</p>
+                                    <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin:0;">Our team will call you to confirm and arrange payment.</p>
+                                </div>
                             </div>
                         </label>
                     </div>
+
+                    <!-- Notes -->
+                    <div class="form-group mt-lg">
+                        <label class="form-label" for="id_notes">Order Notes <span style="color: var(--color-text-muted); font-weight: 400;">(optional)</span></label>
+                        <textarea name="notes" id="id_notes" class="form-input" rows="2"
+                            placeholder="Any special instructions?">{{ posted.notes }}</textarea>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-full btn-lg mt-lg">
-                    <i class="fa-solid fa-circle-check"></i> Place My Order
+                <button type="submit" class="btn btn-primary btn-full btn-lg" id="placeOrderBtn">
+                    <i class="fa-solid fa-bag-shopping"></i> Place Order
                 </button>
             </form>
         </div>
-    </div>
 
-    <!-- Summary block -->
-    <div class="cart-summary">
-        <h3 class="font-bold mb-lg" style="font-size: var(--font-size-md);">Your Cart Items</h3>
-        
-        <ul style="display: flex; flex-direction: column; gap: var(--space-sm); margin-bottom: var(--space-lg);">
-            {% for item in cart.items.all %}
-                <li style="display: flex; justify-content: space-between; font-size: var(--font-size-xs);">
-                    <span style="color: var(--color-text-secondary); max-width: 70%;">{{ item.quantity }}x {{ item.product.name }}</span>
-                    <strong style="color: var(--color-text-primary);">{{ item.subtotal|naira }}</strong>
-                </li>
-            {% endfor %}
-        </ul>
+        <!-- RIGHT: Order Summary -->
+        <div style="position: sticky; top: 100px;">
+            <div class="card" style="border-radius: var(--radius-lg); padding: var(--space-xl);">
+                <h3 style="font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--space-lg);">
+                    Order Summary
+                </h3>
 
-        <hr class="divider">
+                {% for item in cart.items.all %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-sm) 0; border-bottom: 1px solid var(--color-border-light);">
+                    <div style="display: flex; gap: var(--space-sm); align-items: center;">
+                        {% if item.product.cover_image %}
+                            <img src="{{ item.product.cover_image.url }}" alt="{{ item.product.name }}"
+                                style="width: 44px; height: 44px; object-fit: cover; border-radius: var(--radius-sm);">
+                        {% endif %}
+                        <div>
+                            <p style="font-size: var(--font-size-sm); font-weight: 600; margin: 0; line-clamp: 2;">{{ item.product.name }}</p>
+                            <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin: 0;">Qty: {{ item.quantity }}</p>
+                        </div>
+                    </div>
+                    <span style="font-size: var(--font-size-sm); font-weight: 600; white-space: nowrap;">{{ item.subtotal|naira }}</span>
+                </div>
+                {% endfor %}
 
-        <div class="summary-row">
-            <span>Subtotal</span>
-            <strong>{{ subtotal|naira }}</strong>
-        </div>
+                <div style="padding-top: var(--space-md);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-sm);">
+                        <span style="color: var(--color-text-secondary);">Items Total</span>
+                        <strong>{{ subtotal|naira }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-sm);">
+                        <span style="color: var(--color-text-secondary);">Delivery Fee</span>
+                        <span id="deliveryFeeDisplay" style="color: var(--color-text-muted); font-size: var(--font-size-sm);">Paid to rider</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-top: 2px solid var(--color-border); padding-top: var(--space-md); margin-top: var(--space-sm);">
+                        <span class="font-bold" style="font-size: var(--font-size-lg);">Total</span>
+                        <span class="font-bold" style="font-size: var(--font-size-lg); color: var(--color-primary);">{{ total|naira }}</span>
+                    </div>
+                    <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--space-sm);">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Delivery fee is paid separately to the courier.
+                    </p>
+                </div>
 
-        <div class="summary-row">
-            <span>Shipping</span>
-            {% if shipping == 0 %}
-                <strong class="text-success">FREE</strong>
-            {% else %}
-                <strong>{{ shipping|naira }}</strong>
-            {% endif %}
-        </div>
-
-        <div class="summary-row total">
-            <span>Grand Total</span>
-            <strong>{{ total|naira }}</strong>
+                <div style="margin-top: var(--space-md); padding: var(--space-md); background: var(--color-surface); border-radius: var(--radius-md);">
+                    <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin: 0;">
+                        <i class="fa-solid fa-shield-halved" style="color: var(--color-success);"></i>
+                        All payments are secured and encrypted. We never store your card details.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+.checkout-method-card {
+    display: block;
+    cursor: pointer;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: border-color 0.2s, background 0.2s;
+    overflow: hidden;
+}
+.checkout-method-card:has(.checkout-method-radio:checked) {
+    border-color: var(--color-primary);
+    background: rgba(24, 90, 189, 0.04);
+}
+.checkout-method-radio {
+    display: none;
+}
+.checkout-method-body {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+}
+@media (max-width: 768px) {
+    .section > div {
+        grid-template-columns: 1fr !important;
+    }
+    div[style*="position: sticky"] {
+        position: static !important;
+    }
+}
+</style>
+
+<script>
+const stateSelect = document.getElementById('id_state');
+const citySelect = document.getElementById('id_city');
+const pickupSelect = document.getElementById('id_pickup_location');
+const deliveryModeInput = document.getElementById('id_delivery_mode');
+const homeDeliveryBlock = document.getElementById('homeDeliveryBlock');
+const pickupBlock = document.getElementById('pickupBlock');
+const kanoEstimate = document.getElementById('kanoEstimate');
+const interstateEstimate = document.getElementById('interstateEstimate');
+const estimateBlock = document.getElementById('deliveryEstimateBlock');
+const deliveryFeeDisplay = document.getElementById('deliveryFeeDisplay');
+const pickupDetails = document.getElementById('pickupDetails');
+
+stateSelect.addEventListener('change', function() {
+    const state = this.value;
+    citySelect.disabled = true;
+    citySelect.innerHTML = '<option value="">Loading cities...</option>';
+
+    if (!state) {
+        citySelect.innerHTML = '<option value="">— Select state first —</option>';
+        hideDeliveryBlocks();
+        return;
+    }
+
+    fetch(`{% url 'store:checkout_cities' %}?state=${encodeURIComponent(state)}`)
+        .then(r => r.json())
+        .then(data => {
+            citySelect.innerHTML = '<option value="">— Select your city —</option>';
+            if (data.cities.length === 0) {
+                // No cities configured — allow free text
+                citySelect.innerHTML = '<option value="__other__">Other / My city is not listed</option>';
+            } else {
+                data.cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.name;
+                    opt.textContent = c.name;
+                    citySelect.appendChild(opt);
+                });
+            }
+            citySelect.disabled = false;
+
+            // Update delivery mode based on state
+            const isKano = state.toLowerCase() === 'kano';
+            updateDeliveryMode(isKano);
+        })
+        .catch(() => {
+            citySelect.innerHTML = '<option value="">Error loading cities</option>';
+            citySelect.disabled = false;
+        });
+});
+
+citySelect.addEventListener('change', function() {
+    const cityId = this.options[this.selectedIndex]?.dataset?.cityId;
+    if (cityId) loadPickupLocations(cityId);
+});
+
+function loadPickupLocations(cityId) {
+    fetch(`{% url 'store:checkout_pickup_locations' %}?city_id=${cityId}`)
+        .then(r => r.json())
+        .then(data => {
+            pickupSelect.innerHTML = '<option value="">— Select a pickup point —</option>';
+            data.locations.forEach(loc => {
+                const opt = document.createElement('option');
+                opt.value = loc.id;
+                opt.textContent = loc.name;
+                opt.dataset.address = loc.address;
+                opt.dataset.phone = loc.phone;
+                pickupSelect.appendChild(opt);
+            });
+        });
+}
+
+pickupSelect.addEventListener('change', function() {
+    const opt = this.options[this.selectedIndex];
+    if (opt && opt.dataset.address) {
+        pickupDetails.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${opt.dataset.address}${opt.dataset.phone ? ' · <i class="fa-solid fa-phone"></i> ' + opt.dataset.phone : ''}`;
+    } else {
+        pickupDetails.innerHTML = '';
+    }
+});
+
+function updateDeliveryMode(isKano) {
+    estimateBlock.style.display = 'block';
+    if (isKano) {
+        deliveryModeInput.value = 'home_delivery';
+        homeDeliveryBlock.style.display = 'block';
+        pickupBlock.style.display = 'none';
+        kanoEstimate.style.display = 'block';
+        interstateEstimate.style.display = 'none';
+        deliveryFeeDisplay.textContent = 'Paid to rider on arrival';
+    } else {
+        deliveryModeInput.value = 'pickup';
+        homeDeliveryBlock.style.display = 'none';
+        pickupBlock.style.display = 'block';
+        kanoEstimate.style.display = 'none';
+        interstateEstimate.style.display = 'block';
+        deliveryFeeDisplay.textContent = 'Paid to transport company';
+    }
+}
+
+function hideDeliveryBlocks() {
+    estimateBlock.style.display = 'none';
+    homeDeliveryBlock.style.display = 'none';
+    pickupBlock.style.display = 'none';
+}
+
+// Restore state on page reload (validation fail)
+if (stateSelect.value) {
+    stateSelect.dispatchEvent(new Event('change'));
+}
+
+// Form submit feedback
+document.getElementById('checkoutForm').addEventListener('submit', function() {
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Placing order...';
+});
+</script>
 {% endblock %}

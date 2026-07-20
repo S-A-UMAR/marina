@@ -1,49 +1,32 @@
-import requests
 import uuid
+import urllib.parse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.paginator import Paginator
-from django.db.models import Q, Sum, Count, Avg, F
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.utils import timezone
-from datetime import timedelta
 
-# Import models
-from apps.core.models import SiteSettings
-from apps.core.utils import get_cart, is_staff_member, is_admin_member
-from apps.accounts.models import UserProfile
-from apps.brands.models import Brand
-from apps.catalog.models import Category, Product, ProductImage, ProductSpecification, ProductReview
-from apps.cart.models import Cart, CartItem
-from apps.wishlist.models import Wishlist, WishlistItem
+from apps.core.models import SiteSettings, DeliverableCity, PickupLocation
+from apps.core.utils import get_cart
 from apps.orders.models import Order, OrderItem
 from apps.payments.models import Payment
-from apps.inventory.models import StockMovement, Supplier
-from apps.homepage.models import Banner
-from apps.feedback.models import Feedback
-from apps.rewards.models import Reward
-from apps.notifications.models import Notification
 
-# Import helpers across apps
 
-# Import forms
-from apps.accounts.forms import RegisterForm, LoginForm, ProfileForm
-from apps.catalog.forms import ProductForm, BrandForm, CategoryForm, ReviewForm
-from apps.inventory.forms import SupplierForm, StockInForm, StockOutForm
-from apps.checkout.forms import CheckoutForm
-from apps.feedback.forms import FeedbackForm, FeedbackStatusForm
-from apps.rewards.forms import RewardForm
-from apps.homepage.forms import BannerForm
-from apps.core.forms import SiteSettingsForm
-from apps.dashboard.forms import DashboardUserForm
+NIGERIAN_STATES = [
+    'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue',
+    'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu',
+    'FCT - Abuja', 'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina',
+    'Kebbi', 'Kogi', 'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo',
+    'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara',
+]
 
+
+@login_required(login_url='/auth/login/')
 def checkout(request):
-    """3-method checkout: Online (OPay/Paystack), WhatsApp Assisted, Request a Call."""
+    """
+    Overhauled 3-step checkout:
+    Step 1: Customer details + State > City > (Address or Pickup Point).
+    Step 2: Payment method selection.
+    """
     cart = get_cart(request)
     if not cart.items.exists():
         messages.warning(request, 'Your cart is empty.')
@@ -51,89 +34,146 @@ def checkout(request):
 
     settings_obj = SiteSettings.get()
     subtotal = cart.total
-    shipping = settings_obj.shipping_fee if subtotal < settings_obj.free_shipping_threshold else 0
-    total = subtotal + shipping
+    total = subtotal  # No shipping fee in total — customer pays rider separately
 
-    initial = {}
-    if request.user.is_authenticated:
-        profile = getattr(request.user, 'profile', None)
-        initial = {
-            'full_name': request.user.get_full_name(),
-            'email': request.user.email,
-            'phone': profile.phone if profile else '',
-            'address': profile.address if profile else '',
-            'city': profile.city if profile else '',
-            'state': profile.state if profile else '',
-        }
-
-    form = CheckoutForm(initial=initial)
+    # Pre-fill from user profile
+    profile = getattr(request.user, 'profile', None)
+    initial_data = {
+        'full_name': request.user.get_full_name() or '',
+        'phone': profile.phone if profile else '',
+        'email': request.user.email,
+        'state': profile.state if profile else '',
+        'city': profile.city if profile else '',
+        'address': profile.address if profile else '',
+    }
 
     if request.method == 'POST':
-        form = CheckoutForm(request.POST)
-        if form.is_valid():
-            order = form.save(commit=False)
-            if request.user.is_authenticated:
-                order.user = request.user
-            else:
-                if not request.session.session_key:
-                    request.session.create()
-                order.session_key = request.session.session_key
+        # Collect form data
+        full_name = request.POST.get('full_name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        email = request.POST.get('email', '').strip()
+        state = request.POST.get('state', '').strip()
+        city_name = request.POST.get('city', '').strip()
+        checkout_method = request.POST.get('checkout_method', Order.METHOD_ONLINE)
+        notes = request.POST.get('notes', '').strip()
+        delivery_mode = request.POST.get('delivery_mode', Order.DELIVERY_MODE_HOME)
+        pickup_location_id = request.POST.get('pickup_location', '')
+        address = request.POST.get('address', '').strip()
 
-            order.subtotal = subtotal
-            order.shipping_fee = shipping
-            order.total_amount = total
-            order.save()
+        # Validate
+        errors = []
+        if not full_name:
+            errors.append('Full name is required.')
+        if not phone:
+            errors.append('Phone number is required.')
+        if not state:
+            errors.append('Please select your state.')
+        if not city_name:
+            errors.append('Please select your city.')
 
-            for item in cart.items.all():
-                OrderItem.objects.create(
-                    order=order,
-                    product=item.product,
-                    product_name=item.product.name,
-                    quantity=item.quantity,
-                    price=item.product.effective_price
-                )
+        is_kano = state.lower() == 'kano'
+        if is_kano and delivery_mode == Order.DELIVERY_MODE_HOME and not address:
+            errors.append('Please enter your delivery address for home delivery.')
+        if not is_kano and delivery_mode == Order.DELIVERY_MODE_PICKUP and not pickup_location_id:
+            errors.append('Please select a pickup location.')
 
-            checkout_method = form.cleaned_data.get('checkout_method', Order.METHOD_ONLINE)
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+            # Re-render with entered data
+            context = _checkout_context(settings_obj, cart, subtotal, total, initial_data)
+            context.update({'posted': request.POST})
+            return render(request, 'orders/checkout.html', context)
 
-            if checkout_method == Order.METHOD_WHATSAPP:
-                cart.items.all().delete()
-                return redirect('store:whatsapp_checkout', order_number=order.order_number)
+        # Recompute total server-side (security: don't trust client-side values)
+        subtotal = sum(item.product.effective_price * item.quantity for item in cart.items.select_related('product'))
+        total = subtotal
 
-            elif checkout_method == Order.METHOD_CALL:
-                cart.items.all().delete()
-                return redirect('store:request_call', order_number=order.order_number)
+        # Determine pickup location FK
+        pickup_obj = None
+        if pickup_location_id:
+            try:
+                pickup_obj = PickupLocation.objects.get(id=pickup_location_id)
+            except PickupLocation.DoesNotExist:
+                pass
 
-            else:
-                # Online payment — Paystack
-                reference = 'PAY_' + uuid.uuid4().hex[:12].upper()
-                Payment.objects.create(
-                    order=order,
-                    reference=reference,
-                    amount=total,
-                    gateway=Payment.GATEWAY_PAYSTACK
-                )
-                cart.items.all().delete()
-                context = {
-                    'order': order,
-                    'reference': reference,
-                    'amount_kobo': int(total * 100),
-                    'paystack_public_key': getattr(settings, 'PAYSTACK_PUBLIC_KEY', ''),
-                    'email': order.email,
-                }
-                return render(request, 'payments/initiate.html', context)
+        # Create order
+        order = Order.objects.create(
+            user=request.user,
+            status=Order.STATUS_RECEIVED,
+            checkout_method=checkout_method,
+            delivery_mode=delivery_mode,
+            pickup_location=pickup_obj,
+            full_name=full_name,
+            phone=phone,
+            email=email,
+            address=address,
+            city=city_name,
+            state=state,
+            subtotal=subtotal,
+            shipping_fee=0,
+            total_amount=total,
+            notes=notes,
+        )
 
-    context = {
-        'cart': cart,
-        'form': form,
-        'subtotal': subtotal,
-        'shipping': shipping,
-        'total': total,
-        'free_threshold': settings_obj.free_shipping_threshold,
-    }
+        # Create order items and deduct stock
+        for item in cart.items.select_related('product'):
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                product_name=item.product.name,
+                quantity=item.quantity,
+                price=item.product.effective_price,
+            )
+            # Deduct stock
+            product = item.product
+            product.current_stock = max(0, product.current_stock - item.quantity)
+            product.save(update_fields=['current_stock'])
+
+        # Clear cart
+        cart.items.all().delete()
+
+        # Route by payment method
+        if checkout_method == Order.METHOD_WHATSAPP:
+            return redirect('store:whatsapp_checkout', order_number=order.order_number)
+        elif checkout_method == Order.METHOD_CALL:
+            return redirect('store:request_call', order_number=order.order_number)
+        else:
+            # Paystack
+            reference = 'MRN_' + uuid.uuid4().hex[:10].upper()
+            Payment.objects.create(
+                order=order,
+                reference=reference,
+                amount=total,
+                gateway=Payment.GATEWAY_PAYSTACK,
+            )
+            return render(request, 'payments/initiate.html', {
+                'order': order,
+                'reference': reference,
+                'amount_kobo': int(total * 100),
+                'paystack_public_key': getattr(settings, 'PAYSTACK_PUBLIC_KEY', ''),
+                'email': order.email or request.user.email,
+            })
+
+    context = _checkout_context(settings_obj, cart, subtotal, total, initial_data)
     return render(request, 'orders/checkout.html', context)
 
+
+def _checkout_context(settings_obj, cart, subtotal, total, initial_data):
+    return {
+        'cart': cart,
+        'subtotal': subtotal,
+        'total': total,
+        'states': NIGERIAN_STATES,
+        'initial': initial_data,
+        'site_settings': settings_obj,
+        'delivery_estimate_kano': settings_obj.delivery_estimate_kano,
+        'delivery_estimate_interstate': settings_obj.delivery_estimate_interstate,
+    }
+
+
 def whatsapp_checkout(request, order_number):
-    """Generate WhatsApp pre-filled message and redirect."""
+    """Generate WhatsApp pre-filled message."""
     order = get_object_or_404(Order, order_number=order_number)
     settings_obj = SiteSettings.get()
     whatsapp_number = settings_obj.whatsapp_number or getattr(settings, 'MARINA_WHATSAPP_NUMBER', '')
@@ -141,32 +181,32 @@ def whatsapp_checkout(request, order_number):
     items_text = '\n'.join(
         [f'• {item.quantity}x {item.product_name} — ₦{item.price:,.0f}' for item in order.items.all()]
     )
+    delivery_info = (
+        f"Home Delivery ({order.city}, {order.state})\nAddress: {order.address}"
+        if order.delivery_mode == Order.DELIVERY_MODE_HOME
+        else f"Pickup Point: {order.pickup_location.name if order.pickup_location else 'TBD'} ({order.city}, {order.state})"
+    )
     message = (
         f"Hello Marina! I'd like to complete my order.\n\n"
-        f"*Order Reference:* {order.order_number}\n"
+        f"*Order Ref:* {order.order_number}\n"
         f"*Name:* {order.full_name}\n"
         f"*Phone:* {order.phone}\n"
-        f"*Delivery:* {order.city}, {order.state}\n\n"
+        f"*Delivery:* {delivery_info}\n\n"
         f"*Items:*\n{items_text}\n\n"
-        f"*Total:* ₦{order.total_amount:,.0f}\n\n"
+        f"*Items Total:* ₦{order.total_amount:,.0f}\n\n"
         f"Please confirm and advise on payment."
     )
-
-    import urllib.parse
     whatsapp_url = f"https://wa.me/{whatsapp_number}?text={urllib.parse.quote(message)}"
-
-    context = {
+    return render(request, 'orders/whatsapp_checkout.html', {
         'order': order,
         'whatsapp_url': whatsapp_url,
         'whatsapp_number': whatsapp_number,
-    }
-    return render(request, 'orders/whatsapp_checkout.html', context)
+    })
+
 
 def request_call(request, order_number):
     """Request-a-call confirmation page."""
     order = get_object_or_404(Order, order_number=order_number)
-    order.status = Order.STATUS_PENDING
-    order.save()
-    context = {'order': order}
-    return render(request, 'orders/request_call.html', context)
-
+    order.status = Order.STATUS_RECEIVED
+    order.save(update_fields=['status'])
+    return render(request, 'orders/request_call.html', {'order': order})

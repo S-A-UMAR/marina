@@ -10,6 +10,15 @@ import uuid
 
 class Order(models.Model):
     # Full Marina order lifecycle
+    STATUS_RECEIVED             = 'received'
+    STATUS_PAYMENT_CONFIRMED    = 'payment_confirmed'
+    STATUS_PACKING              = 'packing'
+    STATUS_DISPATCHED           = 'dispatched'
+    STATUS_DELIVERED            = 'delivered'
+    STATUS_CANCELLED            = 'cancelled'
+    STATUS_REFUNDED             = 'refunded'
+    
+    # Legacy / Additional statuses
     STATUS_PENDING              = 'pending'
     STATUS_AWAITING_PAYMENT     = 'awaiting_payment'
     STATUS_PAYMENT_VERIFIED     = 'payment_verified'
@@ -18,19 +27,23 @@ class Order(models.Model):
     STATUS_PACKAGING            = 'packaging'
     STATUS_PACKED               = 'packed'
     STATUS_AWAITING_DISPATCH    = 'awaiting_dispatch'
-    STATUS_DISPATCHED           = 'dispatched'
     STATUS_IN_TRANSIT           = 'in_transit'
-    STATUS_DELIVERED            = 'delivered'
     STATUS_COMPLETED            = 'completed'
-    STATUS_CANCELLED            = 'cancelled'
     STATUS_FAILED               = 'failed'
-    STATUS_REFUNDED             = 'refunded'
     STATUS_RETURNED             = 'returned'
     STATUS_DELIVERY_FAILED      = 'delivery_failed'
     STATUS_ON_HOLD              = 'on_hold'
     STATUS_AWAITING_RESPONSE    = 'awaiting_response'
 
     STATUS_CHOICES = [
+        (STATUS_RECEIVED,           'Received'),
+        (STATUS_PAYMENT_CONFIRMED,  'Payment Confirmed'),
+        (STATUS_PACKING,            'Packing'),
+        (STATUS_DISPATCHED,         'Dispatched'),
+        (STATUS_DELIVERED,          'Delivered'),
+        (STATUS_CANCELLED,          'Cancelled'),
+        (STATUS_REFUNDED,           'Refunded'),
+        # Legacy
         (STATUS_PENDING,            'Pending'),
         (STATUS_AWAITING_PAYMENT,   'Awaiting Payment'),
         (STATUS_PAYMENT_VERIFIED,   'Payment Verified'),
@@ -39,20 +52,16 @@ class Order(models.Model):
         (STATUS_PACKAGING,          'Packaging In Progress'),
         (STATUS_PACKED,             'Packed'),
         (STATUS_AWAITING_DISPATCH,  'Awaiting Dispatch'),
-        (STATUS_DISPATCHED,         'Dispatched'),
         (STATUS_IN_TRANSIT,         'In Transit'),
-        (STATUS_DELIVERED,          'Delivered'),
         (STATUS_COMPLETED,          'Completed'),
-        (STATUS_CANCELLED,          'Cancelled'),
         (STATUS_FAILED,             'Failed'),
-        (STATUS_REFUNDED,           'Refunded'),
         (STATUS_RETURNED,           'Returned'),
         (STATUS_DELIVERY_FAILED,    'Delivery Failed'),
         (STATUS_ON_HOLD,            'On Hold'),
         (STATUS_AWAITING_RESPONSE,  'Awaiting Customer Response'),
     ]
 
-    # Delivery type
+    # Delivery type (Legacy)
     DELIVERY_KANO       = 'kano'
     DELIVERY_INTERSTATE = 'interstate'
     DELIVERY_PICKUP     = 'pickup'
@@ -60,6 +69,14 @@ class Order(models.Model):
         (DELIVERY_KANO,       'Kano Delivery'),
         (DELIVERY_INTERSTATE, 'Interstate Delivery'),
         (DELIVERY_PICKUP,     'Shop Pickup'),
+    ]
+
+    # Delivery Mode (New spec)
+    DELIVERY_MODE_HOME   = 'home_delivery'
+    DELIVERY_MODE_PICKUP = 'pickup'
+    DELIVERY_MODE_CHOICES = [
+        (DELIVERY_MODE_HOME,   'Home Delivery'),
+        (DELIVERY_MODE_PICKUP, 'Pickup Point'),
     ]
 
     # Checkout method
@@ -75,9 +92,11 @@ class Order(models.Model):
     user             = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     session_key      = models.CharField(max_length=40, blank=True, null=True)
     order_number     = models.CharField(max_length=20, unique=True, blank=True, db_index=True)
-    status           = models.CharField(max_length=25, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
+    status           = models.CharField(max_length=25, choices=STATUS_CHOICES, default=STATUS_RECEIVED, db_index=True)
     checkout_method  = models.CharField(max_length=20, choices=METHOD_CHOICES, default=METHOD_ONLINE)
     delivery_type    = models.CharField(max_length=20, choices=DELIVERY_CHOICES, default=DELIVERY_KANO, blank=True)
+    delivery_mode    = models.CharField(max_length=20, choices=DELIVERY_MODE_CHOICES, default=DELIVERY_MODE_HOME)
+    pickup_location  = models.ForeignKey('core.PickupLocation', on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     full_name        = models.CharField(max_length=200)
     phone            = models.CharField(max_length=20)
     email            = models.EmailField(blank=True)
@@ -92,6 +111,7 @@ class Order(models.Model):
     notifications_enabled = models.BooleanField(default=True)
     created_at       = models.DateTimeField(auto_now_add=True)
     updated_at       = models.DateTimeField(auto_now=True)
+
 
     class Meta:
         ordering = ['-created_at']

@@ -1,0 +1,65 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Complete Your Profile | Marina Gadgets{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-card-header">
+            <a href="{% url 'store:home' %}" class="auth-logo">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+                <span>Marina Gadgets</span>
+            </a>
+            <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary), #0e3f88); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-md);">
+                <i class="fa-solid fa-user-plus" style="font-size: 24px; color: #fff;"></i>
+            </div>
+            <h2 class="auth-title">One Last Step</h2>
+            <p class="auth-subtitle">
+                Welcome! We just need your name to create your account for
+                <strong>{{ phone }}</strong>.
+            </p>
+        </div>
+
+        <form action="" method="POST">
+            {% csrf_token %}
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-sm);">
+                <div class="form-group">
+                    <label class="form-label" for="id_first_name">First Name</label>
+                    <input
+                        type="text"
+                        name="first_name"
+                        id="id_first_name"
+                        class="form-input"
+                        placeholder="Fatima"
+                        required
+                        autofocus
+                    >
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_last_name">Last Name</label>
+                    <input
+                        type="text"
+                        name="last_name"
+                        id="id_last_name"
+                        class="form-input"
+                        placeholder="Musa"
+                    >
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg mt-md">
+                <i class="fa-solid fa-check-circle"></i> Create My Account
+            </button>
+        </form>
+
+        <div style="margin-top: var(--space-xl); padding: var(--space-md); background: var(--color-surface); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+            <p style="font-size: var(--font-size-xs); color: var(--color-text-muted); text-align: center; margin: 0;">
+                <i class="fa-solid fa-gift" style="color: var(--color-primary);"></i>
+                As a Marina member you'll earn rewards points on every order.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

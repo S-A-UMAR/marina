@@ -74,13 +74,11 @@
         {% if not request.user.is_authenticated %}
         <div class="sidebar-auth-btns">
             <a href="{% url 'store:login' %}" class="btn btn-primary btn-sm" style="flex: 1;">
-                <i class="fa-solid fa-right-to-bracket"></i> Sign In
-            </a>
-            <a href="{% url 'store:register' %}" class="btn btn-secondary btn-sm" style="flex: 1;">
-                <i class="fa-solid fa-user-plus"></i> Register
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In / Join
             </a>
         </div>
         {% endif %}
+
 
         <nav class="sidebar-nav">
             <div class="sidebar-section-label">Shop</div>

@@ -87,7 +87,8 @@ def send_otp(phone: str, otp: str) -> bool:
     from apps.core.models import SiteSettings
     site = SiteSettings.get()
 
-    message = f"Your Marina verification code is: {otp}\n\nThis code expires in 5 minutes. Do not share it with anyone."
+    # Message must exactly match the approved Termii Sender ID template
+    message = f"Your Marina Gadgets verification code is {otp}. This code expires in 5 minutes. Do not share with anyone."
 
     # --- WhatsApp WATI provider ---
     if site.whatsapp_provider == SiteSettings.PROVIDER_WATI and site.whatsapp_api_key:
@@ -103,10 +104,10 @@ def send_otp(phone: str, otp: str) -> bool:
         except Exception as e:
             logger.error(f"Twilio send error: {e}")
 
-    # --- Termii SMS ---
-    elif site.sms_provider == SiteSettings.PROVIDER_TERMII and site.sms_api_key:
+    # --- Termii SMS (primary for Marina Kano) ---
+    if site.sms_provider == SiteSettings.PROVIDER_TERMII and site.sms_api_key:
         try:
-            return _send_termii_sms(phone, message, site.sms_api_key)
+            return _send_termii_sms(phone, otp, site.sms_api_key)
         except Exception as e:
             logger.error(f"Termii send error: {e}")
 
@@ -152,19 +153,39 @@ def _send_twilio_whatsapp(phone: str, message: str, account_sid: str, auth_token
     return msg.sid is not None
 
 
-def _send_termii_sms(phone: str, message: str, api_key: str) -> bool:
+def _normalise_nigerian_phone(phone: str) -> str:
+    """Convert 08xx to 2348xx format for Termii."""
+    p = phone.replace('+', '').replace(' ', '').replace('-', '')
+    if p.startswith('0') and len(p) == 11:
+        p = '234' + p[1:]  # 08012345678 -> 2348012345678
+    elif p.startswith('234') and len(p) == 13:
+        pass  # already correct
+    return p
+
+
+def _send_termii_sms(phone: str, otp: str, api_key: str) -> bool:
+    """Send OTP via Termii SMS using the approved message template."""
     import requests
-    phone_clean = phone.replace('+', '').replace(' ', '')
+    phone_clean = _normalise_nigerian_phone(phone)
+    # Exact format matching approved Termii Sender ID template:
+    # "Your Marina Gadgets verification code is {{OTP}}. This code expires in 5 minutes. Do not share with anyone."
+    message = (
+        f"Your Marina Gadgets verification code is {otp}. "
+        f"This code expires in 5 minutes. Do not share with anyone."
+    )
+    payload = {
+        "to": phone_clean,
+        "from": "Marina",   # Must match your approved Termii Sender ID exactly
+        "sms": message,
+        "type": "plain",
+        "channel": "generic",
+        "api_key": api_key,
+    }
     resp = requests.post(
         "https://api.ng.termii.com/api/sms/send",
-        json={
-            "to": phone_clean,
-            "from": "Marina",
-            "sms": message,
-            "type": "plain",
-            "channel": "generic",
-            "api_key": api_key,
-        },
+        json=payload,
         timeout=10,
     )
+    if not resp.ok:
+        logger.error(f"Termii error {resp.status_code}: {resp.text}")
     return resp.ok

@@ -29,18 +29,18 @@
                         <div class="form-group">
                             <label class="form-label" for="id_full_name">Full Name</label>
                             <input type="text" name="full_name" id="id_full_name" class="form-input"
-                                placeholder="Fatima Musa" value="{{ initial.full_name|default:posted.full_name }}" required>
+                                placeholder="Fatima Musa" value="{{ form_data.full_name }}" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="id_phone">Phone Number</label>
                             <input type="tel" name="phone" id="id_phone" class="form-input"
-                                placeholder="080X XXX XXXX" value="{{ initial.phone|default:posted.phone }}" required>
+                                placeholder="080X XXX XXXX" value="{{ form_data.phone }}" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="id_email">Email Address <span style="color: var(--color-text-muted); font-weight: 400;">(optional, for receipt)</span></label>
                         <input type="email" name="email" id="id_email" class="form-input"
-                            placeholder="you@example.com" value="{{ initial.email|default:posted.email }}">
+                            placeholder="you@example.com" value="{{ form_data.email }}">
                     </div>
                 </div>
 
@@ -57,7 +57,7 @@
                         <select name="state" id="id_state" class="form-input" required>
                             <option value="">— Select your state —</option>
                             {% for state in states %}
-                                <option value="{{ state }}" {% if initial.state == state or posted.state == state %}selected{% endif %}>{{ state }}</option>
+                                <option value="{{ state }}" {% if form_data.state == state %}selected{% endif %}>{{ state }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -87,7 +87,7 @@
                     </div>
 
                     <!-- Delivery mode: Kano = home delivery, outside = pickup -->
-                    <input type="hidden" name="delivery_mode" id="id_delivery_mode" value="{{ posted.delivery_mode|default:'home_delivery' }}">
+                    <input type="hidden" name="delivery_mode" id="id_delivery_mode" value="{{ form_data.delivery_mode|default:'home_delivery' }}">
 
                     <!-- Address block (shown for Kano) -->
                     <div id="homeDeliveryBlock" style="display:none;">
@@ -96,7 +96,7 @@
                                 <i class="fa-solid fa-house"></i> Delivery Address
                             </label>
                             <textarea name="address" id="id_address" class="form-input" rows="2"
-                                placeholder="House number, street name, nearest landmark">{{ initial.address|default:posted.address }}</textarea>
+                                placeholder="House number, street name, nearest landmark">{{ form_data.address }}</textarea>
                         </div>
                     </div>
 
@@ -165,9 +165,10 @@
                     <div class="form-group mt-lg">
                         <label class="form-label" for="id_notes">Order Notes <span style="color: var(--color-text-muted); font-weight: 400;">(optional)</span></label>
                         <textarea name="notes" id="id_notes" class="form-input" rows="2"
-                            placeholder="Any special instructions?">{{ posted.notes }}</textarea>
+                            placeholder="Any special instructions?">{{ form_data.notes }}</textarea>
                     </div>
                 </div>
+
 
                 <button type="submit" class="btn btn-primary btn-full btn-lg" id="placeOrderBtn">
                     <i class="fa-solid fa-bag-shopping"></i> Place Order

@@ -38,27 +38,31 @@ def checkout(request):
 
     # Pre-fill from user profile
     profile = getattr(request.user, 'profile', None)
-    initial_data = {
-        'full_name': request.user.get_full_name() or '',
-        'phone': profile.phone if profile else '',
-        'email': request.user.email,
-        'state': profile.state if profile else '',
-        'city': profile.city if profile else '',
-        'address': profile.address if profile else '',
+    # Populate form_data. If POST fails validation, we merge the POST data.
+    form_data = {
+        'full_name': request.POST.get('full_name', '').strip() if request.method == 'POST' else (request.user.get_full_name() or ''),
+        'phone': request.POST.get('phone', '').strip() if request.method == 'POST' else (profile.phone if profile else ''),
+        'email': request.POST.get('email', '').strip() if request.method == 'POST' else request.user.email,
+        'state': request.POST.get('state', '').strip() if request.method == 'POST' else (profile.state if profile else ''),
+        'city': request.POST.get('city', '').strip() if request.method == 'POST' else (profile.city if profile else ''),
+        'address': request.POST.get('address', '').strip() if request.method == 'POST' else (profile.address if profile else ''),
+        'notes': request.POST.get('notes', '').strip() if request.method == 'POST' else '',
+        'delivery_mode': request.POST.get('delivery_mode', Order.DELIVERY_MODE_HOME) if request.method == 'POST' else Order.DELIVERY_MODE_HOME,
+        'pickup_location': request.POST.get('pickup_location', '') if request.method == 'POST' else '',
     }
 
     if request.method == 'POST':
         # Collect form data
-        full_name = request.POST.get('full_name', '').strip()
-        phone = request.POST.get('phone', '').strip()
-        email = request.POST.get('email', '').strip()
-        state = request.POST.get('state', '').strip()
-        city_name = request.POST.get('city', '').strip()
+        full_name = form_data['full_name']
+        phone = form_data['phone']
+        email = form_data['email']
+        state = form_data['state']
+        city_name = form_data['city']
         checkout_method = request.POST.get('checkout_method', Order.METHOD_ONLINE)
-        notes = request.POST.get('notes', '').strip()
-        delivery_mode = request.POST.get('delivery_mode', Order.DELIVERY_MODE_HOME)
-        pickup_location_id = request.POST.get('pickup_location', '')
-        address = request.POST.get('address', '').strip()
+        notes = form_data['notes']
+        delivery_mode = form_data['delivery_mode']
+        pickup_location_id = form_data['pickup_location']
+        address = form_data['address']
 
         # Validate
         errors = []
@@ -80,7 +84,7 @@ def checkout(request):
         if errors:
             for e in errors:
                 messages.error(request, e)
-            context = _checkout_context(settings_obj, cart, subtotal, total, initial_data, posted=request.POST)
+            context = _checkout_context(settings_obj, cart, subtotal, total, form_data)
             return render(request, 'orders/checkout.html', context)
 
         # Recompute total server-side (security: don't trust client-side values)
@@ -153,18 +157,17 @@ def checkout(request):
                 'email': order.email or request.user.email,
             })
 
-    context = _checkout_context(settings_obj, cart, subtotal, total, initial_data)
+    context = _checkout_context(settings_obj, cart, subtotal, total, form_data)
     return render(request, 'orders/checkout.html', context)
 
 
-def _checkout_context(settings_obj, cart, subtotal, total, initial_data, posted=None):
+def _checkout_context(settings_obj, cart, subtotal, total, form_data):
     return {
         'cart': cart,
         'subtotal': subtotal,
         'total': total,
         'states': NIGERIAN_STATES,
-        'initial': initial_data,
-        'posted': posted or {},
+        'form_data': form_data,
         'site_settings': settings_obj,
         'delivery_estimate_kano': settings_obj.delivery_estimate_kano,
         'delivery_estimate_interstate': settings_obj.delivery_estimate_interstate,

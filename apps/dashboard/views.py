@@ -66,7 +66,7 @@ def is_admin_member(user):
 # Staff Dashboard Views
 # ---------------------------------------------------------------------------
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_overview(request):
     """Marina staff portal — main dashboard."""
     today = timezone.now().date()
@@ -189,7 +189,7 @@ def dashboard_overview(request):
     }
     return render(request, 'dashboard/overview.html', context)
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_products(request):
     query = request.GET.get('q', '')
     category_filter = request.GET.get('category', '')
@@ -235,7 +235,7 @@ def dashboard_products(request):
     }
     return render(request, 'dashboard/products.html', context)
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_product_create(request):
     form = ProductForm()
     upload_session_token = request.GET.get('session_token') or request.POST.get('upload_session_token') or str(uuid.uuid4())
@@ -272,7 +272,7 @@ def dashboard_product_create(request):
         'categories': categories,
     })
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_product_edit(request, pk):
     product = get_object_or_404(Product, pk=pk)
     form = ProductForm(instance=product)
@@ -296,7 +296,7 @@ def dashboard_product_edit(request, pk):
         'categories': categories,
     })
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_product_delete(request, pk):
     product = get_object_or_404(Product, pk=pk)
     product.status = Product.STATUS_ARCHIVED
@@ -306,7 +306,7 @@ def dashboard_product_delete(request, pk):
 
 # --- Brands ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_brands(request):
     brands = Brand.objects.annotate(
         product_count=Count('products', filter=Q(products__status=Product.STATUS_PUBLISHED))
@@ -320,7 +320,7 @@ def dashboard_brands(request):
             return redirect('store:dashboard_brands')
     return render(request, 'dashboard/brands.html', {'brands': brands, 'form': form})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_brand_edit(request, pk):
     brand = get_object_or_404(Brand, pk=pk)
     form = BrandForm(instance=brand)
@@ -332,7 +332,7 @@ def dashboard_brand_edit(request, pk):
             return redirect('store:dashboard_brands')
     return render(request, 'dashboard/brand_edit.html', {'form': form, 'brand': brand})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_brand_delete(request, pk):
     brand = get_object_or_404(Brand, pk=pk)
     brand.delete()
@@ -341,7 +341,7 @@ def dashboard_brand_delete(request, pk):
 
 # --- Categories ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_categories(request):
     categories = Category.objects.annotate(num_products=Count('products'))
     form = CategoryForm()
@@ -353,7 +353,7 @@ def dashboard_categories(request):
             return redirect('store:dashboard_categories')
     return render(request, 'dashboard/categories.html', {'categories': categories, 'form': form})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_category_edit(request, pk):
     category = get_object_or_404(Category, pk=pk)
     form = CategoryForm(instance=category)
@@ -365,7 +365,7 @@ def dashboard_category_edit(request, pk):
             return redirect('store:dashboard_categories')
     return render(request, 'dashboard/category_edit.html', {'form': form, 'category': category})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_category_delete(request, pk):
     category = get_object_or_404(Category, pk=pk)
     category.delete()
@@ -374,7 +374,7 @@ def dashboard_category_delete(request, pk):
 
 # --- Orders ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_orders(request):
     status_filter = request.GET.get('status', '')
     method_filter = request.GET.get('method', '')
@@ -405,7 +405,7 @@ def dashboard_orders(request):
     }
     return render(request, 'dashboard/orders.html', context)
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_order_detail(request, order_number):
     order = get_object_or_404(Order, order_number=order_number)
     if request.method == 'POST':
@@ -424,7 +424,7 @@ def dashboard_order_detail(request, order_number):
 
 # --- Inventory / Stock ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_stock_in(request):
     form = StockInForm()
     if request.method == 'POST':
@@ -443,7 +443,7 @@ def dashboard_stock_in(request):
             return redirect('store:dashboard_stock_history')
     return render(request, 'dashboard/stock_in.html', {'form': form})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_stock_out(request):
     form = StockOutForm()
     if request.method == 'POST':
@@ -462,7 +462,7 @@ def dashboard_stock_out(request):
             return redirect('store:dashboard_stock_history')
     return render(request, 'dashboard/stock_out.html', {'form': form})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_stock_history(request):
     movements_qs = StockMovement.objects.select_related('product', 'performed_by').order_by('-date')
     prod_id = request.GET.get('product')
@@ -483,7 +483,7 @@ def dashboard_stock_history(request):
 
 # --- Customers ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_customers(request):
     query = request.GET.get('q', '')
     customers_qs = User.objects.filter(
@@ -502,7 +502,7 @@ def dashboard_customers(request):
 
 # --- Banners ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_banners(request):
     banners = Banner.objects.all().order_by('order')
     form = BannerForm()
@@ -514,7 +514,7 @@ def dashboard_banners(request):
             return redirect('store:dashboard_banners')
     return render(request, 'dashboard/banners.html', {'banners': banners, 'form': form})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_banner_edit(request, pk):
     banner = get_object_or_404(Banner, pk=pk)
     form = BannerForm(instance=banner)
@@ -526,7 +526,7 @@ def dashboard_banner_edit(request, pk):
             return redirect('store:dashboard_banners')
     return render(request, 'dashboard/banner_edit.html', {'form': form, 'banner': banner})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_banner_delete(request, pk):
     banner = get_object_or_404(Banner, pk=pk)
     banner.delete()
@@ -535,7 +535,7 @@ def dashboard_banner_delete(request, pk):
 
 # --- Feedback ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_feedback(request):
     status_filter = request.GET.get('status', '')
     category_filter = request.GET.get('category', '')
@@ -555,7 +555,7 @@ def dashboard_feedback(request):
     }
     return render(request, 'dashboard/feedback.html', context)
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_feedback_update(request, pk):
     feedback = get_object_or_404(Feedback, pk=pk)
     if request.method == 'POST':
@@ -570,7 +570,7 @@ def dashboard_feedback_update(request, pk):
 
 # --- Rewards ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_rewards(request):
     rewards = Reward.objects.select_related('user', 'issued_by').order_by('-created_at')
     form = RewardForm()
@@ -588,7 +588,7 @@ def dashboard_rewards(request):
 
 # --- Reports ---
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_reports(request):
     low_stock_products = Product.objects.filter(
         status=Product.STATUS_PUBLISHED,
@@ -624,7 +624,7 @@ def dashboard_reports(request):
 
 # --- Site Settings ---
 
-@user_passes_test(is_admin_member, login_url='/auth/login/')
+@user_passes_test(is_admin_member, login_url='/staff/login/')
 def dashboard_settings(request):
     site_settings_obj = SiteSettings.get()
     form = SiteSettingsForm(instance=site_settings_obj)
@@ -638,14 +638,14 @@ def dashboard_settings(request):
 
 # --- Staff / Users ---
 
-@user_passes_test(is_admin_member, login_url='/auth/login/')
+@user_passes_test(is_admin_member, login_url='/staff/login/')
 def dashboard_users(request):
     staff_users = User.objects.exclude(
         profile__role=UserProfile.ROLE_CUSTOMER
     ).select_related('profile').order_by('-date_joined')
     return render(request, 'dashboard/users.html', {'staff_users': staff_users})
 
-@user_passes_test(is_admin_member, login_url='/auth/login/')
+@user_passes_test(is_admin_member, login_url='/staff/login/')
 def dashboard_user_role(request, pk):
     target_user = get_object_or_404(User, pk=pk)
     profile, _ = UserProfile.objects.get_or_create(user=target_user)
@@ -662,7 +662,7 @@ def dashboard_user_role(request, pk):
 
 # Legacy supplier views (kept for inventory management)
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_suppliers(request):
     suppliers = Supplier.objects.all()
     form = SupplierForm()
@@ -674,7 +674,7 @@ def dashboard_suppliers(request):
             return redirect('store:dashboard_suppliers')
     return render(request, 'dashboard/suppliers.html', {'suppliers': suppliers, 'form': form})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_supplier_edit(request, pk):
     supplier = get_object_or_404(Supplier, pk=pk)
     form = SupplierForm(instance=supplier)
@@ -686,14 +686,14 @@ def dashboard_supplier_edit(request, pk):
             return redirect('store:dashboard_suppliers')
     return render(request, 'dashboard/supplier_edit.html', {'form': form, 'supplier': supplier})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_supplier_delete(request, pk):
     supplier = get_object_or_404(Supplier, pk=pk)
     supplier.delete()
     messages.success(request, 'Supplier deleted.')
     return redirect('store:dashboard_suppliers')
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_new_orders_poll(request):
     """AJAX endpoint returning the count and details of unread/new orders."""
     new_orders_qs = Order.objects.filter(is_new=True)
@@ -709,7 +709,7 @@ def dashboard_new_orders_poll(request):
         'orders': new_orders
     })
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def dashboard_upload_package_photo(request, order_number):
     """AJAX upload of package photo, update status, and notify customer."""
@@ -745,7 +745,7 @@ def dashboard_upload_package_photo(request, order_number):
 
     return JsonResponse({'success': True, 'url': photo.photo.url})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_awaiting_dispatch(request):
     """List orders sealed and awaiting dispatch, allow grouping into batches."""
     if request.method == 'POST':
@@ -772,13 +772,13 @@ def dashboard_awaiting_dispatch(request):
     orders = Order.objects.filter(status=Order.STATUS_AWAITING_DISPATCH).order_by('-updated_at')
     return render(request, 'dashboard/awaiting_dispatch.html', {'orders': orders})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_dispatch_batches(request):
     """List all dispatch batches."""
     batches = DispatchBatch.objects.all().order_by('-created_at')
     return render(request, 'dashboard/dispatch_batches.html', {'batches': batches})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_dispatch_batch_detail(request, batch_number):
     """Manage Kano local dispatch and Interstate transport drivers for a batch."""
     batch = get_object_or_404(DispatchBatch, batch_number=batch_number)
@@ -908,13 +908,13 @@ def dashboard_dispatch_batch_detail(request, batch_number):
     }
     return render(request, 'dashboard/dispatch_batch_detail.html', context)
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 def dashboard_sent_orders(request):
     """View orders dispatched and in transit, allow sending delivery confirmation requests."""
     orders = Order.objects.filter(status__in=[Order.STATUS_DISPATCHED, Order.STATUS_IN_TRANSIT]).order_by('-updated_at')
     return render(request, 'dashboard/sent_orders.html', {'orders': orders})
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def dashboard_send_delivery_confirm_request(request, order_number):
     """Trigger WhatsApp request asking customer if they received their order."""

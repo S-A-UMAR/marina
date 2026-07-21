@@ -51,8 +51,6 @@ def serve_sw(request):
 from apps.core.views import robots_txt, sitemap_xml
 
 urlpatterns = [
-    # Redirect /admin/login/ to the OTP phone login flow (staff login via WhatsApp OTP)
-    path('admin/login/', RedirectView.as_view(url='/auth/login/', permanent=False)),
     path('admin/', admin.site.urls),
     path('robots.txt', robots_txt, name='robots_txt'),
     path('sitemap.xml', sitemap_xml, name='sitemap_xml'),

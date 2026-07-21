@@ -6,7 +6,7 @@ from apps.catalog.models import Product, ProductImage, ProductVideo
 from apps.core.utils import is_staff_member
 
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def product_image_upload(request):
     """AJAX upload of product gallery images."""
@@ -52,7 +52,7 @@ def product_image_upload(request):
     })
 
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def product_image_delete(request):
     """AJAX delete of a gallery image."""
@@ -87,7 +87,7 @@ def product_image_delete(request):
     return JsonResponse({'success': True})
 
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def product_image_reorder(request):
     """AJAX reorder of gallery images."""
@@ -97,7 +97,7 @@ def product_image_reorder(request):
     return JsonResponse({'success': True})
 
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def product_image_set_cover(request):
     """AJAX set cover/primary image."""
@@ -121,7 +121,7 @@ def product_image_set_cover(request):
     return JsonResponse({'success': True})
 
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def product_video_upload(request):
     """AJAX upload of product videos."""
@@ -157,7 +157,7 @@ def product_video_upload(request):
     })
 
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def product_video_delete(request):
     """AJAX delete of a product video."""
@@ -168,7 +168,7 @@ def product_video_delete(request):
     return JsonResponse({'success': True})
 
 
-@user_passes_test(is_staff_member, login_url='/auth/login/')
+@user_passes_test(is_staff_member, login_url='/staff/login/')
 @require_POST
 def product_video_reorder(request):
     """AJAX reorder of product videos."""

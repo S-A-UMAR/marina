@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -197,3 +197,55 @@ def profile_view(request):
             'email': request.user.email,
         })
     return render(request, 'auth/profile.html', {'form': user_form, 'profile': profile})
+
+
+# ---------------------------------------------------------------------------
+# Staff Portal Auth (Username & Password)
+# ---------------------------------------------------------------------------
+
+def staff_login_view(request):
+    """Secure username/password login page for administrative and operational staff."""
+    if request.user.is_authenticated:
+        if request.user.is_staff or (hasattr(request.user, 'profile') and request.user.profile.is_staff_member()):
+            return redirect('store:dashboard_overview')
+        return redirect('store:home')
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+
+        if not username or not password:
+            messages.error(request, 'Please enter both your username and password.')
+            return render(request, 'auth/staff_login.html')
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            # Verify the user is staff/admin
+            is_staff = user.is_staff
+            try:
+                if hasattr(user, 'profile') and user.profile.is_staff_member():
+                    is_staff = True
+            except Exception:
+                pass
+
+            if is_staff:
+                login(request, user)
+                messages.success(request, f'Welcome to the Staff Portal, {user.first_name or user.username}!')
+                next_url = request.GET.get('next', '')
+                if next_url:
+                    return redirect(next_url)
+                return redirect('store:dashboard_overview')
+            else:
+                messages.error(request, 'Access denied. This portal is restricted to staff members only.')
+        else:
+            messages.error(request, 'Invalid username or password. Please try again.')
+
+    return render(request, 'auth/staff_login.html')
+
+
+def staff_logout_view(request):
+    """Log out staff members and redirect to staff login."""
+    logout(request)
+    messages.success(request, 'You have successfully signed out of the Staff Portal.')
+    return redirect('store:staff_login')
+

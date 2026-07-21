@@ -70,6 +70,85 @@ def privacy_policy_view(request):
 def terms_view(request):
     return render(request, 'info/terms.html')
 
+
+def robots_txt(request):
+    """Dynamic robots.txt generation."""
+    sitemap_url = request.build_absolute_uri('/sitemap.xml')
+    content = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /admin/\n"
+        "Disallow: /staff/\n"
+        "Disallow: /my-marina/\n\n"
+        f"Sitemap: {sitemap_url}"
+    )
+    return HttpResponse(content, content_type="text/plain")
+
+
+def sitemap_xml(request):
+    """Dynamic sitemap.xml generation."""
+    import xml.etree.ElementTree as ET
+    from django.urls import reverse
+
+    urlset = ET.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+
+    # Static Pages
+    static_urls = [
+        'store:home', 'store:info_about', 'store:info_contact', 'store:info_faq',
+        'store:info_shipping', 'store:info_warranty', 'store:privacy_policy', 'store:terms', 'store:brands'
+    ]
+
+    for url_name in static_urls:
+        try:
+            url = reverse(url_name)
+            loc = request.build_absolute_uri(url)
+            url_el = ET.SubElement(urlset, 'url')
+            ET.SubElement(url_el, 'loc').text = loc
+            ET.SubElement(url_el, 'changefreq').text = 'weekly'
+            ET.SubElement(url_el, 'priority').text = '0.8'
+        except Exception:
+            pass
+
+    # Categories
+    for cat in Category.objects.all():
+        try:
+            url = reverse('store:category_page', kwargs={'slug': cat.slug})
+            loc = request.build_absolute_uri(url)
+            url_el = ET.SubElement(urlset, 'url')
+            ET.SubElement(url_el, 'loc').text = loc
+            ET.SubElement(url_el, 'changefreq').text = 'weekly'
+            ET.SubElement(url_el, 'priority').text = '0.7'
+        except Exception:
+            pass
+
+    # Brands
+    for brand in Brand.objects.all():
+        try:
+            url = reverse('store:brand_detail', kwargs={'slug': brand.slug})
+            loc = request.build_absolute_uri(url)
+            url_el = ET.SubElement(urlset, 'url')
+            ET.SubElement(url_el, 'loc').text = loc
+            ET.SubElement(url_el, 'changefreq').text = 'weekly'
+            ET.SubElement(url_el, 'priority').text = '0.7'
+        except Exception:
+            pass
+
+    # Products
+    for prod in Product.objects.filter(is_active=True):
+        try:
+            url = reverse('store:product_detail', kwargs={'slug': prod.slug})
+            loc = request.build_absolute_uri(url)
+            url_el = ET.SubElement(urlset, 'url')
+            ET.SubElement(url_el, 'loc').text = loc
+            ET.SubElement(url_el, 'changefreq').text = 'daily'
+            ET.SubElement(url_el, 'priority').text = '0.9'
+        except Exception:
+            pass
+
+    xml_str = ET.tostring(urlset, encoding='utf-8', method='xml')
+    return HttpResponse(xml_str, content_type="application/xml")
+
+
 # ===========================================================================
 # STAFF PORTAL VIEWS
 # ===========================================================================

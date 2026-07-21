@@ -1,0 +1,61 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Page Not Found | Marina Gadgets{% endblock %}
+
+{% block content %}
+<div class="auth-page" style="padding: var(--space-xxl) 0;">
+    <div class="auth-card" style="max-width: 580px; text-align: center; padding: var(--space-xxl);">
+        
+        <!-- Animated 404 Icon -->
+        <div style="font-size: 80px; color: var(--color-primary); margin-bottom: var(--space-lg); filter: drop-shadow(0 4px 12px rgba(24, 90, 189, 0.25)); animation: floatIcon 4s ease-in-out infinite;">
+            <i class="fa-solid fa-compass-drafting"></i>
+        </div>
+
+        <h1 class="font-bold text-primary mb-sm" style="font-size: 48px; line-height: 1.1;">404</h1>
+        <h2 class="font-semibold text-secondary mb-md" style="font-size: var(--font-size-xl);">Lost in Transit?</h2>
+        
+        <p class="text-secondary mb-xl" style="font-size: var(--font-size-md); line-height: 1.6; max-width: 440px; margin-left: auto; margin-right: auto;">
+            We couldn't find the page you're looking for. It might have been moved, deleted, or the URL might contain a typo.
+        </p>
+
+        <!-- Product Search Bar -->
+        <form action="{% url 'store:search_results' %}" method="GET" style="margin-bottom: var(--space-xl); max-width: 400px; margin-left: auto; margin-right: auto;">
+            <div style="position: relative; display: flex; gap: var(--space-sm);">
+                <div style="position: relative; flex: 1;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);"></i>
+                    <input 
+                        type="text" 
+                        name="q" 
+                        placeholder="Search gadgets (e.g. iPhone 13 Pro)..." 
+                        class="form-input" 
+                        style="padding-left: 40px; border-radius: var(--radius-md);"
+                        required
+                    >
+                </div>
+                <button type="submit" class="btn btn-primary" style="padding: 0 var(--space-lg); border-radius: var(--radius-md);">Search</button>
+            </div>
+        </form>
+
+        <!-- Navigation Helpers -->
+        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'store:home' %}" class="btn btn-primary">
+                <i class="fa-solid fa-house"></i> Go to Homepage
+            </a>
+            <a href="{% url 'store:brands' %}" class="btn btn-secondary">
+                <i class="fa-solid fa-tags"></i> Browse Brands
+            </a>
+            <a href="{% url 'store:info_contact' %}" class="btn btn-secondary">
+                <i class="fa-solid fa-headset"></i> Contact Support
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+</style>
+{% endblock %}

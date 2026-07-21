@@ -48,16 +48,21 @@ def serve_sw(request):
     response['Cache-Control'] = 'no-cache'
     return response
 
+from apps.core.views import robots_txt, sitemap_xml
+
 urlpatterns = [
     # Redirect /admin/login/ to the OTP phone login flow (staff login via WhatsApp OTP)
     path('admin/login/', RedirectView.as_view(url='/auth/login/', permanent=False)),
     path('admin/', admin.site.urls),
+    path('robots.txt', robots_txt, name='robots_txt'),
+    path('sitemap.xml', sitemap_xml, name='sitemap_xml'),
     path('', include((combined_urlpatterns, 'store'))),
     # PWA
     path('manifest.json', serve_manifest, name='pwa_manifest'),
     path('sw.js', serve_sw, name='pwa_sw'),
     path('offline/', TemplateView.as_view(template_name='offline.html'), name='offline'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT if hasattr(settings, 'MEDIA_ROOT') else '')
+
 
 
 

@@ -6,6 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ site_settings.business_name }}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Premium gadgets and accessories at the best prices on {{ site_settings.business_name }}. Fast delivery in Kano and nationwide.{% endblock %}">
+    
+    <!-- SEO & Metadata -->
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}{{ site_settings.business_name }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Premium gadgets and accessories at the best prices on {{ site_settings.business_name }}. Fast delivery in Kano and nationwide.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/favicon.png' %}{% endblock %}">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ site_settings.business_name }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Premium gadgets and accessories at the best prices on {{ site_settings.business_name }}. Fast delivery in Kano and nationwide.{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/favicon.png' %}{% endblock %}">
+
     <meta name="theme-color" content="#185ABD">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -28,6 +46,73 @@
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     {% block extra_css %}{% endblock %}
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization",
+          "name": "{{ site_settings.business_name }}",
+          "url": "{{ request.scheme }}://{{ request.get_host }}/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/favicon.png' %}{% endif %}"
+          },
+          "sameAs": [
+            "{{ site_settings.facebook_url }}",
+            "{{ site_settings.instagram_url }}",
+            "{{ site_settings.twitter_url }}",
+            "{{ site_settings.whatsapp_url }}"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "{{ site_settings.support_phone|default:site_settings.phone }}",
+            "contactType": "customer service",
+            "email": "{{ site_settings.support_email|default:site_settings.email }}"
+          }
+        },
+        {
+          "@type": "LocalBusiness",
+          "@id": "{{ request.scheme }}://{{ request.get_host }}/#localbusiness",
+          "name": "{{ site_settings.business_name }}",
+          "image": "{% if site_settings.logo %}{{ site_settings.logo.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/favicon.png' %}{% endif %}",
+          "telephone": "{{ site_settings.phone }}",
+          "email": "{{ site_settings.email }}",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ site_settings.address|default:'Kundila' }}",
+            "addressLocality": "Kano",
+            "addressRegion": "Kano State",
+            "addressCountry": "NG"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "12.0022",
+            "longitude": "8.5920"
+          },
+          "url": "{{ request.scheme }}://{{ request.get_host }}/",
+          "priceRange": "₦₦₦"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "{{ request.scheme }}://{{ request.get_host }}/#website",
+          "url": "{{ request.scheme }}://{{ request.get_host }}/",
+          "name": "{{ site_settings.business_name }}",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}{% url 'store:search_results' %}?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 <body>
 

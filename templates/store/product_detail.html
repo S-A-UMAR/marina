@@ -4,6 +4,40 @@
 
 {% block title %}{{ product.name }} | Marina Gadgets{% endblock %}
 
+{% block extra_css %}
+<!-- Product Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.name }}",
+  "image": [
+    "{% if product.cover_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.cover_image.url }}{% endif %}"
+  ],
+  "description": "{{ product.description|striptags|truncatewords:30 }}",
+  "sku": "{{ product.sku|default:'N/A' }}",
+  "mpn": "{{ product.sku|default:'N/A' }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ product.brand.name|default:'Generic' }}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ request.build_absolute_uri }}",
+    "priceCurrency": "NGN",
+    "price": "{{ product.effective_price }}",
+    "priceValidUntil": "2027-12-31",
+    "itemCondition": "{% if product.condition == 'new' %}https://schema.org/NewCondition{% else %}https://schema.org/UsedCondition{% endif %}",
+    "availability": "{% if product.current_stock > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+    "seller": {
+      "@type": "Organization",
+      "name": "{{ site_settings.business_name }}"
+    }
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Breadcrumb -->
 <nav class="breadcrumb">

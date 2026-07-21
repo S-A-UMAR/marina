@@ -2,6 +2,58 @@
 
 {% block title %}Frequently Asked Questions | Marina Gadgets Kano{% endblock %}
 
+{% block extra_css %}
+<!-- FAQ Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Are your UK Used phones actually from the UK?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. We source our inventory directly from verified suppliers in the UK and USA. We do not sell refurbished devices or devices with replaced parts unless explicitly stated in the condition notes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you offer a warranty?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, all our UK Used devices come with a standard 7-day testing warranty. If you find any factory defects during this period, you can return it for a replacement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does delivery take?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Within Kano: We offer same-day delivery for orders placed before 3 PM. Outside Kano: Nationwide delivery usually takes 2-4 business days depending on your location."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I pay on delivery?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We currently do not accept payment on delivery for orders outside Kano due to logistics challenges. For orders within Kano, you can select 'Request a Call' and arrange a pickup at our physical store."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you do swap deals?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, we do. However, swaps are strictly handled at our physical store in Kano so we can physically inspect your current device and evaluate its value."
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <nav class="breadcrumb"><a href="{% url 'store:home' %}">Home</a><span class="sep">/</span><span class="current">FAQ</span></nav>
 

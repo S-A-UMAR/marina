@@ -179,6 +179,7 @@ def product_detail(request, slug):
     context = {
         'product': product,
         'gallery_images': gallery_images,
+        'videos': product.videos.all(),
         'specifications': specifications,
         'reviews': reviews,
         'avg_rating': round(avg_rating, 1),

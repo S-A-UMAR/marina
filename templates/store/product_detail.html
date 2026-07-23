@@ -52,32 +52,68 @@
 
 <div class="product-detail-grid">
     <!-- Gallery Component -->
-    <div>
-        <div class="gallery-main">
+    <!-- ===== GALLERY ===== -->
+    <div class="product-gallery-wrap">
+
+        <!-- Main Viewer -->
+        <div class="gallery-main" id="galleryMain">
             {% if product.cover_image %}
-                <img src="{{ product.cover_image.url }}" alt="{{ product.name }}" id="mainGalleryImage">
+                <img src="{{ product.cover_image.url }}" alt="{{ product.name }}" id="mainGalleryImage" class="gallery-main-img">
             {% else %}
-                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); font-size: 64px;">
-                    <i class="fa-solid fa-image"></i>
-                </div>
+                <img src="" alt="{{ product.name }}" id="mainGalleryImage" class="gallery-main-img" style="display:none;">
+                <div class="gallery-empty-ph" id="galleryEmptyPh"><i class="fa-solid fa-image"></i></div>
             {% endif %}
+            <video id="mainGalleryVideo" class="gallery-main-video" controls preload="none"></video>
+
+            <!-- Nav Arrows (only shown when > 1 media item) -->
+            <button class="gallery-nav-btn gallery-nav-prev" id="galleryPrev" aria-label="Previous">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button class="gallery-nav-btn gallery-nav-next" id="galleryNext" aria-label="Next">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <!-- Slide counter badge -->
+            <span class="gallery-counter" id="galleryCounter"></span>
         </div>
-        
-        {% if gallery_images %}
-        <div class="gallery-thumbs">
+
+        <!-- Thumbnail Strip -->
+        {% with has_gallery=gallery_images has_videos=videos %}
+        {% if product.cover_image or has_gallery or has_videos %}
+        <div class="gallery-thumbs" id="galleryThumbs">
+            <!-- Cover image thumb -->
             {% if product.cover_image %}
-                <div class="gallery-thumb active">
-                    <img src="{{ product.cover_image.url }}" alt="cover">
-                </div>
+            <button class="gallery-thumb active" data-type="image"
+                    data-src="{{ product.cover_image.url }}"
+                    aria-label="Main product image">
+                <img src="{{ product.cover_image.url }}" alt="Main image">
+            </button>
             {% endif %}
+
+            <!-- Additional gallery images -->
             {% for gimg in gallery_images %}
-                <div class="gallery-thumb">
-                    <img src="{{ gimg.image.url }}" alt="gallery thumb">
-                </div>
+            <button class="gallery-thumb" data-type="image"
+                    data-src="{{ gimg.image.url }}"
+                    aria-label="{{ gimg.alt_text|default:'Product image' }}">
+                <img src="{{ gimg.image.url }}" alt="{{ gimg.alt_text|default:'gallery image' }}">
+            </button>
+            {% endfor %}
+
+            <!-- Videos -->
+            {% for v in videos %}
+            <button class="gallery-thumb gallery-thumb-video" data-type="video"
+                    data-src="{{ v.video.url }}"
+                    aria-label="{{ v.title|default:'Product video' }}">
+                <i class="fa-solid fa-circle-play gallery-thumb-play"></i>
+                <span class="gallery-thumb-video-label">{{ v.title|default:"Video"|truncatechars:12 }}</span>
+            </button>
             {% endfor %}
         </div>
         {% endif %}
+        {% endwith %}
     </div>
+    <!-- ===== END GALLERY ===== -->
+
 
     <!-- Product Info Buy Panel -->
     <div class="product-buy-panel">

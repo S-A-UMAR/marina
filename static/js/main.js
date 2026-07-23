@@ -62,21 +62,105 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // -----------------------------------------------
-    // Product Detail Page - Thumbnail Image Switcher
+    // Product Detail Gallery — Images + Videos
     // -----------------------------------------------
-    const thumbnails = document.querySelectorAll('.gallery-thumb');
-    const mainImg = document.querySelector('.gallery-main img');
+    (function () {
+      const thumbs    = Array.from(document.querySelectorAll('.gallery-thumb'));
+      const mainImg   = document.getElementById('mainGalleryImage');
+      const mainVid   = document.getElementById('mainGalleryVideo');
+      const prevBtn   = document.getElementById('galleryPrev');
+      const nextBtn   = document.getElementById('galleryNext');
+      const counter   = document.getElementById('galleryCounter');
 
-    if (thumbnails.length > 0 && mainImg) {
-        thumbnails.forEach(thumb => {
-            thumb.addEventListener('click', function() {
-                thumbnails.forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                const imgEl = this.querySelector('img');
-                if (imgEl) mainImg.src = imgEl.src;
-            });
-        });
-    }
+      if (!mainImg || thumbs.length === 0) return;
+
+      let currentIdx = 0;
+
+      // Show nav arrows and counter only when there is more than one item
+      if (thumbs.length > 1) {
+        prevBtn.style.display  = 'flex';
+        nextBtn.style.display  = 'flex';
+        counter.style.display  = 'block';
+      }
+
+      function updateCounter() {
+        if (counter) counter.textContent = (currentIdx + 1) + ' / ' + thumbs.length;
+      }
+
+      function showMedia(idx) {
+        const thumb = thumbs[idx];
+        const type  = thumb.dataset.type;   // 'image' | 'video'
+        const src   = thumb.dataset.src;
+
+        // Update active state
+        thumbs.forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+
+        // Scroll thumb into view horizontally
+        thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+        if (type === 'video') {
+          // Pause & reset image, show video
+          mainVid.pause();
+          mainImg.style.display = 'none';
+          mainVid.style.display = 'block';
+          mainVid.src = src;
+          mainVid.load();
+          mainVid.play().catch(() => {});     // autoplay on click (may be blocked on mobile)
+        } else {
+          // Pause video, show image
+          mainVid.pause();
+          mainVid.style.display = 'none';
+          mainImg.style.display = 'block';
+          mainImg.src = src;
+        }
+
+        currentIdx = idx;
+        updateCounter();
+      }
+
+      // Thumbnail clicks
+      thumbs.forEach((thumb, idx) => {
+        thumb.addEventListener('click', () => showMedia(idx));
+      });
+
+      // Arrow buttons
+      prevBtn.addEventListener('click', () => {
+        showMedia((currentIdx - 1 + thumbs.length) % thumbs.length);
+      });
+      nextBtn.addEventListener('click', () => {
+        showMedia((currentIdx + 1) % thumbs.length);
+      });
+
+      // Keyboard navigation (left / right)
+      document.addEventListener('keydown', (e) => {
+        const main = document.getElementById('galleryMain');
+        if (!main) return;
+        if (e.key === 'ArrowLeft')  showMedia((currentIdx - 1 + thumbs.length) % thumbs.length);
+        if (e.key === 'ArrowRight') showMedia((currentIdx + 1) % thumbs.length);
+      });
+
+      // Touch swipe (mobile)
+      let touchStartX = 0;
+      const galleryMain = document.getElementById('galleryMain');
+      if (galleryMain) {
+        galleryMain.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].clientX;
+        }, { passive: true });
+
+        galleryMain.addEventListener('touchend', (e) => {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) > 40) {
+            if (dx < 0) showMedia((currentIdx + 1) % thumbs.length);   // swipe left → next
+            else        showMedia((currentIdx - 1 + thumbs.length) % thumbs.length);  // swipe right → prev
+          }
+        }, { passive: true });
+      }
+
+      // Init counter
+      updateCounter();
+    })();
+
 
     // -----------------------------------------------
     // Product Detail Page - Tabs Switcher
